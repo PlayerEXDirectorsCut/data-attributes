@@ -18,13 +18,18 @@ import net.minecraft.server.network.EntityTrackerEntry;
 @Mixin(EntityTrackerEntry.class)
 abstract class EntityTrackerEntryMixin {
 	
+    // Shadowed field to access the 'entity' field in EntityTrackerEntry
 	@Final
 	@Shadow
 	private Entity entity;
 
-	@Redirect(method = "syncEntityData",at = @At(value = "INVOKE", target = "Ljava/util/Set;clear()V"))
+    // Redirects the 'clear' method call on the Set<EntityAttributeInstance>
+	@Redirect(method = "syncEntityData", at = @At(value = "INVOKE", target = "Ljava/util/Set;clear()V"))
 	private void data_syncEntityData(Set<EntityAttributeInstance> set) {
-		MutableAttributeContainer container = (MutableAttributeContainer)((LivingEntity)this.entity).getAttributes();
+        // Accessing the attribute container of the living entity
+		MutableAttributeContainer container = (MutableAttributeContainer) ((LivingEntity) this.entity).getAttributes();
+		
+        // Custom method to clear tracked attributes
 		container.clearTracked();
 	}
 }

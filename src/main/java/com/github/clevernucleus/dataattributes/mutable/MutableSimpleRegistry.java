@@ -4,6 +4,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public interface MutableSimpleRegistry<T> {
-	default void removeCachedIds(Registry<T> registry) {}
-	default void cacheId(Identifier id) {}
+
+    // Default method to remove cached identifiers from a registry
+    default void removeCachedIds(Registry<T> registry) {}
+
+    // Default method to cache an identifier
+    default void cacheId(Identifier id) {}
 }

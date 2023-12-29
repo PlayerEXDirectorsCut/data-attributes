@@ -1,5 +1,7 @@
 package com.github.clevernucleus.dataattributes.mutable;
 
 public interface MutableAttributeModifier {
-	void updateValue(double value);
+
+    // Updates the value of the attribute modifier
+    void updateValue(double value);
 }
