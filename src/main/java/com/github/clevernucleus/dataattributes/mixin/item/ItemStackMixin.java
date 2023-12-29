@@ -14,20 +14,27 @@ import net.minecraft.sound.SoundEvent;
 
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin {
-	
-	@Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
-	private void data_init(ItemConvertible item, int count, CallbackInfo ci) {
-		ItemStack stack = (ItemStack)(Object)this;
-		
-		if(item != null) {
-			((ItemHelper)item.asItem()).onStackCreated(stack, count);
-		}
-	}
 
-	@Inject(method = "getEquipSound", at = @At("HEAD"), cancellable = true)
-	private void data_getEquipSound(CallbackInfoReturnable<SoundEvent> ci) {
-		ItemStack stack = (ItemStack)(Object)this;
-		ItemHelper item = (ItemHelper)stack.getItem();
-		ci.setReturnValue(item.getEquipSound(stack));
-	}
+    // Injects code at the end of the ItemStack constructor
+    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
+    private void data_init(ItemConvertible item, int count, CallbackInfo ci) {
+        // Casts 'this' to ItemStack
+        ItemStack stack = (ItemStack) (Object) this;
+
+        if (item != null) {
+            // Calls onStackCreated from ItemHelper when an ItemStack is created
+            ((ItemHelper) item.asItem()).onStackCreated(stack, count);
+        }
+    }
+
+    // Injects code at the beginning of the getEquipSound method
+    @Inject(method = "getEquipSound", at = @At("HEAD"), cancellable = true)
+    private void data_getEquipSound(CallbackInfoReturnable<SoundEvent> ci) {
+        // Casts 'this' to ItemStack
+        ItemStack stack = (ItemStack) (Object) this;
+        // Retrieves the ItemHelper associated with the ItemStack
+        ItemHelper item = (ItemHelper) stack.getItem();
+        // Sets the return value for getEquipSound
+        ci.setReturnValue(item.getEquipSound(stack));
+    }
 }

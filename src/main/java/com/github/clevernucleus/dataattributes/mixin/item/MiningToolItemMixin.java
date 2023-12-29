@@ -7,9 +7,11 @@ import net.minecraft.item.MiningToolItem;
 
 @Mixin(MiningToolItem.class)
 abstract class MiningToolItemMixin extends ItemMixin {
-	
-	@Override
-	public float getAttackDamage(final ItemStack itemStack) {
-		return ((MiningToolItem)(Object)this).getAttackDamage();
-	}
+
+    // Overrides the getAttackDamage method from ItemMixin
+    @Override
+    public float getAttackDamage(final ItemStack itemStack) {
+        // Calls the original getAttackDamage method from MiningToolItem
+        return ((MiningToolItem) (Object) this).getAttackDamage();
+    }
 }

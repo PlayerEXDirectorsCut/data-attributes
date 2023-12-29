@@ -8,13 +8,19 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.util.Identifier;
 
 public interface MutableAttributeInstance {
-	Identifier getId();
-	
-	void actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded);
-	
-	void setContainerCallback(final AttributeContainer containerIn);
-	
-	void updateId(final Identifier identifierIn);
-	
-	void refresh();
+
+    // Returns the unique identifier of the attribute instance
+    Identifier getId();
+
+    // Performs an action on the attribute modifier
+    void actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded);
+
+    // Sets a callback for changes to the associated AttributeContainer
+    void setContainerCallback(final AttributeContainer containerIn);
+
+    // Updates the identifier of the attribute instance
+    void updateId(final Identifier identifierIn);
+
+    // Refreshes the attribute instance
+    void refresh();
 }
