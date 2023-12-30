@@ -19,7 +19,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 
 @Mixin(DefaultAttributeContainer.class)
 abstract class DefaultAttributeContainerMixin implements MutableDefaultAttributeContainer {
@@ -38,7 +38,7 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 
 		// Populating the custom map with identifiers and instances
 		instances.forEach((attribute, instance) -> {
-			Identifier key = Registry.ATTRIBUTE.getId(attribute);
+			Identifier key = Registries.ATTRIBUTE.getId(attribute);
 
 			if (key != null) {
 				this.data_instances.put(key, instance);
@@ -50,32 +50,34 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 	@Redirect(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_require(Map<?, ?> instances, Object attribute) {
 		EntityAttribute entityAttribute = (EntityAttribute) attribute;
-		Identifier identifier = Registry.ATTRIBUTE.getId(entityAttribute);
+		Identifier identifier = Registries.ATTRIBUTE.getId(entityAttribute);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(attribute));
 	}
 
 	// Redirecting the 'createOverride' method to use the custom map
 	@Redirect(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_createOverride(Map<?, ?> instances, Object attribute) {
-		Identifier identifier = Registry.ATTRIBUTE.getId((EntityAttribute) attribute);
+		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(attribute));
 	}
 
-	// Injecting into the 'has' method to check for the existence of attributes in the custom map
+	// Injecting into the 'has' method to check for the existence of attributes in
+	// the custom map
 	@Inject(method = "has", at = @At("HEAD"), cancellable = true)
 	private void data_has(EntityAttribute type, CallbackInfoReturnable<Boolean> ci) {
-		Identifier identifier = Registry.ATTRIBUTE.getId(type);
+		Identifier identifier = Registries.ATTRIBUTE.getId(type);
 		ci.setReturnValue(this.data_instances.containsKey(identifier) || this.instances.containsKey(type));
 	}
 
 	// Redirecting the 'hasModifier' method to use the custom map
 	@Redirect(method = "hasModifier", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_hasModifier(Map<?, ?> instances, Object type) {
-		Identifier identifier = Registry.ATTRIBUTE.getId((EntityAttribute) type);
+		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) type);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(type));
 	}
 
-	// Implementing the 'copy' method to copy attributes from the original map to the builder
+	// Implementing the 'copy' method to copy attributes from the original map to
+	// the builder
 	@Override
 	public void copy(DefaultAttributeContainer.Builder builder) {
 		for (EntityAttribute entityAttribute : this.instances.keySet()) {

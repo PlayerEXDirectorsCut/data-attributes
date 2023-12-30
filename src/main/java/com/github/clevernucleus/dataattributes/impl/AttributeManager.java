@@ -39,7 +39,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 
 public final class AttributeManager implements SimpleResourceReloadListener<AttributeManager.Wrapper> {
 	private static final Gson GSON = (new GsonBuilder()).excludeFieldsWithoutExposeAnnotation().create();
@@ -54,197 +54,227 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	private AttributeContainerHandler handler = new AttributeContainerHandler();
 	private int updateFlag = 0;
 
-	protected static final record Tuple<T>(Class<? extends LivingEntity> livingEntity, T value) {}
-	protected static final record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData, Map<Identifier, EntityTypeData> entityTypeData) {}
-	
-	public AttributeManager() {}
+	protected static final record Tuple<T>(Class<? extends LivingEntity> livingEntity, T value) {
+	}
 
-	private static Map<Identifier, AttributeFunctionJson> formatFunctions(Map<String, AttributeFunctionJson> functionsIn) {
+	protected static final record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData,
+			Map<Identifier, EntityTypeData> entityTypeData) {
+	}
+
+	public AttributeManager() {
+	}
+
+	private static Map<Identifier, AttributeFunctionJson> formatFunctions(
+			Map<String, AttributeFunctionJson> functionsIn) {
 		Map<Identifier, AttributeFunctionJson> functions = new HashMap<Identifier, AttributeFunctionJson>();
-		
-		for(String key : functionsIn.keySet()) {
+
+		for (String key : functionsIn.keySet()) {
 			AttributeFunctionJson value = functionsIn.get(key);
-			
+
 			functions.put(new Identifier(key), value);
 		}
-		
+
 		return functions;
 	}
-	
+
 	private static EntityAttribute getOrCreate(final Identifier identifier, EntityAttribute attributeIn) {
-		EntityAttribute attribute = Registry.ATTRIBUTE.get(identifier);
-		
-		if(attribute == null) {
-			attribute = MutableRegistryImpl.register(Registry.ATTRIBUTE, identifier, attributeIn);
+		EntityAttribute attribute = Registries.ATTRIBUTE.get(identifier);
+
+		if (attribute == null) {
+			attribute = MutableRegistryImpl.register(Registries.ATTRIBUTE, identifier, attributeIn);
 		}
-		
+
 		return attribute;
 	}
-	
-	private static void loadOverrides(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
+
+	private static void loadOverrides(ResourceManager manager,
+			Map<Identifier, EntityAttributeData> entityAttributeData) {
 		Map<Identifier, AttributeOverrideJson> cache = new HashMap<Identifier, AttributeOverrideJson>();
 		String location = DIRECTORY + "/overrides";
 		int length = location.length() + 1;
-		
-		for(Map.Entry<Identifier, Resource> entry : manager.findResources(location, id -> id.getPath().endsWith(".json")).entrySet()) {
+
+		for (Map.Entry<Identifier, Resource> entry : manager
+				.findResources(location, id -> id.getPath().endsWith(".json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
-			
+			Identifier identifier = new Identifier(resource.getNamespace(),
+					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+
 			try {
 				BufferedReader reader = entry.getValue().getReader();
-				
+
 				try {
-					AttributeOverrideJson json = JsonHelper.deserialize(GSON, (Reader)reader, AttributeOverrideJson.class);
-					
-					if(json != null) {
+					AttributeOverrideJson json = JsonHelper.deserialize(GSON, (Reader) reader,
+							AttributeOverrideJson.class);
+
+					if (json != null) {
 						AttributeOverrideJson object = cache.put(identifier, json);
-						
-						if(object == null) continue;
+
+						if (object == null)
+							continue;
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
-					
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object)identifier, (Object)resource);
+
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
+							(Object) resource);
 				} finally {
-					if(reader == null) continue;
-					((Reader)reader).close();
+					if (reader == null)
+						continue;
+					((Reader) reader).close();
 				}
-			} catch(IOException | IllegalArgumentException exception) {
+			} catch (IOException | IllegalArgumentException exception) {
 				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
 			}
 		}
-		
+
 		cache.forEach((key, value) -> entityAttributeData.put(key, new EntityAttributeData(value)));
 	}
-	
-	private static void loadFunctions(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
+
+	private static void loadFunctions(ResourceManager manager,
+			Map<Identifier, EntityAttributeData> entityAttributeData) {
 		Map<Identifier, FunctionsJson> cache = new HashMap<Identifier, FunctionsJson>();
 		int length = DIRECTORY.length() + 1;
-		
-		for(Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("functions.json")).entrySet()) {
+
+		for (Map.Entry<Identifier, Resource> entry : manager
+				.findResources(DIRECTORY, id -> id.getPath().endsWith("functions.json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
-			
+			Identifier identifier = new Identifier(resource.getNamespace(),
+					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+
 			try {
 				BufferedReader reader = entry.getValue().getReader();
-				
+
 				try {
-					FunctionsJson json = JsonHelper.deserialize(GSON, (Reader)reader, FunctionsJson.class);
-					
-					if(json != null) {
+					FunctionsJson json = JsonHelper.deserialize(GSON, (Reader) reader, FunctionsJson.class);
+
+					if (json != null) {
 						FunctionsJson object = cache.put(identifier, json);
-						
-						if(object == null) continue;
+
+						if (object == null)
+							continue;
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
-					
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object)identifier, (Object)resource);
+
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
+							(Object) resource);
 				} finally {
-					if(reader == null) continue;
-					((Reader)reader).close();
+					if (reader == null)
+						continue;
+					((Reader) reader).close();
 				}
-			} catch(IOException | IllegalArgumentException exception) {
+			} catch (IOException | IllegalArgumentException exception) {
 				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
 			}
 		}
-		
+
 		Map<String, Map<String, AttributeFunctionJson>> functions = new HashMap<String, Map<String, AttributeFunctionJson>>();
 		cache.values().forEach(json -> json.merge(functions));
-		
-		for(String key : functions.keySet()) {
+
+		for (String key : functions.keySet()) {
 			Identifier identifier = new Identifier(key);
 			EntityAttributeData data = entityAttributeData.getOrDefault(identifier, new EntityAttributeData());
 			data.putFunctions(formatFunctions(functions.get(key)));
 			entityAttributeData.put(identifier, data);
 		}
 	}
-	
-	private static void loadProperties(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
+
+	private static void loadProperties(ResourceManager manager,
+			Map<Identifier, EntityAttributeData> entityAttributeData) {
 		Map<Identifier, PropertiesJson> cache = new HashMap<Identifier, PropertiesJson>();
 		int length = DIRECTORY.length() + 1;
-		
-		for(Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("properties.json")).entrySet()) {
+
+		for (Map.Entry<Identifier, Resource> entry : manager
+				.findResources(DIRECTORY, id -> id.getPath().endsWith("properties.json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
-			
+			Identifier identifier = new Identifier(resource.getNamespace(),
+					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+
 			try {
 				BufferedReader reader = entry.getValue().getReader();
-				
+
 				try {
-					PropertiesJson json = JsonHelper.deserialize(GSON, (Reader)reader, PropertiesJson.class);
-					
-					if(json != null) {
+					PropertiesJson json = JsonHelper.deserialize(GSON, (Reader) reader, PropertiesJson.class);
+
+					if (json != null) {
 						PropertiesJson object = cache.put(identifier, json);
-						
-						if(object == null) continue;
+
+						if (object == null)
+							continue;
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
-					
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object)identifier, (Object)resource);
+
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
+							(Object) resource);
 				} finally {
-					if(reader == null) continue;
-					((Reader)reader).close();
+					if (reader == null)
+						continue;
+					((Reader) reader).close();
 				}
-			} catch(IOException | IllegalArgumentException exception) {
+			} catch (IOException | IllegalArgumentException exception) {
 				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
 			}
 		}
-		
+
 		Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
 		cache.values().forEach(json -> json.merge(properties));
-		
-		for(String key : properties.keySet()) {
+
+		for (String key : properties.keySet()) {
 			Identifier identifier = new Identifier(key);
 			EntityAttributeData data = entityAttributeData.getOrDefault(identifier, new EntityAttributeData());
 			data.putProperties(properties.get(key));
 			entityAttributeData.put(identifier, data);
 		}
 	}
-	
+
 	private static void loadEntityTypes(ResourceManager manager, Map<Identifier, EntityTypeData> entityTypeData) {
 		Map<Identifier, EntityTypesJson> cache = new HashMap<Identifier, EntityTypesJson>();
 		int length = DIRECTORY.length() + 1;
-		
-		for(Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("entity_types.json")).entrySet()) {
+
+		for (Map.Entry<Identifier, Resource> entry : manager
+				.findResources(DIRECTORY, id -> id.getPath().endsWith("entity_types.json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
-			
+			Identifier identifier = new Identifier(resource.getNamespace(),
+					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+
 			try {
 				BufferedReader reader = entry.getValue().getReader();
-				
+
 				try {
-					EntityTypesJson json = JsonHelper.deserialize(GSON, (Reader)reader, EntityTypesJson.class);
-					
-					if(json != null) {
+					EntityTypesJson json = JsonHelper.deserialize(GSON, (Reader) reader, EntityTypesJson.class);
+
+					if (json != null) {
 						EntityTypesJson object = cache.put(identifier, json);
-						
-						if(object == null) continue;
+
+						if (object == null)
+							continue;
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
-					
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object)identifier, (Object)resource);
+
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
+							(Object) resource);
 				} finally {
-					if(reader == null) continue;
-					((Reader)reader).close();
+					if (reader == null)
+						continue;
+					((Reader) reader).close();
 				}
-			} catch(IOException | IllegalArgumentException exception) {
+			} catch (IOException | IllegalArgumentException exception) {
 				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
 			}
 		}
-		
+
 		Map<String, Map<String, Double>> entityTypes = new HashMap<String, Map<String, Double>>();
 		cache.values().forEach(json -> json.merge(entityTypes));
-		
-		for(String key : entityTypes.keySet()) {
+
+		for (String key : entityTypes.keySet()) {
 			Identifier identifier = new Identifier(key);
 			EntityTypeData data = new EntityTypeData(entityTypes.get(key));
 			entityTypeData.put(identifier, data);
 		}
 	}
-	
+
 	public void toNbt(NbtCompound tag) {
 		NbtCompound entityAttributeNbt = new NbtCompound();
 		NbtCompound entityTypeNbt = new NbtCompound();
@@ -265,9 +295,9 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		tag.put("EntityTypes", entityTypeNbt);
 		tag.putInt("UpdateFlag", this.updateFlag);
 	}
-	
+
 	public void fromNbt(NbtCompound tag) {
-		if(tag.contains("Attributes")) {
+		if (tag.contains("Attributes")) {
 			ImmutableMap.Builder<Identifier, EntityAttributeData> builder = ImmutableMap.builder();
 			NbtCompound nbtCompound = tag.getCompound("Attributes");
 			nbtCompound.getKeys().forEach(key -> {
@@ -279,7 +309,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			this.entityAttributeData = builder.build();
 		}
 
-		if(tag.contains("EntityTypes")) {
+		if (tag.contains("EntityTypes")) {
 			ImmutableMap.Builder<Identifier, EntityTypeData> builder = ImmutableMap.builder();
 			NbtCompound nbtCompound = tag.getCompound("EntityTypes");
 			nbtCompound.getKeys().forEach(key -> {
@@ -301,81 +331,97 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		return this.updateFlag;
 	}
 
-	public AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType, final LivingEntity livingEntity) {
+	public AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
+			final LivingEntity livingEntity) {
 		return this.handler.getContainer(entityType, livingEntity);
 	}
 
 	public void apply() {
-		MutableRegistryImpl.unregister(Registry.ATTRIBUTE);
-		
-		for(Identifier identifier : Registry.ATTRIBUTE.getIds()) {
-			EntityAttribute entityAttribute = Registry.ATTRIBUTE.get(identifier);
-			
-			if(entityAttribute == null) continue;
-			
-			((MutableEntityAttribute)entityAttribute).clear();
+		MutableRegistryImpl.unregister(Registries.ATTRIBUTE);
+
+		for (Identifier identifier : Registries.ATTRIBUTE.getIds()) {
+			EntityAttribute entityAttribute = Registries.ATTRIBUTE.get(identifier);
+
+			if (entityAttribute == null)
+				continue;
+
+			((MutableEntityAttribute) entityAttribute).clear();
 		}
-		
-		for(Identifier identifier : this.entityAttributeData.keySet()) {
+
+		for (Identifier identifier : this.entityAttributeData.keySet()) {
 			EntityAttributeData entityAttributeData = this.entityAttributeData.get(identifier);
 			entityAttributeData.override(identifier, AttributeManager::getOrCreate);
 		}
-		
-		for(Identifier identifier : this.entityAttributeData.keySet()) {
-			EntityAttribute entityAttribute = Registry.ATTRIBUTE.get(identifier);
-			
-			if(entityAttribute == null) continue;
-			
+
+		for (Identifier identifier : this.entityAttributeData.keySet()) {
+			EntityAttribute entityAttribute = Registries.ATTRIBUTE.get(identifier);
+
+			if (entityAttribute == null)
+				continue;
+
 			EntityAttributeData entityAttributeData = this.entityAttributeData.get(identifier);
 			entityAttributeData.copy(entityAttribute);
 		}
-		
+
 		this.handler.buildContainers(this.entityTypeData, ENTITY_TYPE_INSTANCES);
-		
+
 		AttributesReloadedEvent.EVENT.invoker().onCompletedReload();
 	}
-	
+
 	@Override
-	public CompletableFuture<AttributeManager.Wrapper> load(ResourceManager manager, Profiler profiler, Executor executor) {
+	public CompletableFuture<AttributeManager.Wrapper> load(ResourceManager manager, Profiler profiler,
+			Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
 			Map<Identifier, EntityAttributeData> entityAttributeData = new HashMap<Identifier, EntityAttributeData>();
 			loadOverrides(manager, entityAttributeData);
 			loadFunctions(manager, entityAttributeData);
 			loadProperties(manager, entityAttributeData);
-			
+
 			Map<Identifier, EntityTypeData> entityTypeData = new HashMap<Identifier, EntityTypeData>();
 			loadEntityTypes(manager, entityTypeData);
-			
+
 			return new AttributeManager.Wrapper(entityAttributeData, entityTypeData);
 		}, executor);
 	}
-	
+
 	@Override
-	public CompletableFuture<Void> apply(AttributeManager.Wrapper data, ResourceManager manager, Profiler profiler, Executor executor) {
+	public CompletableFuture<Void> apply(AttributeManager.Wrapper data, ResourceManager manager, Profiler profiler,
+			Executor executor) {
 		return CompletableFuture.runAsync(() -> {
 			ImmutableMap.Builder<Identifier, EntityAttributeData> entityAttributeData = ImmutableMap.builder();
 			data.entityAttributeData.forEach(entityAttributeData::put);
 			this.entityAttributeData = entityAttributeData.build();
-			
+
 			ImmutableMap.Builder<Identifier, EntityTypeData> entityTypeData = ImmutableMap.builder();
 			data.entityTypeData.forEach(entityTypeData::put);
 			this.entityTypeData = entityTypeData.build();
-			
+
 			this.apply();
 		}, executor);
 	}
-	
+
 	@Override
 	public Identifier getFabricId() {
 		return ID;
 	}
 
 	static {
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY), new Tuple<Integer>(LivingEntity.class, 0));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY), new Tuple<Integer>(MobEntity.class, 1));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY), new Tuple<Integer>(PathAwareEntity.class, 2));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY), new Tuple<Integer>(HostileEntity.class, 3));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY), new Tuple<Integer>(PassiveEntity.class, 4));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY), new Tuple<Integer>(AnimalEntity.class, 5));
+		ENTITY_TYPE_INSTANCES.put(
+				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
+				new Tuple<Integer>(LivingEntity.class, 0));
+		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
+				new Tuple<Integer>(MobEntity.class, 1));
+		ENTITY_TYPE_INSTANCES.put(
+				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
+				new Tuple<Integer>(PathAwareEntity.class, 2));
+		ENTITY_TYPE_INSTANCES.put(
+				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
+				new Tuple<Integer>(HostileEntity.class, 3));
+		ENTITY_TYPE_INSTANCES.put(
+				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
+				new Tuple<Integer>(PassiveEntity.class, 4));
+		ENTITY_TYPE_INSTANCES.put(
+				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
+				new Tuple<Integer>(AnimalEntity.class, 5));
 	}
 }
