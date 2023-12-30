@@ -26,6 +26,7 @@ import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public class DataAttributes implements ModInitializer {
     // Identifiers for networking
@@ -36,7 +37,8 @@ public class DataAttributes implements ModInitializer {
     public static final AttributeManager MANAGER = new AttributeManager();
 
     // Sends attribute data to the client during login query start
-    private static void loginQueryStart(ServerLoginNetworkHandler handler, MinecraftServer server, PacketSender sender, LoginSynchronizer synchronizer) {
+    private static void loginQueryStart(ServerLoginNetworkHandler handler, MinecraftServer server, PacketSender sender,
+            LoginSynchronizer synchronizer) {
         PacketByteBuf buf = PacketByteBufs.create();
         NbtCompound tag = new NbtCompound();
         DataAttributes.MANAGER.toNbt(tag);
@@ -45,21 +47,28 @@ public class DataAttributes implements ModInitializer {
     }
 
     // Placeholder for handling login query response
-    private static void loginQueryResponse(MinecraftServer server, ServerLoginNetworkHandler handler, boolean understood, PacketByteBuf buf, LoginSynchronizer synchronizer, PacketSender responseSender) {
+    private static void loginQueryResponse(MinecraftServer server, ServerLoginNetworkHandler handler,
+            boolean understood, PacketByteBuf buf, LoginSynchronizer synchronizer, PacketSender responseSender) {
         // Implementation details can be added as needed
     }
 
     // Refreshes attributes for living entities
     public static void refreshAttributes(final Entity entity) {
-        if (!(entity instanceof LivingEntity)) return;
+        if (!(entity instanceof LivingEntity))
+            return;
         ((MutableAttributeContainer) ((LivingEntity) entity).getAttributes()).refresh();
     }
 
     // Handles health modification events for living entities
-    private static void healthModified(final EntityAttribute attribute, final @Nullable LivingEntity livingEntity, final EntityAttributeModifier modifier, final double prevValue, final boolean isWasAdded) {
-        if (livingEntity == null) return;
-        if (livingEntity.world.isClient) return;
-        if (attribute != EntityAttributes.GENERIC_MAX_HEALTH) return;
+    private static void healthModified(final EntityAttribute attribute, final @Nullable LivingEntity livingEntity,
+            final EntityAttributeModifier modifier, final double prevValue, final boolean isWasAdded) {
+        if (livingEntity == null)
+            return;
+        World world = livingEntity.getWorld();
+        if (world.isClient)
+            return;
+        if (attribute != EntityAttributes.GENERIC_MAX_HEALTH)
+            return;
 
         float c0 = livingEntity.getHealth();
         float c1 = c0 * livingEntity.getMaxHealth() / (float) prevValue;
@@ -75,8 +84,10 @@ public class DataAttributes implements ModInitializer {
         // Registers event handlers
         ServerLoginConnectionEvents.QUERY_START.register(DataAttributes::loginQueryStart);
         ServerLoginNetworking.registerGlobalReceiver(HANDSHAKE, DataAttributes::loginQueryResponse);
-        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register((oldEntity, newEntity, from, to) -> refreshAttributes(newEntity));
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> refreshAttributes(player));
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD
+                .register((oldEntity, newEntity, from, to) -> refreshAttributes(newEntity));
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD
+                .register((player, from, to) -> refreshAttributes(player));
         EntityAttributeModifiedEvents.MODIFIED.register(DataAttributes::healthModified);
     }
 }
