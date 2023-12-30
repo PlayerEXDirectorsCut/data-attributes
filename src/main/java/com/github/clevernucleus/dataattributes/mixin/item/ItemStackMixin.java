@@ -28,7 +28,7 @@ abstract class ItemStackMixin {
     }
 
     // Injects code at the beginning of the getEquipSound method
-    @Inject(method = "getEquipSound", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getEquipSound", at = @At("HEAD"), cancellable = true, remap = false)
     private void data_getEquipSound(CallbackInfoReturnable<SoundEvent> ci) {
         // Casts 'this' to ItemStack
         ItemStack stack = (ItemStack) (Object) this;
