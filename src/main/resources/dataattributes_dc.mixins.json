@@ -1,0 +1,29 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "com.github.clevernucleus.dataattributes_dc.mixin",
+    "compatibilityLevel": "JAVA_17",
+    "mixins": [
+        "SimpleRegistryMixin",
+        "EntityAttributeMixin",
+        "ClampedEntityAttributeMixin",
+        "EntityAttributeModifierMixin",
+        "EntityAttributeInstanceMixin",
+        "DefaultAttributeContainerMixin",
+        "AttributeContainerMixin",
+        "LivingEntityMixin",
+        "PlayerEntityMixin",
+        "MobEntityMixin",
+        "ReloadCommandMixin",
+        "EntityTrackerEntryMixin",
+        "item.ItemMixin",
+        "item.SwordItemMixin",
+        "item.ArmorItemMixin",
+        "item.MiningToolItemMixin",
+        "item.ItemStackMixin"
+    ],
+    "client": [],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
