@@ -112,6 +112,8 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
     @Override
     public void removeCachedIds(Registry<T> registry) {
+        if (this.data_idCache == null)
+            return;
         for (Iterator<Identifier> iterator = this.data_idCache.iterator(); iterator.hasNext();) {
             Identifier id = iterator.next();
 
