@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.asm.mixin.Final;
@@ -56,10 +55,6 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Final
     @Shadow
     private Map<T, RegistryEntry.Reference<T>> valueToEntry;
-
-    @Final
-    @Shadow
-    private Function<T, RegistryEntry.Reference<T>> valueToEntryFunction;
 
     @Final
     @Shadow
