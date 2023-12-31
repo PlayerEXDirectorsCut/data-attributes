@@ -1,29 +1,32 @@
 {
     "schemaVersion": 1,
-    "id": "dataattributes",
+    "id": "dataattributes_dc",
     "version": "${version}",
-    "name": "Data Attributes",
-    "description": "Overhauls the entity attributes systems and exposes it with datapacks.",
+    "name": "Data Attributes: Directors Cut",
+    "description": "An updated mod that overhauls the entity attributes systems and exposes it with datapacks.",
     "authors": [
-        "CleverNucleus"
+        "CleverNucleus",
+        "MerryweatherLost",
+        "pokesmells",
+        "DROGERSMAN"
     ],
     "contact": {
-        "homepage": "https://github.com/CleverNucleus/data-attributes",
-        "sources": "https://github.com/CleverNucleus/data-attributes"
+        "homepage": "https://github.com/PlayerEXDirectorsCut/data-attributes",
+        "sources": "https://github.com/PlayerEXDirectorsCut/data-attributes"
     },
     "license": "MIT",
-    "icon": "assets/dataattributes/icon.png",
+    "icon": "assets/dataattributes_dc/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.github.clevernucleus.dataattributes.DataAttributes"
+            "com.github.clevernucleus.dataattributes_dc.DataAttributes"
         ],
         "client": [
-            "com.github.clevernucleus.dataattributes.DataAttributesClient"
+            "com.github.clevernucleus.dataattributes_dc.DataAttributesClient"
         ]
     },
     "mixins": [
-        "dataattributes.mixins.json"
+        "dataattributes_dc.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=0.14.10",

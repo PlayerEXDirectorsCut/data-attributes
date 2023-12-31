@@ -1,9 +1,10 @@
-<img src="img/logo.png" alt="Data Attributes" height="100" />
-<hr />
+# Data Attributes: Directors Cut
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/CleverNucleus/data-attributes?label=latest)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/CleverNucleus/data-attributes/build-and-deploy.yml)
-![GitHub](https://img.shields.io/github/license/CleverNucleus/data-attributes)
+## Original (Modified) Description
+
+### Maintained Repository
+
+Please see updates, report issues, or contribute here: <https://github.com/PlayerEXDirectorsCut/data-attributes>
 
 ### What is Data Attributes?
 
@@ -11,7 +12,7 @@ Data Attributes is a Minecraft mod, initially released for Minecraft 1.17.1 usin
 
 ### Usage
 
-Data Attributes has a [Curseforge](https://www.curseforge.com/minecraft/mc-mods/data-attributes) and [Modrinth](https://modrinth.com/mod/data-attributes) page. For developers, add the following to your `build.gradle`. 
+Data Attributes has a [Curseforge](https://www.curseforge.com/minecraft/mc-mods/data-attributes-directors-cut) and [Modrinth](https://modrinth.com/mod/data-attributes-directors-cut) page. For developers, add the following to your `build.gradle`.
 
 ```gradle
 repositories {
@@ -25,11 +26,11 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:data-attributes:<version>"
+    modImplementation "maven.modrinth:data-attributes-directors-cut:<version>"
 }
 ```
 
-<details><summary>Alternatively, if you are using cursemaven:</summary>
+Alternatively, if you are using cursemaven:
 
 ```gradle
 repositories {
@@ -40,11 +41,9 @@ repositories {
 }
 
 dependencies {
-    modImplementation "curse.maven:data-attributes-514734:<version-file-id>"
+    modImplementation "curse.maven:data-attributes-directors-cut-955929:<version-file-id>"
 }
 ```
-
-</details>
 
 Note that Data Attributes depends on [Fabric API](https://github.com/FabricMC/fabric), so you will need to consider this as well.
 
@@ -53,7 +52,7 @@ Note that Data Attributes depends on [Fabric API](https://github.com/FabricMC/fa
 - Will you make a Forge version?
   - No, but the license allows you to do so yourself.
 - I think that I've found a bug/crash, where can I report it?
-  - Please make an entry to the [Issue Tracker](https://github.com/CleverNucleus/Data-Attributes/issues).
+  - Please make an entry to the [Issue Tracker](https://github.com/PlayerEXDirectorsCut/data-attributes/issues).
 
 Please also note that the mod AttributeFix is incompatible with Data Attributes - they have the same capabilities!
 
