@@ -1,6 +1,7 @@
 package com.github.clevernucleus.dataattributes_dc.api.item;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvent;
 
 /**
  * Helper interface to enable stack-specific operations. For example, using nbt
@@ -57,5 +58,16 @@ public interface ItemHelper {
 	 */
 	default float getToughness(final ItemStack itemStack) {
 		return 0.0F;
+	}
+
+	/**
+	 * ItemStack dependent version of Item#getEquipSound. Default implementation
+	 * returns aforementioned.
+	 * 
+	 * @param itemStack
+	 * @return
+	 */
+	default SoundEvent getEquipSound(final ItemStack itemStack) {
+		return null;
 	}
 }
