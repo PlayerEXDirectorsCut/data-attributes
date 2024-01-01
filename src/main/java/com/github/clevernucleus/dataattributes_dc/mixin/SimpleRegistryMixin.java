@@ -70,7 +70,7 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     private int nextId;
 
     // Inject annotation is used for injecting code into existing methods
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(method = "<init>*", at = @At("TAIL"))
     private void data_init(CallbackInfo ci) {
         this.data_idCache = new HashSet<Identifier>();
     }
@@ -112,8 +112,6 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
     @Override
     public void removeCachedIds(Registry<T> registry) {
-        if (this.data_idCache == null)
-            return;
         for (Iterator<Identifier> iterator = this.data_idCache.iterator(); iterator.hasNext();) {
             Identifier id = iterator.next();
 
