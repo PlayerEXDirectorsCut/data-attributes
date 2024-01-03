@@ -159,9 +159,8 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
 							(Object) resource);
 				} finally {
-					if (reader == null)
-						continue;
-					((Reader) reader).close();
+					if (reader != null)
+						((Reader) reader).close();
 				}
 			} catch (IOException | IllegalArgumentException exception) {
 				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);

@@ -18,13 +18,16 @@ import net.minecraft.network.PacketByteBuf;
 
 public class DataAttributesClient implements ClientModInitializer {
     // Handles the received login query packet
-    private static CompletableFuture<PacketByteBuf> loginQueryReceived(MinecraftClient client, ClientLoginNetworkHandler handler, PacketByteBuf buf, Consumer<GenericFutureListener<? extends Future<? super Void>>> listenerAdder) {
+    private static CompletableFuture<PacketByteBuf> loginQueryReceived(MinecraftClient client,
+            ClientLoginNetworkHandler handler, PacketByteBuf buf,
+            Consumer<GenericFutureListener<? extends Future<? super Void>>> listenerAdder) {
         onPacketReceived(client, buf);
         return CompletableFuture.completedFuture(PacketByteBufs.empty());
     }
 
     // Handles the received update packet
-    private static void updateReceived(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+    private static void updateReceived(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf,
+            PacketSender responseSender) {
         onPacketReceived(client, buf);
     }
 
@@ -47,7 +50,8 @@ public class DataAttributesClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         // Register packet handlers for login query and update packets
-        ClientLoginNetworking.registerGlobalReceiver(DataAttributes.HANDSHAKE, DataAttributesClient::loginQueryReceived);
+        ClientLoginNetworking.registerGlobalReceiver(DataAttributes.HANDSHAKE,
+                DataAttributesClient::loginQueryReceived);
         ClientPlayNetworking.registerGlobalReceiver(DataAttributes.RELOAD, DataAttributesClient::updateReceived);
     }
 }

@@ -23,19 +23,15 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.registry.entry.RegistryEntry;
 
 @Mixin(SimpleRegistry.class)
 abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
-
-    // Unique annotation is used for fields that are not present in the original
-    // class
     @Unique
     private Collection<Identifier> data_idCache;
 
-    // Final annotation indicates that the field is not meant to be changed
     @Final
     @Shadow
     private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
@@ -56,6 +52,10 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Shadow
     private Map<T, RegistryEntry.Reference<T>> valueToEntry;
 
+    // @Final
+    // @Shadow
+    // private Function<T, RegistryEntry.Reference<T>> valueToEntryFunction;
+
     @Final
     @Shadow
     private Map<T, Lifecycle> entryToLifecycle;
@@ -69,18 +69,14 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Shadow
     private int nextId;
 
-    // Inject annotation is used for injecting code into existing methods
     @Inject(method = "<init>*", at = @At("TAIL"))
     private void data_init(CallbackInfo ci) {
-        if (this.data_idCache == null) {
-            this.data_idCache = new HashSet<Identifier>();
-        }
+        this.data_idCache = new HashSet<Identifier>();
     }
 
     @SuppressWarnings("unchecked")
-    @Inject(method = "assertNotFrozen", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "assertNotFrozen*", at = @At("HEAD"), cancellable = true)
     private void data_assertNotFrozen(CallbackInfo ci) {
-        // Cancel annotation is used to cancel the execution of the method
         if ((SimpleRegistry<T>) (Object) this == Registries.ATTRIBUTE) {
             ci.cancel();
         }
@@ -114,23 +110,16 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
     @Override
     public void removeCachedIds(Registry<T> registry) {
-        if (this.data_idCache != null) {
-            for (Iterator<Identifier> iterator = this.data_idCache.iterator(); iterator.hasNext();) {
-                Identifier id = iterator.next();
+        for (Iterator<Identifier> iterator = this.data_idCache.iterator(); iterator.hasNext();) {
+            Identifier id = iterator.next();
 
-                this.remove(RegistryKey.of(registry.getKey(), id), Lifecycle.stable());
-                iterator.remove();
-            }
+            this.remove(RegistryKey.of(registry.getKey(), id), Lifecycle.stable());
+            iterator.remove();
         }
     }
 
     @Override
     public void cacheId(Identifier id) {
-        if (this.data_idCache != null) {
-            this.data_idCache.add(id);
-        } else {
-            this.data_idCache = new HashSet<Identifier>();
-            this.data_idCache.add(id);
-        }
+        this.data_idCache.add(id);
     }
 }
