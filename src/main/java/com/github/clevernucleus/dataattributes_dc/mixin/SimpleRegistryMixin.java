@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.github.clevernucleus.dataattributes_dc.mutable.MutableSimpleRegistry;
 import com.mojang.serialization.Lifecycle;
@@ -69,17 +70,25 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Shadow
     private int nextId;
 
-    @Inject(method = "<init>*", at = @At("TAIL"))
+    @Shadow
+    private boolean frozen;
+
+    @Inject(method = "<init>(Lnet/minecraft/registry/RegistryKey;Lcom/mojang/serialization/Lifecycle;Z)V", at = @At("TAIL"))
     private void data_init(CallbackInfo ci) {
         this.data_idCache = new HashSet<Identifier>();
     }
 
-    @SuppressWarnings("unchecked")
-    @Inject(method = "assertNotFrozen*", at = @At("HEAD"), cancellable = true)
-    private void data_assertNotFrozen(CallbackInfo ci) {
-        if ((SimpleRegistry<T>) (Object) this == Registries.ATTRIBUTE) {
-            ci.cancel();
-        }
+    // @SuppressWarnings("unchecked")
+    // @Inject(method = "assertNotFrozen", at = @At("HEAD"), cancellable = true)
+    // private void data_assertNotFrozen(CallbackInfo ci) {
+    // if ((SimpleRegistry<T>) (Object) this == Registries.ATTRIBUTE) {
+    // ci.cancel();
+    // }
+    // }
+
+    @Inject(method = "freeze", at = @At("RETURN"))
+    private void freeze(CallbackInfoReturnable<T> cir) {
+        this.frozen = false;
     }
 
     @SuppressWarnings("deprecation")
