@@ -13,13 +13,18 @@
     "sources": "https://github.com/PlayerEXDirectorsCut/data-attributes"
   },
   "license": "MIT",
-  "icon": "assets/data-attributes/icon.png",
+  "icon": "assets/data_attributes/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": []
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "com.bibireden.data_attributes.DataAttributes"
+      }
+    ]
   },
   "mixins": [
-    "data-attributes.mixins.json"
+      "data_attributes.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.21",
