@@ -1,0 +1,27 @@
+{
+    "data_attributes:constitution": {
+        "minecraft:generic.max_health": 1.0,
+        "minecraft:generic.knockback_resistance": 0.01,
+        "data_attributes:poison_resistance": 0.01
+    },
+    "data_attributes:strength": {
+        "minecraft:generic.attack_damage": 0.25,
+        "minecraft:generic.armor": 0.5,
+        "data_attributes:health_regeneration": 0.01
+    },
+    "data_attributes:dexterity": {
+        "minecraft:generic.attack_speed": 0.1,
+        "data_attributes:ranged_damage": 0.25,
+        "data_attributes:lightning_resistance": 0.01
+    },
+    "data_attributes:wisdom": {
+        "data_attributes:heal_amplification": 0.002,
+        "data_attributes:ranged_crit_damage": 0.005,
+        "data_attributes:wither_resistance": 0.01
+    },
+    "data_attributes:intelligence": {
+        "minecraft:generic.luck": 0.1,
+        "data_attributes:evasion": 0.02,
+        "data_attributes:ranged_crit_chance": 0.02
+    }
+}
