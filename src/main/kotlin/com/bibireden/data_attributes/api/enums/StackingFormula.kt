@@ -2,12 +2,21 @@ package com.bibireden.data_attributes.api.enums
 
 enum class StackingFormula {
     Flat,
-    Diminishing;
+    Diminished;
 
     companion object {
         fun of(value: String): StackingFormula = when (value.uppercase()) {
-            "DIMINISHING" -> Diminishing
+            "DIMINISHED" -> Diminished
             else -> Flat
         }
     }
+
+
+    fun id() {
+
+    }
+
+//    fun max(): Double {
+//        val value = this.clamp.apply {  }
+//    }
 }

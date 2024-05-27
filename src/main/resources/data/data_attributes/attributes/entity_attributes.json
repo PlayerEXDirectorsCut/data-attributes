@@ -1,0 +1,7 @@
+
+{
+    "minecraft:creeper": {
+        "data_attributes:constitution": 4.0,
+        "data_attributes:dexterity": 2.0
+    }
+}
