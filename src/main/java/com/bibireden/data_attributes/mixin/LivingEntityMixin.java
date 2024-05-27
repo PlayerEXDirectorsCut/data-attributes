@@ -31,9 +31,9 @@ abstract class LivingEntityMixin {
     private void data_init(EntityType<? extends LivingEntity> entityType, World world, CallbackInfo ci) {
         LivingEntity livingEntity = (LivingEntity)(Object) this;
         // Initializing the attributes container using DataAttributes
-        this.attributes = DataAttributes.Companion.getREGISTRY().getContainer(entityType, livingEntity);
+        this.attributes = DataAttributes.Companion.getRegistry().getContainer(entityType, livingEntity);
         // Initializing the update flag
-        this.data_updateFlag = DataAttributes.Companion.getREGISTRY().updateFlag();
+        this.data_updateFlag = DataAttributes.Companion.getRegistry().updateFlag();
         // Setting the entity's health to its maximum health
         livingEntity.setHealth(livingEntity.getMaxHealth());
     }
@@ -43,7 +43,7 @@ abstract class LivingEntityMixin {
     private void data_tick(CallbackInfo ci) {
         LivingEntity livingEntity = (LivingEntity)(Object)this;
         // Getting the current update flag from DataAttributes
-        final int updateFlag = DataAttributes.Companion.getREGISTRY().updateFlag();
+        final int updateFlag = DataAttributes.Companion.getRegistry().updateFlag();
 
         // Checking if the update flag has changed since the last tick
         if (this.data_updateFlag != updateFlag) {
@@ -52,7 +52,7 @@ abstract class LivingEntityMixin {
 
             // Getting the modified attribute container from DataAttributes
             @SuppressWarnings("unchecked")
-            AttributeContainer container2 = DataAttributes.Companion.getREGISTRY().getContainer((EntityType<? extends LivingEntity>) livingEntity.getType(), livingEntity);
+            AttributeContainer container2 = DataAttributes.Companion.getRegistry().getContainer((EntityType<? extends LivingEntity>) livingEntity.getType(), livingEntity);
 
             // Setting the attributes of the entity to the modified container
             container2.setFrom(container);

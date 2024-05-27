@@ -3,11 +3,8 @@ package com.bibireden.data_attributes.api.attribute
 import java.util.UUID
 
 /**
- *
- * Access to an entity attribute instance.
+ * Provides access to an entity attribute instance.
  * @author CleverNucleus
- * Converted by DataEncoded & bibi-riden
- *
  */
 interface DynamicEntityAttributeInstance {
     /**

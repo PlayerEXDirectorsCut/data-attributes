@@ -16,14 +16,14 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.RegistryKey
 import net.minecraft.util.Identifier
-import org.apache.commons.logging.Log
 import org.slf4j.LoggerFactory
 
 class DataAttributes : ModInitializer {
     companion object {
-        val MOD_ID = "data-attributes"
-        val LOGGER = LoggerFactory.getLogger(MOD_ID)
-        val REGISTRY = DataAttributesRegistry()
+        const val MOD_ID = "data-attributes"
+
+        val logger = LoggerFactory.getLogger(MOD_ID)
+        val registry = DataAttributesRegistry()
 
         object Keys {
             val ATTRIBUTES = RegistryKey.ofRegistry<Map<Identifier, Dynamic<*>>>(Identifier("attributes"))
@@ -46,14 +46,14 @@ class DataAttributes : ModInitializer {
             view.registerEntryAdded(Keys.ATTRIBUTES) { _, fileID, obj ->
                 val skillCache: MutableMap<Identifier, MutableMap<Identifier, Double>> = mutableMapOf()
 
-                REGISTRY.clear()
+                registry.clear()
 
                 for ((attributeID, entry) in obj) {
                     // General Attribute Data (will have to be differentiated somehow)
                     if (fileID.path.contains("attribute_overrides")) {
                         // Attribute Override Data
-                        entry.decode(AttributeOverrideData.CODEC).resultOrPartial({ x -> LOGGER.error("override fail! :: {}", x)}).ifPresent {
-                            REGISTRY.skillAttributes[attributeID] = SkillAttributeData(it.first)
+                        entry.decode(AttributeOverrideData.CODEC).resultOrPartial({ x -> logger.error("override fail! :: {}", x)}).ifPresent {
+                            registry.skillAttributes[attributeID] = SkillAttributeData(it.first)
                         }
                     }
                     else {
@@ -63,21 +63,23 @@ class DataAttributes : ModInitializer {
                                 skillCache[attributeID] = map
                             }
                             else if (fileID.path.contains("entity_attributes")) {
-                                REGISTRY.entityTypeData[attributeID] = EntityTypeData(map)
+                                registry.entityTypeData[attributeID] = EntityTypeData(map)
                             }
                             else {
-                                LOGGER.warn("for {}: identifier {} will be ignored, as it does not have \"skills\" or \"entities\" in its path!", fileID, attributeID)
+                                logger.warn("for {}: identifier {} will be ignored, as it does not have \"skills\" or \"entities\" in its path!", fileID, attributeID)
                             }
                         }
                     }
                 }
 
                 skillCache.forEach { (id, map) ->
-                    val data = REGISTRY.skillAttributes[id] ?: SkillAttributeData()
+                    val data = registry.skillAttributes[id] ?: SkillAttributeData()
                     data.putSkills(map.mapValues { (_, v) -> AttributeSkillData(v) }.toMap())
                 }
 
-                REGISTRY.apply()
+                registry.apply()
+
+                registry.nextUpdateFlag()
             }
         }
 

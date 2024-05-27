@@ -12,11 +12,11 @@ interface MutableAttributeContainer {
     fun getLivingEntity() : LivingEntity
 
     // Sets the LivingEntity associated with this container
-    fun setLivingEntity(livingEntity: LivingEntity): Unit
+    fun setLivingEntity(livingEntity: LivingEntity)
 
     // Refreshes the attributes of the associated LivingEntity
-    fun refresh(): Unit
+    fun refresh()
 
     // Clears any tracked information (possibly related to attribute changes)
-    fun clearTracked(): Unit
+    fun clearTracked()
 }

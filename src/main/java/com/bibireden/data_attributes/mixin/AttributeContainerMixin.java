@@ -18,11 +18,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Mixin(AttributeContainer.class)
 abstract class AttributeContainerMixin implements MutableAttributeContainer {
@@ -59,7 +55,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
     // Injection to get the tracked custom attributes
     @Inject(method = "getTracked", at = @At("HEAD"), cancellable = true)
     private void data_getTracked(CallbackInfoReturnable<Set<EntityAttributeInstance>> cir) {
-        Set<EntityAttributeInstance> tracked = this.data_tracked.values().stream().collect(Collectors.toSet());
+        Set<EntityAttributeInstance> tracked = new HashSet<>(this.data_tracked.values());
         cir.setReturnValue(tracked);
     }
 
@@ -71,14 +67,13 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
     // Injection to get or create a custom attribute instance
     @Inject(method = "getCustomInstance", at = @At("HEAD"), cancellable = true)
-    private void data_getCustomInstance(EntityAttribute attribute2,
-                                        CallbackInfoReturnable<EntityAttributeInstance> ci) {
+    private void data_getCustomInstance(EntityAttribute attribute2, CallbackInfoReturnable<EntityAttributeInstance> ci) {
         Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
 
         if (identifier != null) {
-            EntityAttributeInstance entityAttributeInstance = this.data_custom
-                    .computeIfAbsent(identifier,
-                            id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
+            EntityAttributeInstance entityAttributeInstance = this.data_custom.computeIfAbsent(identifier,
+                    id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2)
+            );
 
             if (entityAttributeInstance != null) {
                 MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
@@ -128,8 +123,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
     // Injection to remove custom modifiers
     @Inject(method = "removeModifiers", at = @At("HEAD"), cancellable = true)
-    private void data_removeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers,
-                                      CallbackInfo ci) {
+    private void data_removeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers, CallbackInfo ci) {
         attributeModifiers.asMap().forEach((attribute, collection) -> {
             Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
             EntityAttributeInstance entityAttributeInstance = this.data_custom.get(identifier);

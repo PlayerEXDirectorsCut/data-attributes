@@ -19,37 +19,17 @@ import net.minecraft.util.Identifier
 
 class DataAttributesRegistry(val skillAttributes: MutableMap<Identifier, SkillAttributeData> = mutableMapOf(), val entityTypeData: MutableMap<Identifier, EntityTypeData> = mutableMapOf()) {
     companion object {
-        val ENTITY_TYPE_INSTANCES = mutableMapOf<Identifier, Tuple<Int>>()
+        val ENTITY_TYPE_INSTANCES = mapOf(
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY) to Tuple(LivingEntity::class.java, 0),
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY) to Tuple(MobEntity::class.java, 1),
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY) to Tuple(PathAwareEntity::class.java, 2),
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY) to Tuple(HostileEntity::class.java, 3),
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY) to Tuple(PassiveEntity::class.java, 4),
+            Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY) to Tuple(AnimalEntity::class.java, 5)
+        )
 
         private fun getOrCreate(identifier: Identifier, attributeIn: EntityAttribute): EntityAttribute {
             return Registries.ATTRIBUTE.get(identifier) ?: DynamicMutableRegistry.register(Registries.ATTRIBUTE, identifier, attributeIn)
-        }
-
-        init {
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
-                Tuple(LivingEntity::class.java, 0)
-            )
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
-                Tuple(MobEntity::class.java, 1)
-            )
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
-                Tuple(PathAwareEntity::class.java, 2)
-            )
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
-                Tuple(HostileEntity::class.java, 3)
-            )
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
-                Tuple(PassiveEntity::class.java, 4)
-            )
-            ENTITY_TYPE_INSTANCES.put(
-                Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
-                Tuple(AnimalEntity::class.java, 5)
-            )
         }
     }
 
