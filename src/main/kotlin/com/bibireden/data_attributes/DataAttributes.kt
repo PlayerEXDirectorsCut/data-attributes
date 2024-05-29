@@ -14,12 +14,11 @@ class DataAttributes : ModInitializer {
 
         val logger = LoggerFactory.getLogger(MOD_ID)
 
-        val registry = AttributeDynamicRegistry() // prepare the masses, singletons are making a comeback!
+        val attributeRegistry = AttributeDynamicRegistry() // prepare the masses, singletons are making a comeback!
     }
 
     override fun onInitialize() {
-        DynamicRegistrySetupCallback.EVENT.register(registry::onSetupCallback)
-        
+        DynamicRegistrySetupCallback.EVENT.register(attributeRegistry::onSetupCallback)
         DynamicRegistries.registerSynced(AttributeDynamicRegistry.key, Codec.unboundedMap(Identifier.CODEC, Codec.PASSTHROUGH), DynamicRegistries.SyncOption.SKIP_WHEN_EMPTY)
     }
 }

@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.registry
 
+import com.bibireden.data_attributes.DataAttributes
 import com.mojang.serialization.Dynamic
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView
 import net.minecraft.registry.Registry
@@ -13,9 +14,9 @@ import net.minecraft.util.Identifier
  *
  * It also has the job of being a singleton instance which can be instantiated containing the relevant data from the `DynamicRegistries` upon a signal for reload.
  */
-class AttributeDynamicRegistry : DynamicRegistry<EntryData> {
+class AttributeDynamicRegistry : DynamicRegistry<AttributeRegistryEntry> {
     companion object {
-        val key: RegistryKey<Registry<EntryData>> = RegistryKey.ofRegistry(Identifier("attributes"))
+        val key: RegistryKey<Registry<AttributeRegistryEntry>> = RegistryKey.ofRegistry(Identifier("attributes"))
     }
 
     override fun onSetupCallback(view: DynamicRegistryView)
@@ -24,22 +25,22 @@ class AttributeDynamicRegistry : DynamicRegistry<EntryData> {
         view.registerEntryRemoved(key, this::onEntryRemoved)
     }
 
-    override fun onEntryAdded(rawID: Int, ref: Identifier, obj: EntryData) {
-        TODO("Not yet implemented")
+    override fun onEntryAdded(rawID: Int, ref: Identifier, obj: AttributeRegistryEntry) {
+        DataAttributes.logger.info("onEntryAdded called :: ID#:{}, ref#:{}, data#:{}", rawID, ref, obj)
+
+        this.apply()
     }
 
-    override fun onEntryRemoved(rawID: Int, ref: Identifier, obj: EntryData) {
-        TODO("Not yet implemented")
-    }
+    override fun onEntryRemoved(rawID: Int, ref: Identifier, obj: AttributeRegistryEntry) {
+        DataAttributes.logger.info("onEntryRemoved called :: ID#:{}, ref:{}, data?:{}", rawID, ref, obj)
 
-    override fun clear() {
-        TODO("Not yet implemented")
+        this.apply()
     }
 
     override fun apply() {
-        TODO("Not yet implemented")
+        DataAttributes.logger.info("Applied :: Dynamic Registry")
     }
 }
 
 /** Quick alias for data that is meant to be deserialized. */
-private typealias EntryData = Map<Identifier, Dynamic<*>>
+private typealias AttributeRegistryEntry = Map<Identifier, Dynamic<*>>

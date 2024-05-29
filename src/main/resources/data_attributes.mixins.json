@@ -3,24 +3,7 @@
   "minVersion": "0.8",
   "package": "com.bibireden.data_attributes.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "AttributeContainerMixin",
-    "ClampedEntityAttributeMixin",
-    "DefaultAttributeContainerMixin",
-    "EntityAttributeInstanceMixin",
-    "EntityAttributeMixin",
-    "EntityAttributeModifierMixin",
-    "EntityTrackerEntryMixin",
-    "LivingEntityMixin",
-    "MobEntityMixin",
-    "PlayerEntityMixin",
-    "SimpleRegistryMixin",
-    "item.ArmorItemMixin",
-    "item.ItemMixin",
-    "item.ItemStackMixin",
-    "item.MiningToolItemMixin",
-    "item.SwordItemMixin"
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

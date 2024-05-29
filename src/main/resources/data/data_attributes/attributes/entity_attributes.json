@@ -1,8 +1,0 @@
-
-{
-    "minecraft:player": {
-        "minecraft:generic.max_health": 30,
-        "data_attributes:constitution": 4.0,
-        "data_attributes:dexterity": 2.0
-    }
-}

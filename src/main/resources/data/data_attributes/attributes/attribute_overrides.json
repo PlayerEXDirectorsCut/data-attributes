@@ -1,9 +1,0 @@
-{
-    "minecraft:generic.max_health": {
-        "min": 0.0,
-        "max": 10000000.0,
-        "increment": 0.0,
-        "behavior": "ADD",
-        "formula": "DIMINISHED"
-    }
-}

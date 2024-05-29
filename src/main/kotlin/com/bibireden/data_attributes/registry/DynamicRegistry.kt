@@ -8,9 +8,6 @@ import net.minecraft.util.Identifier
  * This should normally be applied to a singleton.
  */
 interface DynamicRegistry<D : Any> {
-    /** Flushes the `DynamicRegistry` instance, clearing out all data and preparing new data to be used. */
-    fun clear()
-
     /** Applies the new `DynamicRegistry` data, reflecting the changes across `DataAttributes`. */
     fun apply()
 
