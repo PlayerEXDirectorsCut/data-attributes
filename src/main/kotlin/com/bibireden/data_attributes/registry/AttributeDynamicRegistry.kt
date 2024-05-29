@@ -21,6 +21,7 @@ class AttributeDynamicRegistry : DynamicRegistry<AttributeRegistryEntry> {
 
     override fun onSetupCallback(view: DynamicRegistryView)
     {
+        DataAttributes.logger.info("onSetupCallback called :: {}", view.stream().toList().size)
         view.registerEntryAdded(key, this::onEntryAdded)
         view.registerEntryRemoved(key, this::onEntryRemoved)
     }
