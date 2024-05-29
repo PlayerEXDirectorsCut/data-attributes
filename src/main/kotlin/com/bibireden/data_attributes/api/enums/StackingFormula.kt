@@ -1,8 +1,11 @@
 package com.bibireden.data_attributes.api.enums
 
+/** Refers to the kind of equation the attribute will use when getting stacked. */
 enum class StackingFormula {
     Flat,
     Diminished;
+    
+    val uppercased = this.name.uppercase()
 
     companion object {
         fun of(value: String): StackingFormula = when (value.uppercase()) {
@@ -10,13 +13,4 @@ enum class StackingFormula {
             else -> Flat
         }
     }
-
-
-    fun id() {
-
-    }
-
-//    fun max(): Double {
-//        val value = this.clamp.apply {  }
-//    }
 }

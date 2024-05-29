@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.utils
 
-import com.bibireden.data_attributes.api.enums.FunctionBehavior
+import com.bibireden.data_attributes.api.enums.StackingBehavior
 import com.bibireden.data_attributes.api.enums.StackingFormula
 import kotlin.math.abs
 import kotlin.math.max
@@ -17,7 +17,7 @@ import kotlin.math.pow
 /*
 
  */
-fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?, rawIterativeValue: Double?, functionBehavior: FunctionBehavior, stackingFormula: StackingFormula) : Double
+fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?, rawIterativeValue: Double?, functionBehavior: StackingBehavior, stackingFormula: StackingFormula) : Double
 {
     var iterativeValue = 0.001
 
@@ -27,7 +27,7 @@ fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double
         iterativeValue = max(min(rawIterativeValue, 1.0), 0.001)
     }
 
-    if (functionBehavior == FunctionBehavior.Add)
+    if (functionBehavior == StackingBehavior.Add)
     {
         var positiveMaximum: Double = 0.0
         var positiveSum: Double = 0.0
@@ -59,7 +59,7 @@ fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double
         {
             return (1-negativeMaximum)*((1-iterativeValue).pow(((negativeSum-negativeMaximum)/iterativeValue))) + (1-positiveMaximum)*((1-iterativeValue).pow(((positiveSum-positiveMaximum)/iterativeValue)))
         }
-    } else if (functionBehavior == FunctionBehavior.Multiply)
+    } else if (functionBehavior == StackingBehavior.Multiply)
     {
         var positiveMaximum: Double = 0.0
         var positiveMultiplier: Double = 1.0

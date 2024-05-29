@@ -1,11 +1,9 @@
 {
-    "data_attributes:constitution": {
-        "default": 0.0,
+    "minecraft:generic.max_health": {
         "min": 0.0,
         "max": 10000000.0,
         "increment": 0.0,
         "behavior": "ADD",
-        "formula": "DIMINISHED",
-        "translationKey": "data_attributes.attribute.name.constitution"
+        "formula": "DIMINISHED"
     }
 }
