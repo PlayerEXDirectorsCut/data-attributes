@@ -11,9 +11,6 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     // Overrides the properties of the entity attribute
     void override(String translationKey, double minValue, double maxValue, double fallbackValue, double incrementValue, StackingFormula stackingFormula);
 
-    // Sets additional properties for the entity attribute
-    void properties(Map<String, String> properties);
-
     // Adds a parent entity attribute with an associated function
     void addParent(MutableEntityAttribute attributeIn, final AttributeFunctionJson function);
 

@@ -16,7 +16,6 @@ import com.bibireden.data_attributes.json.AttributeFunctionJson;
 import com.bibireden.data_attributes.json.AttributeOverrideJson;
 import com.bibireden.data_attributes.json.EntityTypesJson;
 import com.bibireden.data_attributes.json.FunctionsJson;
-import com.bibireden.data_attributes.json.PropertiesJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -178,55 +177,6 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		}
 	}
 
-	private static void loadProperties(ResourceManager manager,
-			Map<Identifier, EntityAttributeData> entityAttributeData) {
-		Map<Identifier, PropertiesJson> cache = new HashMap<Identifier, PropertiesJson>();
-		int length = DIRECTORY.length() + 1;
-
-		for (Map.Entry<Identifier, Resource> entry : manager
-				.findResources(DIRECTORY, id -> id.getPath().endsWith("properties.json")).entrySet()) {
-			Identifier resource = entry.getKey();
-			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(),
-					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
-
-			try {
-				BufferedReader reader = entry.getValue().getReader();
-
-				try {
-					PropertiesJson json = JsonHelper.deserialize(GSON, (Reader) reader, PropertiesJson.class);
-
-					if (json != null) {
-						PropertiesJson object = cache.put(identifier, json);
-
-						if (object == null)
-							continue;
-						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
-					}
-
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
-							(Object) resource);
-				} finally {
-					if (reader == null)
-						continue;
-					((Reader) reader).close();
-				}
-			} catch (IOException | IllegalArgumentException exception) {
-				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
-			}
-		}
-
-		Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
-		cache.values().forEach(json -> json.merge(properties));
-
-		for (String key : properties.keySet()) {
-			Identifier identifier = new Identifier(key);
-			EntityAttributeData data = entityAttributeData.getOrDefault(identifier, new EntityAttributeData());
-			data.putProperties(properties.get(key));
-			entityAttributeData.put(identifier, data);
-		}
-	}
-
 	private static void loadEntityTypes(ResourceManager manager, Map<Identifier, EntityTypeData> entityTypeData) {
 		Map<Identifier, EntityTypesJson> cache = new HashMap<Identifier, EntityTypesJson>();
 		int length = DIRECTORY.length() + 1;
@@ -374,7 +324,6 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Map<Identifier, EntityAttributeData> entityAttributeData = new HashMap<Identifier, EntityAttributeData>();
 			loadOverrides(manager, entityAttributeData);
 			loadFunctions(manager, entityAttributeData);
-			loadProperties(manager, entityAttributeData);
 
 			Map<Identifier, EntityTypeData> entityTypeData = new HashMap<Identifier, EntityTypeData>();
 			loadEntityTypes(manager, entityTypeData);

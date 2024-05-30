@@ -12,7 +12,7 @@ public enum StackingBehavior {
 	
 	private final byte id;
 	
-	private StackingBehavior(final byte id) {
+	StackingBehavior(final byte id) {
 		this.id = id;
 	}
 	

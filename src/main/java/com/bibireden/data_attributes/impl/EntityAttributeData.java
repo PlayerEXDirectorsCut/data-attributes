@@ -16,11 +16,9 @@ import net.minecraft.registry.Registries;
 public final class EntityAttributeData implements NbtIO {
 	private AttributeOverrideJson attribute;
 	private final Map<Identifier, AttributeFunctionJson> functions;
-	private final Map<String, String> properties;
 
 	public EntityAttributeData() {
 		this.functions = new HashMap<>();
-		this.properties = new HashMap<>();
 	}
 
 	public EntityAttributeData(final AttributeOverrideJson attribute) {
@@ -36,7 +34,6 @@ public final class EntityAttributeData implements NbtIO {
 
 	public void copy(EntityAttribute entityAttributeIn) {
 		MutableEntityAttribute mutableEntityAttribute = (MutableEntityAttribute) entityAttributeIn;
-		mutableEntityAttribute.properties(this.properties);
 
 		for (Identifier identifier : this.functions.keySet()) {
 			EntityAttribute entityAttribute = Registries.ATTRIBUTE.get(identifier);
@@ -52,10 +49,6 @@ public final class EntityAttributeData implements NbtIO {
 		this.functions.putAll(functions);
 	}
 
-	public void putProperties(Map<String, String> properties) {
-		this.properties.putAll(properties);
-	}
-
 	@Override
 	public void readFromNbt(NbtCompound tag) {
 		if (tag.contains("Attribute")) {
@@ -65,9 +58,6 @@ public final class EntityAttributeData implements NbtIO {
 
 		NbtCompound functions = tag.getCompound("Functions");
 		functions.getKeys().forEach(key -> this.functions.put(new Identifier(key), AttributeFunctionJson.read(functions.getByteArray(key))));
-
-		NbtCompound properties = tag.getCompound("Properties");
-		properties.getKeys().forEach(key -> this.properties.put(key, properties.getString(key)));
 	}
 
 	@Override
@@ -82,9 +72,5 @@ public final class EntityAttributeData implements NbtIO {
 		NbtCompound functions = new NbtCompound();
 		this.functions.forEach((key, value) -> functions.putByteArray(key.toString(), value.write()));
 		tag.put("Functions", functions);
-
-		NbtCompound properties = new NbtCompound();
-		this.properties.forEach((key, value) -> properties.putString(key.toString(), value));
-		tag.put("Properties", properties);
 	}
 }

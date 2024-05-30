@@ -37,21 +37,4 @@ public interface IEntityAttribute {
 	 * @since 1.4.0
 	 */
 	Map<IEntityAttribute, IAttributeFunction> children();
-	
-	/**
-	 * @return An immutable collection of the properties' keys attached to this attribute.
-	 */
-	Collection<String> properties();
-	
-	/**
-	 * @param property A property key.
-	 * @return true if this attribute has the input property key; false if not, or if the input is null.
-	 */
-	boolean hasProperty(final String property);
-	
-	/**
-	 * @param property A property key.
-	 * @return This attribute's property value assigned to the input property's key. If it does not exist or is null, returns 0.0F.
-	 */
-	String getProperty(final String property);
 }

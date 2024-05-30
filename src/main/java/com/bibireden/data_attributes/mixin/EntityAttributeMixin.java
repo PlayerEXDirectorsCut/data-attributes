@@ -31,7 +31,6 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     // Unique fields to store additional attribute data
     @Unique private Map<IEntityAttribute, AttributeFunctionJson> data_parents, data_children;
-    @Unique private Map<String, String> data_properties;
     @Unique private StackingFormula data_stackingFormula;
     @Unique private String data_translationKey;
     @Unique protected double data_fallbackValue, data_minValue, data_maxValue, data_incrementValue;
@@ -53,9 +52,8 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
         this.data_minValue = Integer.MIN_VALUE;
         this.data_maxValue = Integer.MAX_VALUE;
         this.data_stackingFormula = StackingFormula.Flat;
-        this.data_parents = new Object2ObjectArrayMap<IEntityAttribute, AttributeFunctionJson>();
-        this.data_children = new Object2ObjectArrayMap<IEntityAttribute, AttributeFunctionJson>();
-        this.data_properties = new HashMap<String, String>();
+        this.data_parents = new Object2ObjectArrayMap<>();
+        this.data_children = new Object2ObjectArrayMap<>();
     }
     
     // Injection to override the default value
@@ -99,13 +97,6 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
         this.data_stackingFormula = stackingFormula;
     }
     
-    // Method to set additional properties for the attribute
-    @Override
-    public void properties(Map<String, String> properties) {
-        if(properties == null) return;
-        this.data_properties = properties;
-    }
-    
     // Method to add a parent attribute with an associated function
     @Override
     public void addParent(MutableEntityAttribute attributeIn, AttributeFunctionJson function) {
@@ -125,7 +116,6 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Override
     public void clear() {
         this.override(this.translationKey, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat);
-        this.properties(new HashMap<String, String>());
         this.data_parents.clear();
         this.data_children.clear();
     }
@@ -190,23 +180,5 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Override
     public Map<IEntityAttribute, IAttributeFunction> children() {
         return ImmutableMap.copyOf(this.data_children);
-    }
-    
-    // Method to get an immutable collection of property keys
-    @Override
-    public Collection<String> properties() {
-        return ImmutableSet.copyOf(this.data_properties.keySet());
-    }
-    
-    // Method to check if the attribute has a specific property
-    @Override
-    public boolean hasProperty(final String property) {
-        return this.data_properties.containsKey(property);
-    }
-    
-    // Method to get the value of a specific property
-    @Override
-    public String getProperty(final String property) {
-        return this.data_properties.getOrDefault(property, "");
     }
 }
