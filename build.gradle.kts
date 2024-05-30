@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "2.0.0"
     id("fabric-loom")
     `maven-publish`
     java
@@ -18,6 +20,8 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
+
+    implementation("net.benwoodworth.knbt:knbt:${properties["knbt_version"]}")
 }
 
 tasks {
@@ -49,7 +53,7 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "17"
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
     }
 
 }

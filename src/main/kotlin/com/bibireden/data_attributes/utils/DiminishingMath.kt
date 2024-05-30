@@ -1,7 +1,8 @@
 package com.bibireden.data_attributes.utils
 
-import com.bibireden.data_attributes.api.enums.StackingBehavior
-import com.bibireden.data_attributes.api.enums.StackingFormula
+import com.bibireden.data_attributes.api.attribute.StackingBehavior
+import com.bibireden.data_attributes.api.attribute.StackingFormula
+import com.bibireden.data_attributes.utils.DiminishingMathOptions
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -16,7 +17,7 @@ import kotlin.math.pow
 
 /*
 
- */
+
 fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?, rawIterativeValue: Double?, functionBehavior: StackingBehavior, stackingFormula: StackingFormula) : Double
 {
     var iterativeValue = 0.001
@@ -94,4 +95,71 @@ fun calculateStacking(positiveChanges: Set<Double>?, negativeChanges: Set<Double
     }
 
     return 1.0 // todo: for now, want to test a build
+}
+*/
+
+fun calculateString(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?, functionBehavior: StackingBehavior, stackingFormula: StackingFormula, options: DiminishingMathOptions?)
+{
+    var returnValue = 0.0
+    if (functionBehavior == StackingBehavior.Add)
+    {
+        var totalChange = 0.0
+
+        for (change in positiveChanges!!)
+        {
+            totalChange += change
+        }
+        for (change in negativeChanges!!)
+        {
+            totalChange -= change
+        }
+
+        if (stackingFormula == StackingFormula.Flat)
+        {
+            returnValue = totalChange
+        } else if (stackingFormula == StackingFormula.Diminished && options != null) {
+            // Now do the piecewise
+            if (totalChange == 0.0)
+            {
+                returnValue = options.middlePoint
+            } else if (totalChange > 0.0)
+            {
+                returnValue = (options.maximum - options.middlePoint) * (totalChange/(totalChange+options.smoothness)) + options.middlePoint
+            } else if (totalChange < 0.0)
+            {
+                returnValue = (options.middlePoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.middlePoint
+            }
+        }
+    } else if (functionBehavior == StackingBehavior.Multiply)
+    {
+        var totalChange = 1.0
+
+        for (change in positiveChanges!!)
+        {
+            totalChange *= (1+change)
+        }
+        for (change in negativeChanges!!)
+        {
+            totalChange *= (1-change)
+        }
+
+        if (stackingFormula == StackingFormula.Flat)
+        {
+            returnValue = totalChange
+        } else if (stackingFormula == StackingFormula.Diminished && options != null) {
+            // Now do the piecewise
+            if (totalChange == 1.0)
+            {
+                returnValue = options.middlePoint
+            } else if (totalChange > 1.0)
+            {
+                returnValue = (options.maximum - options.middlePoint) * (totalChange/(totalChange+options.smoothness)) + options.middlePoint
+            } else if (totalChange < 1.0)
+            {
+                returnValue = (options.middlePoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.middlePoint
+            }
+        }
+    }
+
+
 }

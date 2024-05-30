@@ -18,8 +18,14 @@
   "entrypoints": {
     "main": [
       {
-        "adapter": "kotlin",
+        "adapter": "default",
         "value": "com.bibireden.data_attributes.DataAttributes"
+      }
+    ],
+    "client": [
+      {
+        "adapter": "default",
+        "value": "com.bibireden.data_attributes.DataAttributesClient"
       }
     ]
   },
