@@ -79,6 +79,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
     
     // Custom method to clamp attribute values and trigger an event
+    @Unique
     protected double data_clamped(double valueIn) {
         double value = EntityAttributeModifiedEvents.CLAMPED.invoker().onClamped((EntityAttribute)(Object)this, valueIn);
         return MathHelper.clamp(value, this.minValue(), this.maxValue());
@@ -86,7 +87,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Override method to modify attribute properties
     @Override
-    public void override(AttributeOverride override) {
+    public void data_attributes$override(AttributeOverride override) {
         this.data_translationKey = override.getTranslationKey();
         this.data_min = override.getMin();
         this.data_max = override.getMax();
@@ -97,42 +98,42 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Method to add a parent attribute with an associated function
     @Override
-    public void addParent(MutableEntityAttribute attributeIn, AttributeFunction function) {
+    public void data_attributes$addParent(MutableEntityAttribute attributeIn, AttributeFunction function) {
         this.data_parents.put(attributeIn, function);
     }
     
     // Method to add a child attribute with an associated function
     @Override
-    public void addChild(MutableEntityAttribute attributeIn, AttributeFunction function) {
-        if(this.contains(this, attributeIn)) return;
-        
-        attributeIn.addParent(this, function);
+    public void data_attributes$addChild(MutableEntityAttribute attributeIn, AttributeFunction function) {
+        if(this.data_attributes$contains(this, attributeIn)) return;
+
+        attributeIn.data_attributes$addParent(this, function);
         this.data_children.put(attributeIn, function);
     }
-    
+
     // Method to clear and reset attribute properties
     @Override
-    public void clear() {
-        this.override(new AttributeOverride(this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat, this.translationKey));
+    public void data_attributes$clear() {
+        this.data_attributes$override(new AttributeOverride(this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat, this.translationKey));
         this.data_parents.clear();
         this.data_children.clear();
     }
     
     // Method to calculate the sum of two attribute values based on stacking behavior
     @Override
-    public double sum(final double k, final double k2, final double v, final double v2) {
+    public double data_attributes$sum(final double k, final double k2, final double v, final double v2) {
         return this.data_formula.result(k, k2, v, v2, this.data_smoothness);
     }
     
     // Method to check if one attribute contains another (checks parent-child relationships)
     @Override
-    public boolean contains(MutableEntityAttribute a, MutableEntityAttribute b) {
+    public boolean data_attributes$contains(MutableEntityAttribute a, MutableEntityAttribute b) {
         if(b == null || a == b) return true;
         
-        for(IEntityAttribute n : a.parentsMutable().keySet()) {
+        for(IEntityAttribute n : a.data_attributes$parentsMutable().keySet()) {
             MutableEntityAttribute m = (MutableEntityAttribute)n;
             
-            if(m.contains(m, b)) return true;
+            if(m.data_attributes$contains(m, b)) return true;
         }
         
         return false;
@@ -140,13 +141,13 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Method to get the mutable map of parent attributes
     @Override
-    public Map<IEntityAttribute, AttributeFunction> parentsMutable() {
+    public Map<IEntityAttribute, AttributeFunction> data_attributes$parentsMutable() {
         return this.data_parents;
     }
     
     // Method to get the mutable map of child attributes
     @Override
-    public Map<IEntityAttribute, AttributeFunction> childrenMutable() {
+    public Map<IEntityAttribute, AttributeFunction> data_attributes$childrenMutable() {
         return this.data_children;
     }
     

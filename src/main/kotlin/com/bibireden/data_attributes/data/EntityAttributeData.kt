@@ -8,6 +8,10 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
+/**
+ * Data that might contain a `AttributeOverride` and contains
+ * `AttributeFunctions` to be used to override or copy to `EntityAttributes`.
+ */
 class EntityAttributeData(val override: AttributeOverride? = null, val functions: MutableMap<Identifier, AttributeFunction> = mutableMapOf()) {
     constructor(value: AttributeOverride) : this(value, mutableMapOf())
 
@@ -24,10 +28,11 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
         this.override?.override(fn(id, this.override.create()) as MutableEntityAttribute)
     }
 
+    /** Copies to a given `EntityAttribute` by adding children to the instance via mixin. */
     fun copy(attributeIn: EntityAttribute) {
         val attribute = attributeIn as MutableEntityAttribute
         this.functions.keys.forEach {
-            attribute.addChild(
+            attribute.`data_attributes$addChild`(
                 Registries.ATTRIBUTE[it] as? MutableEntityAttribute ?: return@forEach,
                 this.functions[it] ?: return@forEach
             )

@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.data
+package com.bibireden.data_attributes.data.merged
 
 import io.wispforest.endec.Endec
 

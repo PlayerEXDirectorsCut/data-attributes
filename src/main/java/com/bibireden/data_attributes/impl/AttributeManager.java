@@ -6,12 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import com.bibireden.data_attributes.data.*;
+import com.bibireden.data_attributes.data.merged.AttributeFunctions;
+import com.bibireden.data_attributes.data.merged.EntityTypes;
 import com.bibireden.data_attributes.endec.NbtDeserializer;
 import com.bibireden.data_attributes.endec.NbtSerializer;
 import com.google.gson.JsonElement;
 import io.wispforest.endec.format.json.JsonDeserializer;
+import net.minecraft.nbt.NbtList;
 import org.slf4j.Logger;
 
 import com.bibireden.data_attributes.api.DataAttributesAPI;
@@ -163,7 +167,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 
 		for (String key : entityTypes.keySet()) {
 			Identifier identifier = new Identifier(key);
-			EntityTypeData data = new EntityTypeData(entityTypes.get(key));
+			EntityTypeData data = new EntityTypeData(entityTypes.get(key).entrySet().stream().collect(Collectors.toMap((e) -> new Identifier(e.getKey()), Map.Entry::getValue)));
 			entityTypeData.put(identifier, data);
 		}
 	}
@@ -177,9 +181,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		});
 
 		this.entityTypeData.forEach((key, val) -> {
-			NbtCompound entry = new NbtCompound();
-			val.writeToNbt(entry);
-			entityTypeNbt.put(key.toString(), entry);
+			entityTypeNbt.put(key.toString(), EntityTypeData.Companion.getEndec().encodeFully(NbtSerializer::of, val));
 		});
 
 		tag.put("Attributes", entityAttributeNbt);
@@ -203,10 +205,8 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			ImmutableMap.Builder<Identifier, EntityTypeData> builder = ImmutableMap.builder();
 			NbtCompound nbtCompound = tag.getCompound("EntityTypes");
 			nbtCompound.getKeys().forEach(key -> {
-				NbtCompound entry = nbtCompound.getCompound(key);
-				EntityTypeData entityTypeData = new EntityTypeData();
-				entityTypeData.readFromNbt(entry);
-				builder.put(new Identifier(key), entityTypeData);
+				NbtList entry = nbtCompound.getList(key, NbtList.COMPOUND_TYPE);
+				builder.put(new Identifier(key), EntityTypeData.Companion.getEndec().decodeFully(NbtDeserializer::of, entry));
 			});
 			this.entityTypeData = builder.build();
 		}
@@ -234,7 +234,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			if (entityAttribute == null)
 				continue;
 
-			((MutableEntityAttribute) entityAttribute).clear();
+			((MutableEntityAttribute) entityAttribute).data_attributes$clear();
 		}
 
 		for (Identifier identifier : this.entityAttributeData.keySet()) {

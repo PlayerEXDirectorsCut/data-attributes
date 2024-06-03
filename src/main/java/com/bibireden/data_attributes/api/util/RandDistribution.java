@@ -8,8 +8,8 @@ import java.util.Map;
  * @param <T> Input type.
  */
 public final class RandDistribution<T> {
-	private Map<T, Float> distribution;
-	private T defualtValue;
+	private final Map<T, Float> distribution;
+	private final T defaultValue;
 	private float distSum;
 	
 	/**
@@ -18,7 +18,7 @@ public final class RandDistribution<T> {
 	 */
 	public RandDistribution(final T fallback) {
 		this.distribution = new HashMap<>();
-		this.defualtValue = fallback;
+		this.defaultValue = fallback;
 	}
 	
 	/**
@@ -49,6 +49,6 @@ public final class RandDistribution<T> {
 			if(rand / dist <= mean) return object;
 		}
 		
-		return this.defualtValue;
+		return this.defaultValue;
 	}
 }

@@ -117,7 +117,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_containerCallback != null) {
 			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute)
-					.parentsMutable();
+					.data_attributes$parentsMutable();
 
 			for (IEntityAttribute parent : parents.keySet()) {
 				EntityAttributeInstance instance = this.data_containerCallback
@@ -146,7 +146,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			}
 		}
 
-		double d = attribute.sum(k, k2, v, v2);
+		double d = attribute.data_attributes$sum(k, k2, v, v2);
 		double e = d;
 
 		for (EntityAttributeModifier modifier : this
@@ -161,7 +161,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_containerCallback != null) {
 			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute)
-					.parentsMutable();
+					.data_attributes$parentsMutable();
 
 			for (IEntityAttribute parent : parents.keySet()) {
 				EntityAttributeInstance instance = this.data_containerCallback
@@ -232,7 +232,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_containerCallback == null)
 			return;
-		for (IEntityAttribute child : parent.childrenMutable().keySet()) {
+		for (IEntityAttribute child : parent.data_attributes$childrenMutable().keySet()) {
 			EntityAttribute attribute = (EntityAttribute) child;
 			EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance(attribute);
 
@@ -252,7 +252,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, livingEntity, modifierIn, value,
 				isWasAdded);
 
-		for (IEntityAttribute child : parent.childrenMutable().keySet()) {
+		for (IEntityAttribute child : parent.data_attributes$childrenMutable().keySet()) {
 			EntityAttribute attribute = (EntityAttribute) child;
 			EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance(attribute);
 

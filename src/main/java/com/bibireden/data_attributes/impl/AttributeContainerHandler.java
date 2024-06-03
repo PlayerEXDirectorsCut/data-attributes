@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.bibireden.data_attributes.data.EntityTypeData;
 import com.bibireden.data_attributes.impl.AttributeManager.Tuple;
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer;
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer;
@@ -22,12 +23,12 @@ public final class AttributeContainerHandler {
 	private Map<Integer, Tuple<DefaultAttributeContainer>> implicitContainers;
 	private Map<EntityType<? extends LivingEntity>, DefaultAttributeContainer> explicitContainers;
 
-	protected AttributeContainerHandler() {
+	AttributeContainerHandler() {
 		this.implicitContainers = ImmutableMap.of();
 		this.explicitContainers = ImmutableMap.of();
 	}
 
-	protected AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
+	AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
 			final LivingEntity livingEntity) {
 		DefaultAttributeContainer.Builder builder = DefaultAttributeContainer.builder();
 		((MutableDefaultAttributeContainer) DefaultAttributeRegistry.get(entityType)).copy(builder);
@@ -52,7 +53,7 @@ public final class AttributeContainerHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void buildContainers(final Map<Identifier, EntityTypeData> entityTypeDataIn,
+	void buildContainers(final Map<Identifier, EntityTypeData> entityTypeDataIn,
 			Map<Identifier, Tuple<Integer>> entityTypeInstances) {
 		Collection<Identifier> entityTypes = Registries.ENTITY_TYPE.getIds().stream()
 				.filter(id -> DefaultAttributeRegistry.hasDefinitionFor(Registries.ENTITY_TYPE.get(id)))
@@ -65,7 +66,7 @@ public final class AttributeContainerHandler {
 		for (Identifier identifier : entityTypeDataIn.keySet()) {
 			if (entityTypeInstances.containsKey(identifier)) {
 				Tuple<Integer> tuple = entityTypeInstances.get(identifier);
-				orderedEntityTypes.put(tuple.value(), new Tuple<Identifier>(tuple.livingEntity(), identifier));
+				orderedEntityTypes.put(tuple.value(), new Tuple<>(tuple.livingEntity(), identifier));
 			}
 			if (!entityTypes.contains(identifier))
 				continue;
@@ -88,7 +89,7 @@ public final class AttributeContainerHandler {
 			DefaultAttributeContainer.Builder builder = DefaultAttributeContainer.builder();
 			EntityTypeData entityTypeData = entityTypeDataIn.get(identifier);
 			entityTypeData.build(builder, null);
-			implicitContainers.put(index, new Tuple<DefaultAttributeContainer>(tuple.livingEntity(), builder.build()));
+			implicitContainers.put(index, new Tuple<>(tuple.livingEntity(), builder.build()));
 		}
 
 		this.implicitContainers = implicitContainers.build();

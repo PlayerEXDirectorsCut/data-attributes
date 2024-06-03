@@ -29,7 +29,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
 		// Overriding the attribute with custom settings
-		this.override(new AttributeOverride(min, max, fallback, 0.0D, StackingFormula.Flat, translationKey));
+		this.data_attributes$override(new AttributeOverride(fallback, min, max, 0.0D, StackingFormula.Flat, translationKey));
 	}
 
 	// Injecting into the getMinValue method to return custom min value
@@ -52,8 +52,8 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 
 	// Overriding the clear method to also clear custom values
 	@Override
-	public void clear() {
-		super.clear(); // Calling the superclass clear method
+	public void data_attributes$clear() {
+		super.data_attributes$clear(); // Calling the superclass clear method
 		this.data_min = this.minValue; // Resetting custom min value
 		this.data_max = this.maxValue; // Resetting custom max value
 	}

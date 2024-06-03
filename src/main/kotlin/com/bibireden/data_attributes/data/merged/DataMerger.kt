@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.data
+package com.bibireden.data_attributes.data.merged
 
 /**
  * Meant to simplify merging a map's values into a greater set of values.
