@@ -2,11 +2,6 @@ package com.bibireden.data_attributes.utils
 
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.api.attribute.StackingFormula
-import com.bibireden.data_attributes.utils.DiminishingMathOptions
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.pow
 
 /*
     The math in the legacy version of this library uses classes which I dislike
@@ -121,13 +116,13 @@ fun calculateString(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?
             // Now do the piecewise
             if (totalChange == 0.0)
             {
-                returnValue = options.middlePoint
+                returnValue = options.midpoint
             } else if (totalChange > 0.0)
             {
-                returnValue = (options.maximum - options.middlePoint) * (totalChange/(totalChange+options.smoothness)) + options.middlePoint
+                returnValue = (options.maximum - options.midpoint) * (totalChange/(totalChange+options.smoothness)) + options.midpoint
             } else if (totalChange < 0.0)
             {
-                returnValue = (options.middlePoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.middlePoint
+                returnValue = (options.midpoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.midpoint
             }
         }
     } else if (functionBehavior == StackingBehavior.Multiply)
@@ -150,13 +145,13 @@ fun calculateString(positiveChanges: Set<Double>?, negativeChanges: Set<Double>?
             // Now do the piecewise
             if (totalChange == 1.0)
             {
-                returnValue = options.middlePoint
+                returnValue = options.midpoint
             } else if (totalChange > 1.0)
             {
-                returnValue = (options.maximum - options.middlePoint) * (totalChange/(totalChange+options.smoothness)) + options.middlePoint
+                returnValue = (options.maximum - options.midpoint) * (totalChange/(totalChange+options.smoothness)) + options.midpoint
             } else if (totalChange < 1.0)
             {
-                returnValue = (options.middlePoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.middlePoint
+                returnValue = (options.midpoint - options.minimum) * (-(totalChange/(totalChange-options.smoothness))) + options.midpoint
             }
         }
     }
