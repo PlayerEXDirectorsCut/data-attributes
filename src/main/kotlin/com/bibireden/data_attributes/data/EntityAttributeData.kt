@@ -1,6 +1,5 @@
 package com.bibireden.data_attributes.data
 
-import com.bibireden.data_attributes.json.AttributeFunctionJson
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.CodecUtils
 import io.wispforest.endec.Endec
@@ -9,7 +8,9 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
-class EntityAttributeData(val override: AttributeOverride, val functions: MutableMap<Identifier, AttributeFunction> = mutableMapOf()) {
+class EntityAttributeData(val override: AttributeOverride? = null, val functions: MutableMap<Identifier, AttributeFunction> = mutableMapOf()) {
+    constructor(value: AttributeOverride) : this(value, mutableMapOf())
+
     companion object {
         val endec = StructEndecBuilder.of(
             AttributeOverride.endec.fieldOf("override") { it.override },
@@ -20,7 +21,7 @@ class EntityAttributeData(val override: AttributeOverride, val functions: Mutabl
 
     /** Overrides a `EntityAttribute`. */
     fun override(id: Identifier, fn: (id: Identifier, attribute: EntityAttribute?) -> EntityAttribute) {
-        this.override.override(fn(id, this.override.create()) as MutableEntityAttribute)
+        this.override?.override(fn(id, this.override.create()) as MutableEntityAttribute)
     }
 
     fun copy(attributeIn: EntityAttribute) {
@@ -33,7 +34,7 @@ class EntityAttributeData(val override: AttributeOverride, val functions: Mutabl
         }
     }
 
-    fun putFunctions(functions: Map<Identifier, AttributeFunctionJson>) {
+    fun putFunctions(functions: Map<Identifier, AttributeFunction>) {
         this.functions.putAll(functions)
     }
 }

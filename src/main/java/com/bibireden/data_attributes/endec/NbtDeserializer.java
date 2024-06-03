@@ -94,8 +94,8 @@ public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implement
             return Optional.of(endec.decode(this));
         } else {
             var struct = this.struct();
-            return struct.field("present", Endec.BOOLEAN)
-                    ? Optional.of(struct.field("value", endec))
+            return Boolean.TRUE.equals(struct.field("present", Endec.BOOLEAN)) // - null safety to prevent warning ???
+                    ? Optional.ofNullable(struct.field("value", endec))
                     : Optional.empty();
         }
     }

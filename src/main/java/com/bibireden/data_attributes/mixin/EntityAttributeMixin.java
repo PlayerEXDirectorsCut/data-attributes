@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Map;
 
+import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.data.AttributeOverride;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +17,6 @@ import com.bibireden.data_attributes.api.attribute.IAttributeFunction;
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
-import com.bibireden.data_attributes.json.AttributeFunctionJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
 import com.google.common.collect.ImmutableMap;
 
@@ -28,7 +28,7 @@ import net.minecraft.util.math.MathHelper;
 abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     // Unique fields to store additional attribute data
-    @Unique private Map<IEntityAttribute, AttributeFunctionJson> data_parents, data_children;
+    @Unique private Map<IEntityAttribute, AttributeFunction> data_parents, data_children;
     @Unique private StackingFormula data_formula;
     @Unique private String data_translationKey;
     @Unique protected double data_midpoint, data_min, data_max, data_smoothness;
@@ -97,13 +97,13 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Method to add a parent attribute with an associated function
     @Override
-    public void addParent(MutableEntityAttribute attributeIn, AttributeFunctionJson function) {
+    public void addParent(MutableEntityAttribute attributeIn, AttributeFunction function) {
         this.data_parents.put(attributeIn, function);
     }
     
     // Method to add a child attribute with an associated function
     @Override
-    public void addChild(MutableEntityAttribute attributeIn, AttributeFunctionJson function) {
+    public void addChild(MutableEntityAttribute attributeIn, AttributeFunction function) {
         if(this.contains(this, attributeIn)) return;
         
         attributeIn.addParent(this, function);
@@ -140,13 +140,13 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Method to get the mutable map of parent attributes
     @Override
-    public Map<IEntityAttribute, AttributeFunctionJson> parentsMutable() {
+    public Map<IEntityAttribute, AttributeFunction> parentsMutable() {
         return this.data_parents;
     }
     
     // Method to get the mutable map of child attributes
     @Override
-    public Map<IEntityAttribute, AttributeFunctionJson> childrenMutable() {
+    public Map<IEntityAttribute, AttributeFunction> childrenMutable() {
         return this.data_children;
     }
     

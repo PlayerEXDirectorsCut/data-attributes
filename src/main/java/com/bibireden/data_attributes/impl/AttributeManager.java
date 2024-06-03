@@ -8,14 +8,18 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.data.AttributeOverride;
+import com.bibireden.data_attributes.data.EntityAttributeData;
+import com.bibireden.data_attributes.endec.NbtDeserializer;
+import com.bibireden.data_attributes.endec.NbtSerializer;
 import com.google.gson.JsonElement;
 import io.wispforest.endec.format.json.JsonDeserializer;
 import org.slf4j.Logger;
 
 import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent;
-import com.bibireden.data_attributes.json.AttributeFunctionJson;
+import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.json.EntityTypesJson;
 import com.bibireden.data_attributes.json.FunctionsJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
@@ -63,11 +67,11 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	public AttributeManager() {
 	}
 
-	private static Map<Identifier, AttributeFunctionJson> formatFunctions(Map<String, AttributeFunctionJson> functionsIn) {
-		Map<Identifier, AttributeFunctionJson> functions = new HashMap<>();
+	private static Map<Identifier, AttributeFunction> formatFunctions(Map<String, AttributeFunction> functionsIn) {
+		Map<Identifier, AttributeFunction> functions = new HashMap<>();
 
 		for (String key : functionsIn.keySet()) {
-			AttributeFunctionJson value = functionsIn.get(key);
+			AttributeFunction value = functionsIn.get(key);
 
 			functions.put(new Identifier(key), value);
 		}
@@ -146,7 +150,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			}
 		}
 
-		Map<String, Map<String, AttributeFunctionJson>> functions = new HashMap<String, Map<String, AttributeFunctionJson>>();
+		Map<String, Map<String, AttributeFunction>> functions = new HashMap<>();
 		cache.values().forEach(json -> json.merge(functions));
 
 		for (String key : functions.keySet()) {
@@ -209,9 +213,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		NbtCompound entityTypeNbt = new NbtCompound();
 
 		this.entityAttributeData.forEach((key, val) -> {
-			NbtCompound entry = new NbtCompound();
-			val.writeToNbt(entry);
-			entityAttributeNbt.put(key.toString(), entry);
+			entityAttributeNbt.put(key.toString(), EntityAttributeData.Companion.getEndec().encodeFully(NbtSerializer::of, val));
 		});
 
 		this.entityTypeData.forEach((key, val) -> {
@@ -231,8 +233,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			NbtCompound nbtCompound = tag.getCompound("Attributes");
 			nbtCompound.getKeys().forEach(key -> {
 				NbtCompound entry = nbtCompound.getCompound(key);
-				EntityAttributeData entityAttributeData = new EntityAttributeData();
-				entityAttributeData.readFromNbt(entry);
+				EntityAttributeData entityAttributeData = EntityAttributeData.Companion.getEndec().decodeFully(NbtDeserializer::of, entry);
 				builder.put(new Identifier(key), entityAttributeData);
 			});
 			this.entityAttributeData = builder.build();

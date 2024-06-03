@@ -9,7 +9,7 @@ public interface IAttributeFunction {
 	/**
 	 * @return The FunctionBehaviour associated with this attribute function.
 	 */
-	StackingBehavior behaviour();
+	StackingBehavior behavior();
 	
 	/**
 	 * @return The value associated with this attribute function.

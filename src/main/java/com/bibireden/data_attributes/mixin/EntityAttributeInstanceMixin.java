@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.bibireden.data_attributes.data.AttributeFunction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +24,6 @@ import com.bibireden.data_attributes.api.attribute.IEntityAttributeInstance;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
 import com.bibireden.data_attributes.api.util.VoidConsumer;
-import com.bibireden.data_attributes.json.AttributeFunctionJson;
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer;
 import com.bibireden.data_attributes.mutable.MutableAttributeInstance;
 import com.bibireden.data_attributes.mutable.MutableAttributeModifier;
@@ -116,7 +116,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		}
 
 		if (this.data_containerCallback != null) {
-			Map<IEntityAttribute, AttributeFunctionJson> parents = ((MutableEntityAttribute) attribute)
+			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute)
 					.parentsMutable();
 
 			for (IEntityAttribute parent : parents.keySet()) {
@@ -125,9 +125,9 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 				if (instance == null)
 					continue;
-				AttributeFunctionJson function = parents.get(parent);
+				AttributeFunction function = parents.get(parent);
 
-				if (function.behaviour() != StackingBehavior.Add)
+				if (function.behavior() != StackingBehavior.Add)
 					continue;
 				double multiplier = function.value();
 				double value = multiplier * instance.getValue();
@@ -160,7 +160,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		}
 
 		if (this.data_containerCallback != null) {
-			Map<IEntityAttribute, AttributeFunctionJson> parents = ((MutableEntityAttribute) attribute)
+			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute)
 					.parentsMutable();
 
 			for (IEntityAttribute parent : parents.keySet()) {
@@ -169,9 +169,9 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 				if (instance == null)
 					continue;
-				AttributeFunctionJson function = parents.get(parent);
+				AttributeFunction function = parents.get(parent);
 
-				if (function.behaviour() != StackingBehavior.Multiply)
+				if (function.behavior() != StackingBehavior.Multiply)
 					continue;
 				e *= 1.0D + (instance.getValue() * function.value());
 			}

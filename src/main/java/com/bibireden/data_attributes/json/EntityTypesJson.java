@@ -13,7 +13,7 @@ public final class EntityTypesJson {
 	public void merge(Map<String, Map<String, Double>> entityTypesIn) {
 		for(String key : this.values.keySet()) {
 			Map<String, Double> entityTypes = entityTypesIn.getOrDefault(key, new HashMap<String, Double>());
-			this.values.get(key).forEach(entityTypes::put);
+            entityTypes.putAll(this.values.get(key));
 			entityTypesIn.put(key, entityTypes);
 		}
 	}
