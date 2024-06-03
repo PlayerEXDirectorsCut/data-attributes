@@ -26,10 +26,12 @@ dependencies {
     implementation("io.wispforest:endec:${properties["endec_version"]}")
     implementation("io.wispforest.endec:gson:${properties["endec_version_2"]}")
     implementation("io.wispforest.endec:codec:${properties["endec_version_2"]}")
+    implementation("io.wispforest.endec:netty:${properties["endec_version_2"]}")
 
     include("io.wispforest:endec:${properties["endec_version"]}")
     include("io.wispforest.endec:gson:${properties["endec_version_2"]}")
     include("io.wispforest.endec:codec:${properties["endec_version_2"]}")
+    include("io.wispforest.endec:netty:${properties["endec_version_2"]}")
 }
 
 tasks {

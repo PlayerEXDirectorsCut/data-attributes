@@ -9,10 +9,11 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 import com.bibireden.data_attributes.data.*;
+import com.bibireden.data_attributes.data.AttributeResourceManager.Tuple;
 import com.bibireden.data_attributes.data.merged.AttributeFunctions;
 import com.bibireden.data_attributes.data.merged.EntityTypes;
-import com.bibireden.data_attributes.endec.NbtDeserializer;
-import com.bibireden.data_attributes.endec.NbtSerializer;
+import com.bibireden.data_attributes.endec.nbt.NbtDeserializer;
+import com.bibireden.data_attributes.endec.nbt.NbtSerializer;
 import com.google.gson.JsonElement;
 import io.wispforest.endec.format.json.JsonDeserializer;
 import net.minecraft.nbt.NbtList;
@@ -56,9 +57,6 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	private Map<Identifier, EntityTypeData> entityTypeData = ImmutableMap.of();
 	private final AttributeContainerHandler handler = new AttributeContainerHandler();
 	private int updateFlag = 0;
-
-	protected record Tuple<T>(Class<? extends LivingEntity> livingEntity, T value) {
-	}
 
 	protected record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData, Map<Identifier, EntityTypeData> entityTypeData) {}
 
@@ -293,21 +291,22 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 
 	static {
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
+				DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY,
 				new Tuple<>(LivingEntity.class, 0));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
+		ENTITY_TYPE_INSTANCES.put(
+				DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY,
 				new Tuple<>(MobEntity.class, 1));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
+				DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY,
 				new Tuple<>(PathAwareEntity.class, 2));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
+				DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY,
 				new Tuple<>(HostileEntity.class, 3));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
+				DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY,
 				new Tuple<>(PassiveEntity.class, 4));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
+				DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY,
 				new Tuple<>(AnimalEntity.class, 5));
 	}
 }

@@ -1,4 +1,4 @@
-package io.wispforest.efm.format.nbt;
+package com.bibireden.data_attributes.endec.nbt;
 
 import com.google.common.io.ByteStreams;
 import io.wispforest.endec.*;
@@ -10,7 +10,6 @@ import net.minecraft.nbt.NbtTagSizeTracker;
 import java.io.IOException;
 
 public final class NbtEndec implements Endec<NbtElement> {
-
     public static final Endec<NbtElement> ELEMENT = new NbtEndec();
     public static final Endec<NbtCompound> COMPOUND = new NbtEndec().xmap(NbtCompound.class::cast, compound -> compound);
 

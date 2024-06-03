@@ -18,32 +18,38 @@ object DataAttributesAPI {
     /**
      * The entity instance for LivingEntity.class.
      */
-    const val ENTITY_INSTANCE_LIVING_ENTITY: String = "living_entity"
+    @JvmField
+    val ENTITY_INSTANCE_LIVING_ENTITY = id("living_entity")
 
     /**
      * The entity instance for MobEntity.class.
      */
-    const val ENTITY_INSTANCE_MOB_ENTITY: String = "mob_entity"
+    @JvmField
+    val ENTITY_INSTANCE_MOB_ENTITY = id("mob_entity")
 
     /**
      * The entity instance for PathAwareEntity.class.
      */
-    const val ENTITY_INSTANCE_PATH_AWARE_ENTITY: String = "path_aware_entity"
+    @JvmField
+    val ENTITY_INSTANCE_PATH_AWARE_ENTITY = id("path_aware_entity")
 
     /**
      * The entity instance for HostileEntity.class.
      */
-    const val ENTITY_INSTANCE_HOSTILE_ENTITY: String = "hostile_entity"
+    @JvmField
+    val ENTITY_INSTANCE_HOSTILE_ENTITY = id("hostile_entity")
 
     /**
      * The entity instance for PassiveEntity.class.
      */
-    const val ENTITY_INSTANCE_PASSIVE_ENTITY: String = "passive_entity"
+    @JvmField
+    val ENTITY_INSTANCE_PASSIVE_ENTITY = id("passive_entity")
 
     /**
      * The entity instance for AnimalEntity.class.
      */
-    const val ENTITY_INSTANCE_ANIMAL_ENTITY: String = "animal_entity"
+    @JvmField
+    val ENTITY_INSTANCE_ANIMAL_ENTITY = id("animal_entity")
 
     /**
      * Gets a [Function] that will provide a registered attribute assigned to the given key.

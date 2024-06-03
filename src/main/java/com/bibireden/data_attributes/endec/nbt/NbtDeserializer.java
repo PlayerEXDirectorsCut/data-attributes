@@ -1,4 +1,4 @@
-package io.wispforest.efm.format.nbt;
+package com.bibireden.data_attributes.endec.nbt;
 
 
 import io.wispforest.endec.Deserializer;

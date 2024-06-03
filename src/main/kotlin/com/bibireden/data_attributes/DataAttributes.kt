@@ -2,8 +2,10 @@ package com.bibireden.data_attributes
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
-import com.bibireden.data_attributes.impl.AttributeManager
+import com.bibireden.data_attributes.data.AttributeResourceManager
+import com.bibireden.data_attributes.endec.nbt.NbtSerializer
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
+import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -21,28 +23,30 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.resource.ResourceType
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
+import net.minecraft.world.World
 
 class DataAttributes : ModInitializer {
     companion object {
         @JvmField val HANDSHAKE = DataAttributesAPI.id("handshake")
         @JvmField val RELOAD = DataAttributesAPI.id("reload")
 
-        @JvmField
-        val MANAGER: AttributeManager = AttributeManager()
+        @JvmField var CLIENT_MANAGER = AttributeResourceManager()
+        @JvmField val SERVER_MANAGER = AttributeResourceManager()
+
+        /** Gets the [AttributeResourceManager] based on the world context. */
+        fun getManager(world: World): AttributeResourceManager = when {
+            world.isClient -> CLIENT_MANAGER
+            else -> SERVER_MANAGER
+        }
 
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
             val buf = PacketByteBufs.create()
-            val tag = NbtCompound()
-            MANAGER.toNbt(tag)
-            buf.writeNbt(tag)
-            sender.sendPacket(HANDSHAKE, buf)
+            sender.sendPacket(HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ -> ByteBufSerializer.of(buf)}, SERVER_MANAGER))
         }
 
         @JvmStatic
         fun refreshAttributes(entity: Entity) {
-            if (entity is LivingEntity) {
-                (entity.attributes as MutableAttributeContainer).refresh()
-            }
+            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).refresh()
         }
 
         // Handles health modification events for all living entities
@@ -54,10 +58,10 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(MANAGER)
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
 
         ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)
-        ServerLoginNetworking.registerGlobalReceiver(HANDSHAKE) {_, _, _, _, _, _ -> }
+        ServerLoginNetworking.registerGlobalReceiver(HANDSHAKE) { _, _, _, _, _, _ -> }
 
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ -> refreshAttributes(newEntity) }
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> refreshAttributes(player) }

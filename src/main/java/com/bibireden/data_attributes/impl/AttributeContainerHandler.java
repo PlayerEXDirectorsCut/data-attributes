@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.bibireden.data_attributes.data.AttributeResourceManager.Tuple;
 import com.bibireden.data_attributes.data.EntityTypeData;
-import com.bibireden.data_attributes.impl.AttributeManager.Tuple;
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer;
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer;
 import com.google.common.collect.ImmutableMap;
@@ -23,12 +23,12 @@ public final class AttributeContainerHandler {
 	private Map<Integer, Tuple<DefaultAttributeContainer>> implicitContainers;
 	private Map<EntityType<? extends LivingEntity>, DefaultAttributeContainer> explicitContainers;
 
-	AttributeContainerHandler() {
+	public AttributeContainerHandler() {
 		this.implicitContainers = ImmutableMap.of();
 		this.explicitContainers = ImmutableMap.of();
 	}
 
-	AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
+	public AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
 			final LivingEntity livingEntity) {
 		DefaultAttributeContainer.Builder builder = DefaultAttributeContainer.builder();
 		((MutableDefaultAttributeContainer) DefaultAttributeRegistry.get(entityType)).copy(builder);
@@ -53,8 +53,7 @@ public final class AttributeContainerHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	void buildContainers(final Map<Identifier, EntityTypeData> entityTypeDataIn,
-			Map<Identifier, Tuple<Integer>> entityTypeInstances) {
+	public void buildContainers(final Map<Identifier, EntityTypeData> entityTypeDataIn, Map<Identifier, Tuple<Integer>> entityTypeInstances) {
 		Collection<Identifier> entityTypes = Registries.ENTITY_TYPE.getIds().stream()
 				.filter(id -> DefaultAttributeRegistry.hasDefinitionFor(Registries.ENTITY_TYPE.get(id)))
 				.collect(Collectors.toSet());
