@@ -8,12 +8,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import com.bibireden.data_attributes.data.AttributeFunction;
-import com.bibireden.data_attributes.data.AttributeOverride;
-import com.bibireden.data_attributes.data.EntityAttributeData;
+import com.bibireden.data_attributes.data.*;
 import com.bibireden.data_attributes.endec.NbtDeserializer;
 import com.bibireden.data_attributes.endec.NbtSerializer;
 import com.google.gson.JsonElement;
+import io.wispforest.endec.Endec;
 import io.wispforest.endec.format.json.JsonDeserializer;
 import org.slf4j.Logger;
 
@@ -21,7 +20,6 @@ import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent;
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.json.EntityTypesJson;
-import com.bibireden.data_attributes.json.FunctionsJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -115,38 +113,22 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	}
 
 	private static void loadFunctions(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
-		Map<Identifier, FunctionsJson> cache = new HashMap<>();
+		Map<Identifier, FunctionData> cache = new HashMap<>();
 		int length = DIRECTORY.length() + 1;
 
-		for (Map.Entry<Identifier, Resource> entry : manager
-				.findResources(DIRECTORY, id -> id.getPath().endsWith("functions.json")).entrySet()) {
+		for (Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("functions.json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(),
-					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
-			try {
-				BufferedReader reader = entry.getValue().getReader();
+			try(BufferedReader reader = entry.getValue().getReader()) {
+				FunctionData json = FunctionData.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
 
-				try {
-					FunctionsJson json = JsonHelper.deserialize(GSON, reader, FunctionsJson.class);
-
-					if (json != null) {
-						FunctionsJson object = cache.put(identifier, json);
-
-						if (object == null)
-							continue;
-						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
-					}
-
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", identifier,
-                            resource);
-				} finally {
-					if (reader != null)
-						((Reader) reader).close();
+				if (cache.put(identifier, json) != null) {
+					LOGGER.error("Overriding function(s) with found duplicate: {}", identifier);
 				}
 			} catch (IOException | IllegalArgumentException exception) {
-				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
+				LOGGER.error("Failed to parse data file {} from {} :: {}", identifier, resource, exception);
 			}
 		}
 
@@ -162,15 +144,13 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	}
 
 	private static void loadEntityTypes(ResourceManager manager, Map<Identifier, EntityTypeData> entityTypeData) {
-		Map<Identifier, EntityTypesJson> cache = new HashMap<Identifier, EntityTypesJson>();
+		Map<Identifier, EntityTypesJson> cache = new HashMap<>();
 		int length = DIRECTORY.length() + 1;
 
-		for (Map.Entry<Identifier, Resource> entry : manager
-				.findResources(DIRECTORY, id -> id.getPath().endsWith("entity_types.json")).entrySet()) {
+		for (Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("entity_types.json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(),
-					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
+			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
 			try {
 				BufferedReader reader = entry.getValue().getReader();

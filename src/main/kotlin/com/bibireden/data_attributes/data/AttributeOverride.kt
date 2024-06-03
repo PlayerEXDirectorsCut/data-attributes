@@ -3,6 +3,7 @@ package com.bibireden.data_attributes.data
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
+import io.wispforest.endec.StructEndec
 import io.wispforest.endec.impl.StructEndecBuilder
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttribute
@@ -17,7 +18,7 @@ data class AttributeOverride(val midpoint: Double, val min: Double, val max: Dou
     }
 
     companion object {
-        val endec = StructEndecBuilder.of(
+        val endec: StructEndec<AttributeOverride> = StructEndecBuilder.of(
             Endec.DOUBLE.optionalFieldOf("midpoint", { it.midpoint }, 0.0),
             Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
             Endec.DOUBLE.optionalFieldOf("max", { it.max }, Double.MAX_VALUE),

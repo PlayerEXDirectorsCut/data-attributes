@@ -9,7 +9,7 @@ import io.wispforest.endec.impl.StructEndecBuilder
 class AttributeFunction(val behavior: StackingBehavior, val value: Double) : IAttributeFunction {
     companion object {
         val endec = StructEndecBuilder.of(
-            Endec.STRING.xmap(StackingBehavior::of) { x -> x.name.uppercase() }.fieldOf("behavior") { it.behavior },
+            Endec.STRING.xmap(StackingBehavior::of) { x -> x.name.uppercase() }.fieldOf("behavior", { it.behavior }),
             Endec.DOUBLE.fieldOf("value") { it.value },
             ::AttributeFunction
         )

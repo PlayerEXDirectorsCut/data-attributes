@@ -13,7 +13,7 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
 
     companion object {
         val endec = StructEndecBuilder.of(
-            AttributeOverride.endec.fieldOf("override") { it.override },
+            AttributeOverride.endec.optionalFieldOf("override", { it.override }, { -> null}),
             Endec.map(CodecUtils.ofCodec(Identifier.CODEC), AttributeFunction.endec).fieldOf("functions") { it.functions },
             ::EntityAttributeData,
         )
