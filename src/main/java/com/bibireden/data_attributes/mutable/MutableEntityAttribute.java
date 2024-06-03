@@ -7,6 +7,15 @@ import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.data.AttributeOverride;
 
 public interface MutableEntityAttribute extends IEntityAttribute {
+    // Method to check if one attribute contains another (checks parent-child relationships)
+    static boolean contains(MutableEntityAttribute lhs, MutableEntityAttribute rhs) {
+        if(rhs == null || lhs == rhs) return true;
+        for(IEntityAttribute conv : lhs.data_attributes$parentsMutable().keySet()) {
+            MutableEntityAttribute attribute = (MutableEntityAttribute) conv;
+            if(MutableEntityAttribute.contains(attribute, rhs)) return true;
+        }
+        return false;
+    }
 
     // Overrides the properties of the entity attribute
     void data_attributes$override(AttributeOverride override);
@@ -22,9 +31,6 @@ public interface MutableEntityAttribute extends IEntityAttribute {
 
     // Calculates the sum of values using specific parameters
     double data_attributes$sum(final double k, final double k2, final double v, final double v2);
-
-    // Checks if a given entity attribute is contained within another
-    boolean data_attributes$contains(MutableEntityAttribute a, MutableEntityAttribute b);
 
     // Returns a mutable map of parent entity attributes with associated functions
     Map<IEntityAttribute, AttributeFunction> data_attributes$parentsMutable();

@@ -26,14 +26,11 @@ import net.minecraft.util.math.MathHelper;
 
 @Mixin(EntityAttribute.class)
 abstract class EntityAttributeMixin implements MutableEntityAttribute {
-
-    // Unique fields to store additional attribute data
     @Unique private Map<IEntityAttribute, AttributeFunction> data_parents, data_children;
     @Unique private StackingFormula data_formula;
     @Unique private String data_translationKey;
     @Unique protected double data_midpoint, data_min, data_max, data_smoothness;
-    
-    // Original fields from the EntityAttribute class
+
     @Final
     @Shadow
     private double fallback;
@@ -56,33 +53,33 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Injection to override the default value
     @Inject(method = "getDefaultValue", at = @At("HEAD"), cancellable = true)
-    private void data_getDefaultValue(CallbackInfoReturnable<Double> ci) {
+    private void data_attributes$getDefaultValue(CallbackInfoReturnable<Double> ci) {
         ci.setReturnValue(this.data_midpoint);
     }
     
     // Injection to always consider the attribute as tracked
     @Inject(method = "isTracked", at = @At("HEAD"), cancellable = true)
-    private void data_isTracked(CallbackInfoReturnable<Boolean> ci) {
+    private void data_attributes$isTracked(CallbackInfoReturnable<Boolean> ci) {
         ci.setReturnValue(true);
     }
     
     // Injection to clamp attribute values and trigger an event
     @Inject(method = "clamp", at = @At("HEAD"), cancellable = true)
-    private void data_clamp(double value, CallbackInfoReturnable<Double> ci) {
-        ci.setReturnValue(this.data_clamped(value));
+    private void data_attributes$clamp(double value, CallbackInfoReturnable<Double> ci) {
+        ci.setReturnValue(this.data_attributes$clamped(value));
     }
     
     // Injection to get the custom translation key
     @Inject(method = "getTranslationKey", at = @At("HEAD"), cancellable = true)
-    private void data_getTranslationKey(CallbackInfoReturnable<String> ci) {
+    private void data_attributes$getTranslationKey(CallbackInfoReturnable<String> ci) {
         ci.setReturnValue(this.data_translationKey);
     }
     
     // Custom method to clamp attribute values and trigger an event
     @Unique
-    protected double data_clamped(double valueIn) {
+    protected double data_attributes$clamped(double valueIn) {
         double value = EntityAttributeModifiedEvents.CLAMPED.invoker().onClamped((EntityAttribute)(Object)this, valueIn);
-        return MathHelper.clamp(value, this.minValue(), this.maxValue());
+        return MathHelper.clamp(value, this.data_attributes$min(), this.data_attributes$max());
     }
     
     // Override method to modify attribute properties
@@ -105,38 +102,29 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     // Method to add a child attribute with an associated function
     @Override
     public void data_attributes$addChild(MutableEntityAttribute attributeIn, AttributeFunction function) {
-        if(this.data_attributes$contains(this, attributeIn)) return;
-
+        if(MutableEntityAttribute.contains(this, attributeIn)) return;
         attributeIn.data_attributes$addParent(this, function);
         this.data_children.put(attributeIn, function);
+    }
+
+    // Clears parent-child relationships of this clamped attribute
+    @Unique
+    public void data_attributes$clearDescendants() {
+        this.data_parents.clear();
+        this.data_children.clear();
     }
 
     // Method to clear and reset attribute properties
     @Override
     public void data_attributes$clear() {
         this.data_attributes$override(new AttributeOverride(this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat, this.translationKey));
-        this.data_parents.clear();
-        this.data_children.clear();
+        this.data_attributes$clearDescendants();
     }
     
     // Method to calculate the sum of two attribute values based on stacking behavior
     @Override
     public double data_attributes$sum(final double k, final double k2, final double v, final double v2) {
         return this.data_formula.result(k, k2, v, v2, this.data_smoothness);
-    }
-    
-    // Method to check if one attribute contains another (checks parent-child relationships)
-    @Override
-    public boolean data_attributes$contains(MutableEntityAttribute a, MutableEntityAttribute b) {
-        if(b == null || a == b) return true;
-        
-        for(IEntityAttribute n : a.data_attributes$parentsMutable().keySet()) {
-            MutableEntityAttribute m = (MutableEntityAttribute)n;
-            
-            if(m.data_attributes$contains(m, b)) return true;
-        }
-        
-        return false;
     }
     
     // Method to get the mutable map of parent attributes
@@ -153,31 +141,31 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     
     // Method to get the minimum value of the attribute
     @Override
-    public double minValue() {
+    public double data_attributes$min() {
         return this.data_min;
     }
     
     // Method to get the maximum value of the attribute
     @Override
-    public double maxValue() {
+    public double data_attributes$max() {
         return this.data_max;
     }
     
     // Method to get the stacking behavior of the attribute
     @Override
-    public StackingFormula formula() {
+    public StackingFormula data_attributes$formula() {
         return this.data_formula;
     }
     
     // Method to get an immutable map of parent attributes and their functions
     @Override
-    public Map<IEntityAttribute, IAttributeFunction> parents() {
+    public Map<IEntityAttribute, IAttributeFunction> data_attributes$parents() {
         return ImmutableMap.copyOf(this.data_parents);
     }
     
     // Method to get an immutable map of child attributes and their functions
     @Override
-    public Map<IEntityAttribute, IAttributeFunction> children() {
+    public Map<IEntityAttribute, IAttributeFunction> data_attributes$children() {
         return ImmutableMap.copyOf(this.data_children);
     }
 }

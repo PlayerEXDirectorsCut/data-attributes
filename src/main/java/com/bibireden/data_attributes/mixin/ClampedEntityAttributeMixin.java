@@ -35,19 +35,19 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	// Injecting into the getMinValue method to return custom min value
 	@Inject(method = "getMinValue", at = @At("HEAD"), cancellable = true)
 	private void data_getMinValue(CallbackInfoReturnable<Double> ci) {
-		ci.setReturnValue(this.minValue()); // Returning the custom min value
+		ci.setReturnValue(this.data_attributes$min()); // Returning the custom min value
 	}
 
 	// Injecting into the getMaxValue method to return custom max value
 	@Inject(method = "getMaxValue", at = @At("HEAD"), cancellable = true)
 	private void data_getMaxValue(CallbackInfoReturnable<Double> ci) {
-		ci.setReturnValue(this.maxValue()); // Returning the custom max value
+		ci.setReturnValue(this.data_attributes$max()); // Returning the custom max value
 	}
 
 	// Injecting into the clamp method to customize attribute clamping
 	@Inject(method = "clamp", at = @At("HEAD"), cancellable = true)
 	private void data_clamp(double value, CallbackInfoReturnable<Double> ci) {
-		ci.setReturnValue(this.data_clamped(value)); // Customizing clamping behavior
+		ci.setReturnValue(this.data_attributes$clamped(value)); // Customizing clamping behavior
 	}
 
 	// Overriding the clear method to also clear custom values

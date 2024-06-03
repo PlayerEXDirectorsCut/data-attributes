@@ -91,7 +91,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	private void data_computeValue(CallbackInfoReturnable<Double> ci) {
 		MutableEntityAttribute attribute = (MutableEntityAttribute) ((EntityAttributeInstance) (Object) this)
 				.getAttribute();
-		StackingFormula behaviour = attribute.formula();
+		StackingFormula behaviour = attribute.data_attributes$formula();
 		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
 
 		if (this.baseValue > 0.0D) {

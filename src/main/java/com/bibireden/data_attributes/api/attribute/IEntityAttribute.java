@@ -13,27 +13,27 @@ public interface IEntityAttribute {
 	/**
 	 * @return The attribute's minimum value;
 	 */
-	double minValue();
+	double data_attributes$min();
 	
 	/**
 	 * @return The attribute's maximum value;
 	 */
-	double maxValue();
+	double data_attributes$max();
 	
 	/**
 	 * @return The attribute's stacking behaviour.
 	 */
-	StackingFormula formula();
+	StackingFormula data_attributes$formula();
 	
 	/**
 	 * @return An immutable map of the function-parents attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, IAttributeFunction> parents();
+	Map<IEntityAttribute, IAttributeFunction> data_attributes$parents();
 	
 	/**
 	 * @return An immutable map of the function-children attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, IAttributeFunction> children();
+	Map<IEntityAttribute, IAttributeFunction> data_attributes$children();
 }
