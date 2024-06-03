@@ -62,8 +62,7 @@ public final class Maths {
 	 * @since 1.4.0
 	 */
 	public static boolean isWithinLimits(final double value, final double min, final double max) {
-		if(value < min || value >= max) return false;
-		return true;
+		return !(value < min || value >= max);
 	}
 	
 	/**

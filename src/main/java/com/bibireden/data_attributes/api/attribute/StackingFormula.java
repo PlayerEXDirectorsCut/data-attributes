@@ -19,10 +19,7 @@ public enum StackingFormula {
 	}
 
 	public static StackingFormula of(final String id) {
-		if (id.equalsIgnoreCase("diminished")) {
-			return Diminished;
-		}
-		return Flat;
+		return id.equalsIgnoreCase("diminished") ? Diminished : Flat;
 	}
 
 	public static StackingFormula of(final byte id) {

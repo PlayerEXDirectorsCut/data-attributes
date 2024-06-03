@@ -25,10 +25,7 @@ public enum StackingBehavior {
 	}
 
 	public static StackingBehavior of(final String id) {
-		if (id.equalsIgnoreCase("multiply")) {
-			return Multiply;
-		}
-		return Add;
+		return id.equalsIgnoreCase("multiply") ? Multiply : Add;
 	}
 	
 	public byte id() {
