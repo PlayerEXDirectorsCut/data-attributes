@@ -22,9 +22,9 @@ data class AttributeOverride(val midpoint: Double, val min: Double, val max: Dou
             Endec.DOUBLE.optionalFieldOf("midpoint", { it.midpoint }, 0.0),
             Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
             Endec.DOUBLE.optionalFieldOf("max", { it.max }, Double.MAX_VALUE),
-            Endec.DOUBLE.fieldOf("smoothness", { it.smoothness }),
+            Endec.DOUBLE.fieldOf("smoothness") { it.smoothness },
             Endec.STRING.xmap(StackingFormula::of) { x -> x.name.uppercase() }.fieldOf("formula") { it.formula },
-            Endec.STRING.fieldOf("translationKey", { it.translationKey }),
+            Endec.STRING.fieldOf("translationKey") { it.translationKey },
             ::AttributeOverride,
         )
     }
