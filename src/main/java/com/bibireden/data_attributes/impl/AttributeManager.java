@@ -2,7 +2,6 @@ package com.bibireden.data_attributes.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -12,14 +11,12 @@ import com.bibireden.data_attributes.data.*;
 import com.bibireden.data_attributes.endec.NbtDeserializer;
 import com.bibireden.data_attributes.endec.NbtSerializer;
 import com.google.gson.JsonElement;
-import io.wispforest.endec.Endec;
 import io.wispforest.endec.format.json.JsonDeserializer;
 import org.slf4j.Logger;
 
 import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent;
 import com.bibireden.data_attributes.data.AttributeFunction;
-import com.bibireden.data_attributes.json.EntityTypesJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -40,7 +37,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.registry.Registries;
 
@@ -62,8 +58,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 
 	protected record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData, Map<Identifier, EntityTypeData> entityTypeData) {}
 
-	public AttributeManager() {
-	}
+	public AttributeManager() {}
 
 	private static Map<Identifier, AttributeFunction> formatFunctions(Map<String, AttributeFunction> functionsIn) {
 		Map<Identifier, AttributeFunction> functions = new HashMap<>();
@@ -113,7 +108,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	}
 
 	private static void loadFunctions(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
-		Map<Identifier, FunctionData> cache = new HashMap<>();
+		Map<Identifier, AttributeFunctions> cache = new HashMap<>();
 		int length = DIRECTORY.length() + 1;
 
 		for (Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("functions.json")).entrySet()) {
@@ -122,7 +117,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
 			try(BufferedReader reader = entry.getValue().getReader()) {
-				FunctionData json = FunctionData.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+				AttributeFunctions json = AttributeFunctions.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
 
 				if (cache.put(identifier, json) != null) {
 					LOGGER.error("Overriding function(s) with found duplicate: {}", identifier);
@@ -144,7 +139,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	}
 
 	private static void loadEntityTypes(ResourceManager manager, Map<Identifier, EntityTypeData> entityTypeData) {
-		Map<Identifier, EntityTypesJson> cache = new HashMap<>();
+		Map<Identifier, EntityTypes> cache = new HashMap<>();
 		int length = DIRECTORY.length() + 1;
 
 		for (Map.Entry<Identifier, Resource> entry : manager.findResources(DIRECTORY, id -> id.getPath().endsWith("entity_types.json")).entrySet()) {
@@ -152,33 +147,18 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			String path = resource.getPath();
 			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
-			try {
-				BufferedReader reader = entry.getValue().getReader();
-
-				try {
-					EntityTypesJson json = JsonHelper.deserialize(GSON, reader, EntityTypesJson.class);
-
-					if (json != null) {
-						EntityTypesJson object = cache.put(identifier, json);
-
-						if (object == null)
-							continue;
-						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
-					}
-
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", identifier,
-                            resource);
-				} finally {
-					if (reader == null)
-						continue;
-					((Reader) reader).close();
+			try(BufferedReader reader = entry.getValue().getReader()) {
+				EntityTypes types = EntityTypes.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+				if (cache.put(identifier, types) != null) {
+					LOGGER.error("Overriding entity-types with found duplicate: {}", identifier);
 				}
-			} catch (IOException | IllegalArgumentException exception) {
-				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
+			}
+			catch (IOException | IllegalArgumentException exception) {
+				LOGGER.error("Failed to parse data file {} from {} :: {}", identifier, resource, exception);
 			}
 		}
 
-		Map<String, Map<String, Double>> entityTypes = new HashMap<String, Map<String, Double>>();
+		Map<String, Map<String, Double>> entityTypes = new HashMap<>();
 		cache.values().forEach(json -> json.merge(entityTypes));
 
 		for (String key : entityTypes.keySet()) {
@@ -280,11 +260,11 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	@Override
 	public CompletableFuture<Wrapper> load(ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
-			Map<Identifier, EntityAttributeData> entityAttributeData = new HashMap<Identifier, EntityAttributeData>();
+			Map<Identifier, EntityAttributeData> entityAttributeData = new HashMap<>();
 			loadOverrides(manager, entityAttributeData);
 			loadFunctions(manager, entityAttributeData);
 
-			Map<Identifier, EntityTypeData> entityTypeData = new HashMap<Identifier, EntityTypeData>();
+			Map<Identifier, EntityTypeData> entityTypeData = new HashMap<>();
 			loadEntityTypes(manager, entityTypeData);
 
 			return new Wrapper(entityAttributeData, entityTypeData);
