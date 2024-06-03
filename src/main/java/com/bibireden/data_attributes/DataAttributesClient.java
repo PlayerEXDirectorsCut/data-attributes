@@ -16,8 +16,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientLoginNetworkHandler;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
 
 public class DataAttributesClient implements ClientModInitializer {
@@ -34,7 +32,6 @@ public class DataAttributesClient implements ClientModInitializer {
 
     // Common method for handling received packets
     private static void onPacketReceived(MinecraftClient client, PacketByteBuf buf) {
-        // Execute on the main thread to interact with the game state
         client.execute(() -> {
             DataAttributes.CLIENT_MANAGER = AttributeResourceManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf);
             DataAttributes.CLIENT_MANAGER.onDataUpdate();
