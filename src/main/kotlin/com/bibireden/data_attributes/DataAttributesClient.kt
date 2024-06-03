@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture
 
 class DataAttributesClient : ClientModInitializer {
     companion object {
-        fun onPacketRecieved(client: MinecraftClient, buf: PacketByteBuf) {
+        fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             client.execute {
                 DataAttributes.CLIENT_MANAGER = AttributeResourceManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf)
                 DataAttributes.CLIENT_MANAGER.onDataUpdate()
@@ -23,12 +23,12 @@ class DataAttributesClient : ClientModInitializer {
 
     override fun onInitializeClient() {
         ClientLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { client, _, buf, _ ->
-            onPacketRecieved(client, buf)
+            onPacketReceived(client, buf)
             CompletableFuture.completedFuture(PacketByteBufs.empty())
         }
 
         ClientPlayNetworking.registerGlobalReceiver(Channels.RELOAD) { client, _, buf, sender ->
-            onPacketRecieved(client, buf)
+            onPacketReceived(client, buf)
         }
     }
 }
