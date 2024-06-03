@@ -9,6 +9,8 @@ import net.minecraft.nbt.*;
 
 import java.util.Optional;
 
+// Thank you wispforest 💖
+
 public class NbtSerializer extends RecursiveSerializer<NbtElement> {
 
     protected NbtElement prefix;

@@ -17,7 +17,8 @@ data class AttributeOverride(val midpoint: Double, val min: Double, val max: Dou
     }
 
     companion object {
-        val endec: Endec<AttributeOverride> = StructEndecBuilder.of(
+        @JvmField
+        val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
             Endec.DOUBLE.optionalFieldOf("midpoint", { it.midpoint }, 0.0),
             Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
             Endec.DOUBLE.optionalFieldOf("max", { it.max }, Double.MAX_VALUE),

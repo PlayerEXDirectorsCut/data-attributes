@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+// Thank you wispforest 💖
+
 public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implements SelfDescribedDeserializer<NbtElement> {
 
     protected NbtDeserializer(NbtElement element) {

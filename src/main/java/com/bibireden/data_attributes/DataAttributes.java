@@ -1,8 +1,8 @@
 package com.bibireden.data_attributes;
 
+import com.bibireden.data_attributes.api.DataAttributesAPI;
 import org.jetbrains.annotations.Nullable;
 
-import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
 import com.bibireden.data_attributes.impl.AttributeManager;
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer;
@@ -30,15 +30,18 @@ import net.minecraft.world.World;
 
 public class DataAttributes implements ModInitializer {
     // Identifiers for networking
-    public static final Identifier HANDSHAKE = new Identifier(DataAttributesAPI.MODID, "handshake");
-    public static final Identifier RELOAD = new Identifier(DataAttributesAPI.MODID, "reload");
+    public static final Identifier HANDSHAKE = new Identifier(DataAttributesAPI.MOD_ID, "handshake");
+    public static final Identifier RELOAD = new Identifier(DataAttributesAPI.MOD_ID, "reload");
 
     // Attribute manager instance
     public static final AttributeManager MANAGER = new AttributeManager();
 
+    private static Identifier id(String str) {
+        return Identifier.of(DataAttributesAPI.MOD_ID, str);
+    }
+
     // Sends attribute data to the client during login query start
-    private static void loginQueryStart(ServerLoginNetworkHandler handler, MinecraftServer server, PacketSender sender,
-            LoginSynchronizer synchronizer) {
+    private static void loginQueryStart(ServerLoginNetworkHandler handler, MinecraftServer server, PacketSender sender, LoginSynchronizer synchronizer) {
         PacketByteBuf buf = PacketByteBufs.create();
         NbtCompound tag = new NbtCompound();
         DataAttributes.MANAGER.toNbt(tag);
@@ -47,10 +50,7 @@ public class DataAttributes implements ModInitializer {
     }
 
     // Placeholder for handling login query response
-    private static void loginQueryResponse(MinecraftServer server, ServerLoginNetworkHandler handler,
-            boolean understood, PacketByteBuf buf, LoginSynchronizer synchronizer, PacketSender responseSender) {
-        // Implementation details can be added as needed
-    }
+    private static void loginQueryResponse(MinecraftServer server, ServerLoginNetworkHandler handler, boolean understood, PacketByteBuf buf, LoginSynchronizer synchronizer, PacketSender responseSender) {}
 
     // Refreshes attributes for living entities
     public static void refreshAttributes(final Entity entity) {

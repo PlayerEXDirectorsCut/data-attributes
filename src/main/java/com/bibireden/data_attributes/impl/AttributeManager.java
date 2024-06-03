@@ -49,7 +49,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	private static final int PATH_SUFFIX_LENGTH = ".json".length();
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private static final String DIRECTORY = "attributes";
-	private static final Identifier ID = new Identifier(DataAttributesAPI.MODID, DIRECTORY);
+	private static final Identifier ID = new Identifier(DataAttributesAPI.MOD_ID, DIRECTORY);
 	private static final Map<Identifier, Tuple<Integer>> ENTITY_TYPE_INSTANCES = new HashMap<>();
 
 	private Map<Identifier, EntityAttributeData> entityAttributeData = ImmutableMap.of();
@@ -99,7 +99,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
             try (BufferedReader reader = entry.getValue().getReader()) {
-                AttributeOverride override = AttributeOverride.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+                AttributeOverride override = AttributeOverride.ENDEC.decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
                 if (cache.put(identifier, override) != null) {
                     LOGGER.error("Overriding override with found duplicate: {}", identifier);
                 }
@@ -121,7 +121,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
 			try(BufferedReader reader = entry.getValue().getReader()) {
-				AttributeFunctions json = AttributeFunctions.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+				AttributeFunctions json = AttributeFunctions.ENDEC.decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
 
 				if (cache.put(identifier, json) != null) {
 					LOGGER.error("Overriding function(s) with found duplicate: {}", identifier);
@@ -152,7 +152,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
 			try(BufferedReader reader = entry.getValue().getReader()) {
-				EntityTypes types = EntityTypes.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+				EntityTypes types = EntityTypes.ENDEC.decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
 				if (cache.put(identifier, types) != null) {
 					LOGGER.error("Overriding entity-types with found duplicate: {}", identifier);
 				}
@@ -177,11 +177,11 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		NbtCompound entityTypeNbt = new NbtCompound();
 
 		this.entityAttributeData.forEach((key, val) -> {
-			entityAttributeNbt.put(key.toString(), EntityAttributeData.Companion.getEndec().encodeFully(NbtSerializer::of, val));
+			entityAttributeNbt.put(key.toString(), EntityAttributeData.ENDEC.encodeFully(NbtSerializer::of, val));
 		});
 
 		this.entityTypeData.forEach((key, val) -> {
-			entityTypeNbt.put(key.toString(), EntityTypeData.Companion.getEndec().encodeFully(NbtSerializer::of, val));
+			entityTypeNbt.put(key.toString(), EntityTypeData.ENDEC.encodeFully(NbtSerializer::of, val));
 		});
 
 		tag.put("Attributes", entityAttributeNbt);
@@ -195,7 +195,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			NbtCompound nbtCompound = tag.getCompound("Attributes");
 			nbtCompound.getKeys().forEach(key -> {
 				NbtCompound entry = nbtCompound.getCompound(key);
-				EntityAttributeData entityAttributeData = EntityAttributeData.Companion.getEndec().decodeFully(NbtDeserializer::of, entry);
+				EntityAttributeData entityAttributeData = EntityAttributeData.ENDEC.decodeFully(NbtDeserializer::of, entry);
 				builder.put(new Identifier(key), entityAttributeData);
 			});
 			this.entityAttributeData = builder.build();
@@ -206,7 +206,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			NbtCompound nbtCompound = tag.getCompound("EntityTypes");
 			nbtCompound.getKeys().forEach(key -> {
 				NbtList entry = nbtCompound.getList(key, NbtList.COMPOUND_TYPE);
-				builder.put(new Identifier(key), EntityTypeData.Companion.getEndec().decodeFully(NbtDeserializer::of, entry));
+				builder.put(new Identifier(key), EntityTypeData.ENDEC.decodeFully(NbtDeserializer::of, entry));
 			});
 			this.entityTypeData = builder.build();
 		}
@@ -293,21 +293,21 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 
 	static {
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
+				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
 				new Tuple<>(LivingEntity.class, 0));
-		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
+		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
 				new Tuple<>(MobEntity.class, 1));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
+				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
 				new Tuple<>(PathAwareEntity.class, 2));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
+				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
 				new Tuple<>(HostileEntity.class, 3));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
+				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
 				new Tuple<>(PassiveEntity.class, 4));
 		ENTITY_TYPE_INSTANCES.put(
-				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
+				new Identifier(DataAttributesAPI.MOD_ID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
 				new Tuple<>(AnimalEntity.class, 5));
 	}
 }

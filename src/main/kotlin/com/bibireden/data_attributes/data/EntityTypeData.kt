@@ -9,7 +9,8 @@ import net.minecraft.util.Identifier
 
 class EntityTypeData(val data: MutableMap<Identifier, Double> = mutableMapOf()) {
     companion object {
-        val endec: Endec<EntityTypeData> = Endec.map(CodecUtils.ofCodec(Identifier.CODEC), Endec.DOUBLE).xmap(::EntityTypeData) { it.data }
+        @JvmField
+        val ENDEC: Endec<EntityTypeData> = Endec.map(CodecUtils.ofCodec(Identifier.CODEC), Endec.DOUBLE).xmap(::EntityTypeData) { it.data }
     }
 
     fun build(builder: DefaultAttributeContainer.Builder, container: DefaultAttributeContainer?) {
