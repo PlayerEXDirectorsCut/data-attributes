@@ -1,6 +1,10 @@
-package com.bibireden.data_attributes.endec;
+package io.wispforest.efm.format.nbt;
 
-import io.wispforest.endec.*;
+
+import io.wispforest.endec.Deserializer;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.SelfDescribedDeserializer;
+import io.wispforest.endec.Serializer;
 import io.wispforest.endec.util.RecursiveDeserializer;
 import net.minecraft.nbt.*;
 import org.jetbrains.annotations.Nullable;
@@ -9,13 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-// Thank you wispforest 💖
-
 public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implements SelfDescribedDeserializer<NbtElement> {
 
     protected NbtDeserializer(NbtElement element) {
         super(element);
-        this.set(DataToken.SELF_DESCRIBING, null);
     }
 
     public static NbtDeserializer of(NbtElement element) {
@@ -96,8 +97,8 @@ public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implement
             return Optional.of(endec.decode(this));
         } else {
             var struct = this.struct();
-            return Boolean.TRUE.equals(struct.field("present", Endec.BOOLEAN)) // - null safety to prevent warning ???
-                    ? Optional.ofNullable(struct.field("value", endec))
+            return struct.field("present", Endec.BOOLEAN)
+                    ? Optional.of(struct.field("value", endec))
                     : Optional.empty();
         }
     }
@@ -107,7 +108,7 @@ public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implement
     @Override
     public <E> Deserializer.Sequence<E> sequence(Endec<E> elementEndec) {
         //noinspection unchecked
-        return new Sequence<>(elementEndec, this.getAs(this.getValue(), AbstractNbtList.class));
+        return new Sequence<>(elementEndec, this.getAs(this.getValue(), NbtList.class));
     }
 
     @Override
@@ -137,7 +138,7 @@ public class NbtDeserializer extends RecursiveDeserializer<NbtElement> implement
             case NbtElement.DOUBLE_TYPE -> visitor.writeDouble(((NbtDouble) value).doubleValue());
             case NbtElement.STRING_TYPE -> visitor.writeString(value.asString());
             case NbtElement.BYTE_ARRAY_TYPE -> visitor.writeBytes(((NbtByteArray) value).getByteArray());
-            case NbtElement.INT_ARRAY_TYPE , NbtElement.LONG_ARRAY_TYPE, NbtElement.LIST_TYPE -> {
+            case NbtElement.INT_ARRAY_TYPE, NbtElement.LONG_ARRAY_TYPE, NbtElement.LIST_TYPE -> {
                 var list = (AbstractNbtList<?>) value;
                 try (var sequence = visitor.sequence(Endec.<NbtElement>of(this::decodeValue, deserializer -> null), list.size())) {
                     list.forEach(sequence::element);
