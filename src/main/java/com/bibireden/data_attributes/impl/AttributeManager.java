@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.bibireden.data_attributes.data.AttributeOverride;
+import com.google.gson.JsonElement;
+import io.wispforest.endec.format.json.JsonDeserializer;
 import org.slf4j.Logger;
 
 import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent;
 import com.bibireden.data_attributes.json.AttributeFunctionJson;
-import com.bibireden.data_attributes.json.AttributeOverrideJson;
 import com.bibireden.data_attributes.json.EntityTypesJson;
 import com.bibireden.data_attributes.json.FunctionsJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
@@ -50,22 +52,19 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 
 	private Map<Identifier, EntityAttributeData> entityAttributeData = ImmutableMap.of();
 	private Map<Identifier, EntityTypeData> entityTypeData = ImmutableMap.of();
-	private AttributeContainerHandler handler = new AttributeContainerHandler();
+	private final AttributeContainerHandler handler = new AttributeContainerHandler();
 	private int updateFlag = 0;
 
-	protected static final record Tuple<T>(Class<? extends LivingEntity> livingEntity, T value) {
+	protected record Tuple<T>(Class<? extends LivingEntity> livingEntity, T value) {
 	}
 
-	protected static final record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData,
-			Map<Identifier, EntityTypeData> entityTypeData) {
-	}
+	protected record Wrapper(Map<Identifier, EntityAttributeData> entityAttributeData, Map<Identifier, EntityTypeData> entityTypeData) {}
 
 	public AttributeManager() {
 	}
 
-	private static Map<Identifier, AttributeFunctionJson> formatFunctions(
-			Map<String, AttributeFunctionJson> functionsIn) {
-		Map<Identifier, AttributeFunctionJson> functions = new HashMap<Identifier, AttributeFunctionJson>();
+	private static Map<Identifier, AttributeFunctionJson> formatFunctions(Map<String, AttributeFunctionJson> functionsIn) {
+		Map<Identifier, AttributeFunctionJson> functions = new HashMap<>();
 
 		for (String key : functionsIn.keySet()) {
 			AttributeFunctionJson value = functionsIn.get(key);
@@ -86,52 +85,33 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		return attribute;
 	}
 
-	private static void loadOverrides(ResourceManager manager,
-			Map<Identifier, EntityAttributeData> entityAttributeData) {
-		Map<Identifier, AttributeOverrideJson> cache = new HashMap<Identifier, AttributeOverrideJson>();
+	private static void loadOverrides(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
 		String location = DIRECTORY + "/overrides";
 		int length = location.length() + 1;
 
-		for (Map.Entry<Identifier, Resource> entry : manager
-				.findResources(location, id -> id.getPath().endsWith(".json")).entrySet()) {
+		Map<Identifier, AttributeOverride> cache = new HashMap<>();
+
+		for (Map.Entry<Identifier, Resource> entry : manager.findResources(location, id -> id.getPath().endsWith(".json")).entrySet()) {
 			Identifier resource = entry.getKey();
 			String path = resource.getPath();
-			Identifier identifier = new Identifier(resource.getNamespace(),
-					path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
-			try {
-				BufferedReader reader = entry.getValue().getReader();
+			Identifier identifier = new Identifier(resource.getNamespace(), path.substring(length, path.length() - PATH_SUFFIX_LENGTH));
 
-				try {
-					AttributeOverrideJson json = JsonHelper.deserialize(GSON, (Reader) reader,
-							AttributeOverrideJson.class);
-
-					if (json != null) {
-						AttributeOverrideJson object = cache.put(identifier, json);
-
-						if (object == null)
-							continue;
-						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
-					}
-
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
-							(Object) resource);
-				} finally {
-					if (reader == null)
-						continue;
-					((Reader) reader).close();
-				}
-			} catch (IOException | IllegalArgumentException exception) {
-				LOGGER.error("Couldn't parse data file {} from {}", identifier, resource, exception);
-			}
+            try (BufferedReader reader = entry.getValue().getReader()) {
+                AttributeOverride override = AttributeOverride.Companion.getEndec().decodeFully(JsonDeserializer::of, GSON.fromJson(reader, JsonElement.class));
+                if (cache.put(identifier, override) != null) {
+                    LOGGER.error("Overriding override with found duplicate: {}", identifier);
+                }
+            } catch (IOException | IllegalArgumentException exception) {
+                LOGGER.error("Failed to parse data file {} from {} :: {}", identifier, resource, exception);
+            }
 		}
 
 		cache.forEach((key, value) -> entityAttributeData.put(key, new EntityAttributeData(value)));
 	}
 
-	private static void loadFunctions(ResourceManager manager,
-			Map<Identifier, EntityAttributeData> entityAttributeData) {
-		Map<Identifier, FunctionsJson> cache = new HashMap<Identifier, FunctionsJson>();
+	private static void loadFunctions(ResourceManager manager, Map<Identifier, EntityAttributeData> entityAttributeData) {
+		Map<Identifier, FunctionsJson> cache = new HashMap<>();
 		int length = DIRECTORY.length() + 1;
 
 		for (Map.Entry<Identifier, Resource> entry : manager
@@ -145,7 +125,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 				BufferedReader reader = entry.getValue().getReader();
 
 				try {
-					FunctionsJson json = JsonHelper.deserialize(GSON, (Reader) reader, FunctionsJson.class);
+					FunctionsJson json = JsonHelper.deserialize(GSON, reader, FunctionsJson.class);
 
 					if (json != null) {
 						FunctionsJson object = cache.put(identifier, json);
@@ -155,8 +135,8 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
 
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
-							(Object) resource);
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", identifier,
+                            resource);
 				} finally {
 					if (reader != null)
 						((Reader) reader).close();
@@ -192,7 +172,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 				BufferedReader reader = entry.getValue().getReader();
 
 				try {
-					EntityTypesJson json = JsonHelper.deserialize(GSON, (Reader) reader, EntityTypesJson.class);
+					EntityTypesJson json = JsonHelper.deserialize(GSON, reader, EntityTypesJson.class);
 
 					if (json != null) {
 						EntityTypesJson object = cache.put(identifier, json);
@@ -202,8 +182,8 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 						throw new IllegalStateException("Duplicate data file ignored with ID " + identifier);
 					}
 
-					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", (Object) identifier,
-							(Object) resource);
+					LOGGER.error("Couldn't load data file {} from {} as it's null or empty", identifier,
+                            resource);
 				} finally {
 					if (reader == null)
 						continue;
@@ -280,8 +260,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 		return this.updateFlag;
 	}
 
-	public AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType,
-			final LivingEntity livingEntity) {
+	public AttributeContainer getContainer(final EntityType<? extends LivingEntity> entityType, final LivingEntity livingEntity) {
 		return this.handler.getContainer(entityType, livingEntity);
 	}
 
@@ -318,8 +297,7 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	}
 
 	@Override
-	public CompletableFuture<AttributeManager.Wrapper> load(ResourceManager manager, Profiler profiler,
-			Executor executor) {
+	public CompletableFuture<Wrapper> load(ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
 			Map<Identifier, EntityAttributeData> entityAttributeData = new HashMap<Identifier, EntityAttributeData>();
 			loadOverrides(manager, entityAttributeData);
@@ -328,13 +306,12 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 			Map<Identifier, EntityTypeData> entityTypeData = new HashMap<Identifier, EntityTypeData>();
 			loadEntityTypes(manager, entityTypeData);
 
-			return new AttributeManager.Wrapper(entityAttributeData, entityTypeData);
+			return new Wrapper(entityAttributeData, entityTypeData);
 		}, executor);
 	}
 
 	@Override
-	public CompletableFuture<Void> apply(AttributeManager.Wrapper data, ResourceManager manager, Profiler profiler,
-			Executor executor) {
+	public CompletableFuture<Void> apply(Wrapper data, ResourceManager manager, Profiler profiler, Executor executor) {
 		return CompletableFuture.runAsync(() -> {
 			ImmutableMap.Builder<Identifier, EntityAttributeData> entityAttributeData = ImmutableMap.builder();
 			data.entityAttributeData.forEach(entityAttributeData::put);
@@ -356,20 +333,20 @@ public final class AttributeManager implements SimpleResourceReloadListener<Attr
 	static {
 		ENTITY_TYPE_INSTANCES.put(
 				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY),
-				new Tuple<Integer>(LivingEntity.class, 0));
+				new Tuple<>(LivingEntity.class, 0));
 		ENTITY_TYPE_INSTANCES.put(new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY),
-				new Tuple<Integer>(MobEntity.class, 1));
+				new Tuple<>(MobEntity.class, 1));
 		ENTITY_TYPE_INSTANCES.put(
 				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY),
-				new Tuple<Integer>(PathAwareEntity.class, 2));
+				new Tuple<>(PathAwareEntity.class, 2));
 		ENTITY_TYPE_INSTANCES.put(
 				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY),
-				new Tuple<Integer>(HostileEntity.class, 3));
+				new Tuple<>(HostileEntity.class, 3));
 		ENTITY_TYPE_INSTANCES.put(
 				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY),
-				new Tuple<Integer>(PassiveEntity.class, 4));
+				new Tuple<>(PassiveEntity.class, 4));
 		ENTITY_TYPE_INSTANCES.put(
 				new Identifier(DataAttributesAPI.MODID, DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY),
-				new Tuple<Integer>(AnimalEntity.class, 5));
+				new Tuple<>(AnimalEntity.class, 5));
 	}
 }

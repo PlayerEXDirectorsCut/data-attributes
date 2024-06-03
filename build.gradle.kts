@@ -10,7 +10,9 @@ plugins {
 group = property("maven_group")!!
 version = "${property("mod_version")!!}-${property("loader")!!}"
 
-repositories {}
+repositories {
+    maven("https://maven.wispforest.io")
+}
 
 dependencies {
     minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
@@ -21,7 +23,15 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
 
-    implementation("net.benwoodworth.knbt:knbt:${properties["knbt_version"]}")
+    implementation("io.wispforest:endec:0.1.0-pre.7")
+    implementation("io.wispforest.endec:gson:0.1.0-pre.1")
+    implementation("io.wispforest.endec:netty:0.1.0-pre.1")
+    implementation("io.wispforest.endec:codec:0.1.0-pre.1")
+
+    include("io.wispforest:endec:0.1.0-pre.7")
+    include("io.wispforest.endec:gson:0.1.0-pre.1")
+    include("io.wispforest.endec:netty:0.1.0-pre.1")
+    include("io.wispforest.endec:codec:0.1.0-pre.1")
 }
 
 tasks {

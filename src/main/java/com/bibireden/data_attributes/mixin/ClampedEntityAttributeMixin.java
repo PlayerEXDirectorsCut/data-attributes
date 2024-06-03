@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.mixin;
 
+import com.bibireden.data_attributes.data.AttributeOverride;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +29,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
 		// Overriding the attribute with custom settings
-		this.override(translationKey, min, max, fallback, 0.0D, StackingFormula.Flat);
+		this.override(new AttributeOverride(min, max, fallback, 0.0D, StackingFormula.Flat, translationKey));
 	}
 
 	// Injecting into the getMinValue method to return custom min value
@@ -53,7 +54,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	@Override
 	public void clear() {
 		super.clear(); // Calling the superclass clear method
-		this.data_minValue = this.minValue; // Resetting custom min value
-		this.data_maxValue = this.maxValue; // Resetting custom max value
+		this.data_min = this.minValue; // Resetting custom min value
+		this.data_max = this.maxValue; // Resetting custom max value
 	}
 }

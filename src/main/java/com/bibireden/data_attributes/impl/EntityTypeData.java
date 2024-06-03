@@ -15,7 +15,7 @@ public final class EntityTypeData implements NbtIO {
 	public final Map<Identifier, Double> data;
 
 	public EntityTypeData() {
-		this.data = new HashMap<Identifier, Double>();
+		this.data = new HashMap<>();
 	}
 
 	public EntityTypeData(final Map<String, Double> data) {

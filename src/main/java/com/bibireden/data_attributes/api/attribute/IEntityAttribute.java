@@ -1,6 +1,5 @@
 package com.bibireden.data_attributes.api.attribute;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -24,7 +23,7 @@ public interface IEntityAttribute {
 	/**
 	 * @return The attribute's stacking behaviour.
 	 */
-	StackingFormula stackingBehaviour();
+	StackingFormula formula();
 	
 	/**
 	 * @return An immutable map of the function-parents attached to this attribute.

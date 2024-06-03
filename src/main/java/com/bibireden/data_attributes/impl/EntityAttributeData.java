@@ -1,11 +1,14 @@
 package com.bibireden.data_attributes.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import com.bibireden.data_attributes.data.AttributeOverride;
+import com.bibireden.data_attributes.endec.NbtDeserializer;
+import com.bibireden.data_attributes.endec.NbtSerializer;
 import com.bibireden.data_attributes.json.AttributeFunctionJson;
-import com.bibireden.data_attributes.json.AttributeOverrideJson;
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute;
 
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -14,14 +17,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registries;
 
 public final class EntityAttributeData implements NbtIO {
-	private AttributeOverrideJson attribute;
+	private AttributeOverride attribute;
 	private final Map<Identifier, AttributeFunctionJson> functions;
 
 	public EntityAttributeData() {
 		this.functions = new HashMap<>();
 	}
 
-	public EntityAttributeData(final AttributeOverrideJson attribute) {
+	public EntityAttributeData(final AttributeOverride attribute) {
 		this();
 		this.attribute = attribute;
 	}
@@ -50,11 +53,10 @@ public final class EntityAttributeData implements NbtIO {
 	}
 
 	@Override
-	public void readFromNbt(NbtCompound tag) {
+	public void readFromNbt(NbtCompound tag) throws IllegalStateException {
 		if (tag.contains("Attribute")) {
-			this.attribute = new AttributeOverrideJson();
-			this.attribute.readFromNbt(tag.getCompound("Attribute"));
-		}
+			this.attribute = AttributeOverride.Companion.getEndec().decodeFully(NbtDeserializer::of, tag.getCompound("Attribute"));
+        }
 
 		NbtCompound functions = tag.getCompound("Functions");
 		functions.getKeys().forEach(key -> this.functions.put(new Identifier(key), AttributeFunctionJson.read(functions.getByteArray(key))));
@@ -62,11 +64,8 @@ public final class EntityAttributeData implements NbtIO {
 
 	@Override
 	public void writeToNbt(NbtCompound tag) {
-		NbtCompound attribute = new NbtCompound();
-
 		if (this.attribute != null) {
-			this.attribute.writeToNbt(attribute);
-			tag.put("Attribute", attribute);
+			tag.put("Attribute", AttributeOverride.Companion.getEndec().encodeFully(NbtSerializer::of, this.attribute));
 		}
 
 		NbtCompound functions = new NbtCompound();

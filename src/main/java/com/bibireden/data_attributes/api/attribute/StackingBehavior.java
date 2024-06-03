@@ -23,6 +23,10 @@ public enum StackingBehavior {
 			default -> Add;
 		};
 	}
+
+	public static StackingBehavior of(final String id) {
+		return id.equalsIgnoreCase("multiply") ? Multiply : Add;
+	}
 	
 	public byte id() {
 		return this.id;

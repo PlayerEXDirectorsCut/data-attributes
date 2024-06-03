@@ -4,12 +4,13 @@ import java.util.Map;
 
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
+import com.bibireden.data_attributes.data.AttributeOverride;
 import com.bibireden.data_attributes.json.AttributeFunctionJson;
 
 public interface MutableEntityAttribute extends IEntityAttribute {
 
     // Overrides the properties of the entity attribute
-    void override(String translationKey, double minValue, double maxValue, double fallbackValue, double incrementValue, StackingFormula stackingFormula);
+    void override(AttributeOverride override);
 
     // Adds a parent entity attribute with an associated function
     void addParent(MutableEntityAttribute attributeIn, final AttributeFunctionJson function);

@@ -17,7 +17,14 @@ public enum StackingFormula {
 		this.clamp = clamp;
 		this.stack = stack;
 	}
-	
+
+	public static StackingFormula of(final String id) {
+		if (id.equalsIgnoreCase("diminished")) {
+			return Diminished;
+		}
+		return Flat;
+	}
+
 	public static StackingFormula of(final byte id) {
 		return switch(id) {
 			case 0 -> Flat;
