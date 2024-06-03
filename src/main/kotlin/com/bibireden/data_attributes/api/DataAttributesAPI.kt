@@ -12,6 +12,9 @@ object DataAttributesAPI {
     @JvmField
     val MOD_ID = "data_attributes"
 
+    /** Creates an identifier based on the API. */
+    fun id(str: String) = Identifier.of(MOD_ID, str)!!
+
     /**
      * The entity instance for LivingEntity.class.
      */
