@@ -32,6 +32,10 @@ dependencies {
     include("io.wispforest.endec:gson:${properties["endec_version_2"]}")
     include("io.wispforest.endec:codec:${properties["endec_version_2"]}")
     include("io.wispforest.endec:netty:${properties["endec_version_2"]}")
+
+    include("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
+    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
+    implementation("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
 }
 
 tasks {
