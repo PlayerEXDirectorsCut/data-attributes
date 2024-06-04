@@ -25,7 +25,7 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
     }
 
     /** Overrides a `EntityAttribute`. */
-    fun override(id: Identifier, fn: (id: Identifier, attribute: EntityAttribute?) -> EntityAttribute) {
+    fun override(id: Identifier, fn: (id: Identifier, attribute: EntityAttribute) -> EntityAttribute) {
         this.override?.override(fn(id, this.override.create()) as MutableEntityAttribute)
     }
 

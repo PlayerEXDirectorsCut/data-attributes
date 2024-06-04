@@ -66,7 +66,7 @@ class AttributeResourceManager(
         )
 
         /** Gets or registers an [EntityAttribute] based on the provided identifier key and attribute. */
-        fun getOrCreate(identifier: Identifier, attribute: EntityAttribute?): EntityAttribute = Registries.ATTRIBUTE[identifier] ?: MutableRegistryImpl.register(Registries.ATTRIBUTE, identifier, attribute)
+        fun getOrCreate(identifier: Identifier, attribute: EntityAttribute): EntityAttribute = Registries.ATTRIBUTE[identifier] ?: MutableRegistryImpl.register(Registries.ATTRIBUTE, identifier, attribute)
 
         // Passing in overrides to the data argument.
         fun loadOverrides(manager: ResourceManager, data: MutableMap<Identifier, EntityAttributeData>) {

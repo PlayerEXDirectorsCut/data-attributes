@@ -23,12 +23,13 @@ object DataAttributesAPI {
     fun getAttribute(key: Identifier): EntityAttributeSupplier = { -> Optional.ofNullable(Registries.ATTRIBUTE[key]) }
 
     /**
-     * Tries to obtain a [EntityAttribute] off a [LivingEntity]. Certain requirements must be met in order for the value to be present:
+     * Tries to obtain a [EntityAttribute] value off a [LivingEntity].
+     * Certain requirements must be met in order for the value to be present:
      *
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      *
-     * The returned [Optional] provides more versatility and fallback abilities.
+     * The returned [Optional] provides more versatility.
      */
     fun getValue(entity: LivingEntity, supplier: EntityAttributeSupplier): Optional<Double> {
         val container = entity.attributes
