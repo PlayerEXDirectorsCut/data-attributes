@@ -23,19 +23,15 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
 
-    implementation("io.wispforest:endec:${properties["endec_version"]}")
-    implementation("io.wispforest.endec:gson:${properties["endec_version_2"]}")
-    implementation("io.wispforest.endec:codec:${properties["endec_version_2"]}")
-    implementation("io.wispforest.endec:netty:${properties["endec_version_2"]}")
+    implementation("io.wispforest:endec:${properties["endec_version"]}")?.let(::include)
+    implementation("io.wispforest.endec:gson:${properties["endec_version_2"]}")?.let(::include)
+    implementation("io.wispforest.endec:codec:${properties["endec_version_2"]}")?.let(::include)
+    implementation("io.wispforest.endec:netty:${properties["endec_version_2"]}")?.let(::include)
 
-    include("io.wispforest:endec:${properties["endec_version"]}")
-    include("io.wispforest.endec:gson:${properties["endec_version_2"]}")
-    include("io.wispforest.endec:codec:${properties["endec_version_2"]}")
-    include("io.wispforest.endec:netty:${properties["endec_version_2"]}")
-
-    include("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
-    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
-    implementation("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")
+    implementation("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let {
+        include(it)
+        annotationProcessor(it)
+    }
 }
 
 tasks {
