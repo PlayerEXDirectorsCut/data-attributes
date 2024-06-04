@@ -6,7 +6,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import java.util.*
 
-private typealias AttributeSupplier = () -> Optional<EntityAttribute>
+typealias EntityAttributeSupplier = () -> Optional<EntityAttribute>
 
 object DataAttributesAPI {
     @JvmField
@@ -16,47 +16,11 @@ object DataAttributesAPI {
     fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
     /**
-     * The entity instance for LivingEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_LIVING_ENTITY = id("living_entity")
-
-    /**
-     * The entity instance for MobEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_MOB_ENTITY = id("mob_entity")
-
-    /**
-     * The entity instance for PathAwareEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_PATH_AWARE_ENTITY = id("path_aware_entity")
-
-    /**
-     * The entity instance for HostileEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_HOSTILE_ENTITY = id("hostile_entity")
-
-    /**
-     * The entity instance for PassiveEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_PASSIVE_ENTITY = id("passive_entity")
-
-    /**
-     * The entity instance for AnimalEntity.class.
-     */
-    @JvmField
-    val ENTITY_INSTANCE_ANIMAL_ENTITY = id("animal_entity")
-
-    /**
      * Gets a [Function] that will provide a registered attribute assigned to the given key.
      *
      * Static initialization is not possible for these attributes, which is the reason why this is handled differently.
      */
-    fun getAttribute(key: Identifier): AttributeSupplier = { -> Optional.ofNullable(Registries.ATTRIBUTE[key]) }
+    fun getAttribute(key: Identifier): EntityAttributeSupplier = { -> Optional.ofNullable(Registries.ATTRIBUTE[key]) }
 
     /**
      * Tries to obtain a [EntityAttribute] off a [LivingEntity]. Certain requirements must be met in order for the value to be present:
@@ -66,7 +30,7 @@ object DataAttributesAPI {
      *
      * The returned [Optional] provides more versatility and fallback abilities.
      */
-    fun getValue(entity: LivingEntity, supplier: AttributeSupplier): Optional<Double> {
+    fun getValue(entity: LivingEntity, supplier: EntityAttributeSupplier): Optional<Double> {
         val container = entity.attributes
         val attribute = supplier()
 

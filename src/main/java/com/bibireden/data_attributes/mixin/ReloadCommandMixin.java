@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.bibireden.data_attributes.data.AttributeResourceManager;
 import com.bibireden.data_attributes.endec.nbt.NbtSerializer;
+import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,7 +17,6 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ReloadCommand;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -30,7 +30,7 @@ abstract class ReloadCommandMixin {
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
 		PacketByteBuf buf = PacketByteBufs.create();
-		buf.writeNbt((NbtCompound) AttributeResourceManager.ENDEC.encodeFully(NbtSerializer::of, DataAttributes.SERVER_MANAGER));
+		AttributeResourceManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(buf), DataAttributes.SERVER_MANAGER);
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, DataAttributes.RELOAD, buf));
 	}
 }

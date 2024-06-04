@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
+import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.data.merged.AttributeFunctions
 import com.bibireden.data_attributes.data.merged.EntityTypes
 import com.bibireden.data_attributes.impl.AttributeContainerHandler
@@ -45,7 +46,7 @@ class AttributeResourceManager(
         const val PATH_SUFFIX_LENGTH = ".json".length
 
         val ID = DataAttributesAPI.id(DIRECTORY)
-        val GSON = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create() // todo: expose is probably no longer needed...
+        val GSON = GsonBuilder().create()
         val LOGGER = LogUtils.getLogger()
 
         @JvmField
@@ -56,12 +57,12 @@ class AttributeResourceManager(
         )
 
         val ENTITY_TYPE_INSTANCES = mapOf(
-            DataAttributesAPI.ENTITY_INSTANCE_LIVING_ENTITY     to Tuple(LivingEntity::class.java, 0),
-            DataAttributesAPI.ENTITY_INSTANCE_MOB_ENTITY        to Tuple(MobEntity::class.java, 1),
-            DataAttributesAPI.ENTITY_INSTANCE_PATH_AWARE_ENTITY to Tuple(PathAwareEntity::class.java, 2),
-            DataAttributesAPI.ENTITY_INSTANCE_HOSTILE_ENTITY    to Tuple(HostileEntity::class.java, 3),
-            DataAttributesAPI.ENTITY_INSTANCE_PASSIVE_ENTITY    to Tuple(PassiveEntity::class.java, 4),
-            DataAttributesAPI.ENTITY_INSTANCE_ANIMAL_ENTITY     to Tuple(AnimalEntity::class.java, 5)
+            EntityInstances.LIVING     to Tuple(LivingEntity::class.java, 0),
+            EntityInstances.MOB        to Tuple(MobEntity::class.java, 1),
+            EntityInstances.PATH_AWARE to Tuple(PathAwareEntity::class.java, 2),
+            EntityInstances.HOSTILE    to Tuple(HostileEntity::class.java, 3),
+            EntityInstances.PASSIVE    to Tuple(PassiveEntity::class.java, 4),
+            EntityInstances.ANIMAL     to Tuple(AnimalEntity::class.java, 5)
         )
 
         /** Gets or registers an [EntityAttribute] based on the provided identifier key and attribute. */

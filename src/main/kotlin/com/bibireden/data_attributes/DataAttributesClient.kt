@@ -14,9 +14,11 @@ import java.util.concurrent.CompletableFuture
 class DataAttributesClient : ClientModInitializer {
     companion object {
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
+            buf.retain()
             client.execute {
                 DataAttributes.CLIENT_MANAGER = AttributeResourceManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf)
                 DataAttributes.CLIENT_MANAGER.onDataUpdate()
+                buf.release()
             }
         }
     }
