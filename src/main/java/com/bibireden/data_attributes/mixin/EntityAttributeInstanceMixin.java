@@ -247,7 +247,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		this.onUpdate();
 
-		LivingEntity livingEntity = ((MutableAttributeContainer) this.data_containerCallback).getLivingEntity();
+		LivingEntity livingEntity = ((MutableAttributeContainer) this.data_containerCallback).data_attributes$getLivingEntity();
 
 		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, livingEntity, modifierIn, value,
 				isWasAdded);

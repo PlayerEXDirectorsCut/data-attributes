@@ -9,17 +9,17 @@ import net.minecraft.util.Identifier;
 public interface MutableAttributeContainer {
 
     // Returns a map of custom attributes associated with this container
-    Map<Identifier, EntityAttributeInstance> custom();
+    Map<Identifier, EntityAttributeInstance> data_attributes$custom();
 
     // Returns the LivingEntity associated with this container
-    LivingEntity getLivingEntity();
+    LivingEntity data_attributes$getLivingEntity();
 
     // Sets the LivingEntity associated with this container
-    void setLivingEntity(final LivingEntity livingEntity);
+    void data_attributes$setLivingEntity(final LivingEntity livingEntity);
 
     // Refreshes the attributes of the associated LivingEntity
-    void refresh();
+    void data_attributes$refresh();
 
     // Clears any tracked information (possibly related to attribute changes)
-    void clearTracked();
+    void data_attributes$clearTracked();
 }

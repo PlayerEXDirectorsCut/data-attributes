@@ -4,7 +4,6 @@ import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.data.merged.AttributeFunctions
 import com.bibireden.data_attributes.data.merged.EntityTypes
-import com.bibireden.data_attributes.impl.AttributeContainerHandler
 import com.bibireden.data_attributes.impl.MutableRegistryImpl
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.google.gson.GsonBuilder
@@ -153,9 +152,6 @@ class AttributeResourceManager(
                 data[id] = dat
             }
         }
-
-//        /** Replacement of the Tuple. Uses [Pair] to achieve the same goal. */
-//        fun <T> pair(entity: Class<out LivingEntity>, value: T) = Pair(entity, value)
 
         // todo: These get formatted to map to identifiers. Let us use the Endec system to avoid doing this soon.
         fun formatFunctions(functions: Map<String, AttributeFunction>) = functions.map { (key, value) -> Identifier(key) to value }.toMap()

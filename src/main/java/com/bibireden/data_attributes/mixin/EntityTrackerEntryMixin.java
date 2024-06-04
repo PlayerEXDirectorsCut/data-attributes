@@ -30,6 +30,6 @@ abstract class EntityTrackerEntryMixin {
 		MutableAttributeContainer container = (MutableAttributeContainer) ((LivingEntity) this.entity).getAttributes();
 		
         // Custom method to clear tracked attributes
-		container.clearTracked();
+		container.data_attributes$clearTracked();
 	}
 }

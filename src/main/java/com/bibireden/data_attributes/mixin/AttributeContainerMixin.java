@@ -65,7 +65,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@ModifyReceiver(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
 	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
 
-	@Inject(method = "getCustomInstance*", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getCustomInstance", at = @At("HEAD"), cancellable = true)
 	private void data_getCustomInstance(EntityAttribute attribute2, CallbackInfoReturnable<EntityAttributeInstance> ci) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
 
@@ -140,7 +140,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	private void data_setFrom(AttributeContainer other, CallbackInfo ci) {
 		AttributeContainer container = (AttributeContainer) (Object) this;
 
-		((MutableAttributeContainer) other).custom().values().forEach(attributeInstance -> {
+		((MutableAttributeContainer) other).data_attributes$custom().values().forEach(attributeInstance -> {
 			EntityAttribute entityAttribute = attributeInstance.getAttribute();
 			EntityAttributeInstance entityAttributeInstance = container.getCustomInstance(entityAttribute);
 
@@ -163,29 +163,29 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	}
 
 	@Override
-	public Map<Identifier, EntityAttributeInstance> custom() {
+	public Map<Identifier, EntityAttributeInstance> data_attributes$custom() {
 		return this.data_custom;
 	}
 
 	@Override
-	public LivingEntity getLivingEntity() {
+	public LivingEntity data_attributes$getLivingEntity() {
 		return this.data_livingEntity;
 	}
 
 	@Override
-	public void setLivingEntity(final LivingEntity livingEntity) {
+	public void data_attributes$setLivingEntity(final LivingEntity livingEntity) {
 		this.data_livingEntity = livingEntity;
 	}
 
 	@Override
-	public void refresh() {
+	public void data_attributes$refresh() {
 		for (EntityAttributeInstance instance : this.data_custom.values()) {
 			((MutableAttributeInstance) instance).refresh();
 		}
 	}
 
 	@Override
-	public void clearTracked() {
+	public void data_attributes$clearTracked() {
 		this.data_tracked.clear();
 	}
 }

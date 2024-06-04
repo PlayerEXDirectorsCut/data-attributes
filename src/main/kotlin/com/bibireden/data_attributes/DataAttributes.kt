@@ -3,7 +3,6 @@ package com.bibireden.data_attributes
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.data.AttributeResourceManager
-import com.bibireden.data_attributes.endec.nbt.NbtSerializer
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
@@ -19,7 +18,6 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.resource.ResourceType
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
@@ -45,7 +43,7 @@ class DataAttributes : ModInitializer {
 
         @JvmStatic
         fun refreshAttributes(entity: Entity) {
-            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).refresh()
+            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
         }
 
         fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {
