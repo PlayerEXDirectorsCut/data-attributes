@@ -15,14 +15,6 @@ class AttributeFunction(val behavior: StackingBehavior, val value: Double) : IAt
             Endec.DOUBLE.fieldOf("value") { it.value },
             ::AttributeFunction
         )
-
-        fun of(array: ByteArray) = AttributeFunction(StackingBehavior.of(array[8]), Maths.byteArrayToDouble(array))
-    }
-
-    fun write(): ByteArray {
-        val array = Maths.doubleToByteArray(this.value, 9)
-        array[8] = this.behavior.id()
-        return array
     }
 
     override fun behavior(): StackingBehavior = this.behavior

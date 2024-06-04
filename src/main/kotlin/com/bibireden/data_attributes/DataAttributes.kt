@@ -40,8 +40,7 @@ class DataAttributes : ModInitializer {
         }
 
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
-            val buf = PacketByteBufs.create()
-            sender.sendPacket(HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ -> ByteBufSerializer.of(buf)}, SERVER_MANAGER))
+            sender.sendPacket(HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ -> ByteBufSerializer.of(PacketByteBufs.create())}, SERVER_MANAGER))
         }
 
         @JvmStatic
@@ -49,7 +48,6 @@ class DataAttributes : ModInitializer {
             if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).refresh()
         }
 
-        // Handles health modification events for all living entities
         fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {
             if (entity?.world?.isClient == false && attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
                 entity.health = (entity.health * entity.maxHealth / previous).toFloat()
@@ -60,8 +58,9 @@ class DataAttributes : ModInitializer {
     override fun onInitialize() {
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
 
-        ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)
         ServerLoginNetworking.registerGlobalReceiver(HANDSHAKE) { _, _, _, _, _, _ -> }
+
+        ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)
 
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ -> refreshAttributes(newEntity) }
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> refreshAttributes(player) }

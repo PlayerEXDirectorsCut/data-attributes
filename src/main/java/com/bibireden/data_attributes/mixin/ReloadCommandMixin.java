@@ -29,8 +29,7 @@ abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
-		PacketByteBuf buf = PacketByteBufs.create();
-		AttributeResourceManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(buf), DataAttributes.SERVER_MANAGER);
+		PacketByteBuf buf = AttributeResourceManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER);
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, DataAttributes.RELOAD, buf));
 	}
 }

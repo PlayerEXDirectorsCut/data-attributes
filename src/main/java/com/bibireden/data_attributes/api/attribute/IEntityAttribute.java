@@ -11,17 +11,17 @@ import java.util.Map;
  */
 public interface IEntityAttribute {
 	/**
-	 * @return The attribute's minimum value;
+	 * @return The minimum value of the attribute.
 	 */
 	double data_attributes$min();
 	
 	/**
-	 * @return The attribute's maximum value;
+	 * @return The maximum value of the attribute.
 	 */
 	double data_attributes$max();
 	
 	/**
-	 * @return The attribute's stacking behaviour.
+	 * @return The attribute's {@link StackingFormula}.
 	 */
 	StackingFormula data_attributes$formula();
 	

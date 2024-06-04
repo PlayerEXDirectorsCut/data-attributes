@@ -1,11 +1,9 @@
 package com.bibireden.data_attributes.mixin;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,10 +32,10 @@ import net.minecraft.registry.Registries;
 abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
 	@Unique
-	private Map<Identifier, EntityAttributeInstance> data_custom = new HashMap<Identifier, EntityAttributeInstance>();
+	private final Map<Identifier, EntityAttributeInstance> data_custom = new HashMap<>();
 
 	@Unique
-	private Map<Identifier, EntityAttributeInstance> data_tracked = new HashMap<Identifier, EntityAttributeInstance>();
+	private final Map<Identifier, EntityAttributeInstance> data_tracked = new HashMap<>();
 
 	@Unique
 	private LivingEntity data_livingEntity;
@@ -47,44 +45,33 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	private DefaultAttributeContainer fallback;
 
 	@Shadow
-	private void updateTrackedStatus(EntityAttributeInstance instance) {
-	}
+	private void updateTrackedStatus(EntityAttributeInstance instance) {}
 
 	// Injection to update the tracked status of the custom attributes
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
-	private void data_updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
+	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
 		Identifier identifier = ((MutableAttributeInstance) instance).getId();
-
 		if (identifier != null) {
 			this.data_tracked.put(identifier, instance);
 		}
-
 		ci.cancel();
 	}
 
-	// Injection to get the tracked custom attributes
-	@Inject(method = "getTracked", at = @At("Head"), cancellable = true)
-	private void data_getTracked(CallbackInfoReturnable<Set<EntityAttributeInstance>> cir) {
-		Set<EntityAttributeInstance> tracked = this.data_tracked.values().stream().collect(Collectors.toSet());
-		cir.setReturnValue(tracked);
+	@ModifyReturnValue(method = "getTracked", at = @At("RETURN"))
+	private Set<EntityAttributeInstance> data_attributes$getTracked(Set<EntityAttributeInstance> original) {
+		return new HashSet<>(this.data_tracked.values());
 	}
 
-	// Redirecting the getAttributesToSend method to use custom attributes
-	@Redirect(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
-	private Collection<?> data_getAttributesToSend(Map<?, ?> instances) {
-		return this.data_custom.values();
-	}
+	@ModifyReceiver(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
+	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
 
-	// Injection to get or create a custom attribute instance
-	@Inject(method = "getCustomInstance", at = @At("HEAD"), cancellable = true)
-	private void data_getCustomInstance(EntityAttribute attribute2,
-			CallbackInfoReturnable<EntityAttributeInstance> ci) {
+	@Inject(method = "getCustomInstance*", at = @At("HEAD"), cancellable = true)
+	private void data_getCustomInstance(EntityAttribute attribute2, CallbackInfoReturnable<EntityAttributeInstance> ci) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
 
 		if (identifier != null) {
 			EntityAttributeInstance entityAttributeInstance = this.data_custom
-					.computeIfAbsent(identifier,
-							id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
+					.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
 
 			if (entityAttributeInstance != null) {
 				MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
