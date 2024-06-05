@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.*;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
@@ -47,7 +48,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Shadow
 	private void updateTrackedStatus(EntityAttributeInstance instance) {}
 
-	// Injection to update the tracked status of the custom attributes
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
 		Identifier identifier = ((MutableAttributeInstance) instance).getId();
@@ -65,7 +65,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@ModifyReceiver(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
 	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
 
-	@Inject(method = "getCustomInstance", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getCustomInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;", at = @At("HEAD"), cancellable = true)
 	private void data_getCustomInstance(EntityAttribute attribute2, CallbackInfoReturnable<EntityAttributeInstance> ci) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
 
@@ -88,14 +88,15 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		}
 	}
 
-	// Redirecting methods to use custom attributes
-	@Redirect(method = "hasAttribute", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_hasAttribute(Map<?, ?> instances, Object attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
-		return this.data_custom.get(identifier);
+	@ModifyExpressionValue(
+		method = "hasAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;)Z",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/attribute/DefaultAttributeContainer;has(Lnet/minecraft/entity/attribute/EntityAttribute;)Z")
+	)
+	private boolean data_attributes$hasAttribute(boolean original, EntityAttribute attribute) {
+		return this.data_custom.get(Registries.ATTRIBUTE.getId(attribute)) != null || original;
 	}
 
-	@Redirect(method = "hasModifierForAttribute", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	@Redirect(method = "hasModifierForAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;Ljava/util/UUID;)Z", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_hasModifierForAttribute(Map<?, ?> instances, Object attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
 		return this.data_custom.get(identifier);
@@ -113,7 +114,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		return this.data_custom.get(identifier);
 	}
 
-	@Redirect(method = "getModifierValue", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	@Redirect(method = "getModifierValue(Lnet/minecraft/entity/attribute/EntityAttribute;Ljava/util/UUID;)D", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_getModifierValue(Map<?, ?> instances, Object attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
 		return this.data_custom.get(identifier);
@@ -136,6 +137,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	}
 
 	// Injection to set custom attributes from another container
+	@SuppressWarnings("all") // todo: temp until intellij update
 	@Inject(method = "setFrom", at = @At("HEAD"), cancellable = true)
 	private void data_setFrom(AttributeContainer other, CallbackInfo ci) {
 		AttributeContainer container = (AttributeContainer) (Object) this;
@@ -147,9 +149,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 			if (entityAttributeInstance != null) {
 				entityAttributeInstance.setFrom(attributeInstance);
 				final double value = entityAttributeInstance.getValue();
-				EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, this.data_livingEntity,
-						null,
-						value, false);
+				EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, this.data_livingEntity, null, value, false);
 			}
 		});
 

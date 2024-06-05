@@ -20,7 +20,9 @@ object DataAttributesAPI {
      *
      * Static initialization is not possible for these attributes, which is the reason why this is handled differently.
      */
-    fun getAttribute(key: Identifier): EntityAttributeSupplier = { -> Optional.ofNullable(Registries.ATTRIBUTE[key]) }
+    fun getAttribute(key: Identifier): EntityAttributeSupplier {
+        return { -> Optional.ofNullable(Registries.ATTRIBUTE[key]) }
+    }
 
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity].

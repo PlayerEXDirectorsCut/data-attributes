@@ -43,7 +43,9 @@ class DataAttributes : ModInitializer {
 
         @JvmStatic
         fun refreshAttributes(entity: Entity) {
-            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
+            if (entity is LivingEntity) {
+                (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
+            }
         }
 
         fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {

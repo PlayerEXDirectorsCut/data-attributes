@@ -1,13 +1,10 @@
 package com.bibireden.data_attributes.mixin;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 import com.bibireden.data_attributes.data.AttributeFunction;
+import com.bibireden.data_attributes.utils.DiminishingMathKt;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -87,31 +84,33 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		}
 	}
 
+	@SuppressWarnings("all")
 	@Inject(method = "computeValue", at = @At("HEAD"), cancellable = true)
 	private void data_computeValue(CallbackInfoReturnable<Double> ci) {
-		MutableEntityAttribute attribute = (MutableEntityAttribute) ((EntityAttributeInstance) (Object) this)
-				.getAttribute();
-		StackingFormula behaviour = attribute.data_attributes$formula();
+//		DiminishingMathKt.computeStacking((EntityAttributeInstance) (Object) this, this.type, this.data_containerCallback);
+
+		MutableEntityAttribute attribute = (MutableEntityAttribute) ((EntityAttributeInstance) (Object) this).getAttribute();
+		StackingFormula formula = attribute.data_attributes$formula();
+
 		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
 
 		if (this.baseValue > 0.0D) {
-			k = behaviour.stack(k, this.baseValue);
-			k2 = behaviour.max(k2, this.baseValue);
+			k = formula.stack(k, this.baseValue);
+			k2 = formula.max(k2, this.baseValue);
 		} else {
-			v = behaviour.stack(v, this.baseValue);
-			v2 = behaviour.max(v2, this.baseValue);
+			v = formula.stack(v, this.baseValue);
+			v2 = formula.max(v2, this.baseValue);
 		}
 
-		for (EntityAttributeModifier modifier : this
-				.getModifiersByOperation(EntityAttributeModifier.Operation.ADDITION)) {
+		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.ADDITION)) {
 			double value = modifier.getValue();
 
 			if (value > 0.0D) {
-				k = behaviour.stack(k, value);
-				k2 = behaviour.max(k2, value);
+				k = formula.stack(k, value);
+				k2 = formula.max(k2, value);
 			} else {
-				v = behaviour.stack(v, value);
-				v2 = behaviour.max(v2, value);
+				v = formula.stack(v, value);
+				v2 = formula.max(v2, value);
 			}
 		}
 
@@ -133,12 +132,12 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 				double value = multiplier * instance.getValue();
 
 				if (value > 0.0D) {
-					k = behaviour.stack(k, value);
+					k = formula.stack(k, value);
 					// We don't put this here because follow-on attribute values should always be
 					// diminishing (if the attribute supports it).
 					// k2 = behaviour.max(k2, value);
 				} else {
-					v = behaviour.stack(v, value);
+					v = formula.stack(v, value);
 					// We don't put this here because follow-on attribute values should always be
 					// diminishing (if the attribute supports it).
 					// v2 = behaviour.max(v2, value);

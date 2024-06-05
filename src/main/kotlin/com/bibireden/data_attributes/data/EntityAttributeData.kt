@@ -32,11 +32,9 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
     /** Copies to a given `EntityAttribute` by adding children to the instance via mixin. */
     fun copy(attributeIn: EntityAttribute) {
         val attribute = attributeIn as MutableEntityAttribute
-        this.functions.keys.forEach {
-            attribute.`data_attributes$addChild`(
-                Registries.ATTRIBUTE[it] as? MutableEntityAttribute ?: return@forEach,
-                this.functions[it] ?: return@forEach
-            )
+        for ((id, function) in functions) {
+            val childAttribute = Registries.ATTRIBUTE[id] ?: continue
+            attribute.`data_attributes$addChild`(childAttribute as MutableEntityAttribute, function)
         }
     }
 

@@ -7,9 +7,9 @@ import io.wispforest.endec.impl.StructEndecBuilder
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttribute
 
-data class AttributeOverride(val midpoint: Double, val min: Double, val max: Double, val smoothness: Double, val formula: StackingFormula, val translationKey: String) {
+data class AttributeOverride(val fallback: Double, val min: Double, val max: Double, val smoothness: Double, val formula: StackingFormula, val translationKey: String) {
     /** Creates a **clamped** `EntityAttribute` based on the fields of this class. */
-    fun create(): EntityAttribute = ClampedEntityAttribute(this.translationKey, this.midpoint, this.min, this.max)
+    fun create(): EntityAttribute = ClampedEntityAttribute(this.translationKey, this.fallback, this.min, this.max)
 
     /** Calls an override of an `MutableEntityAttribute`. */
     fun override(mutableEntityAttribute: MutableEntityAttribute) {
@@ -19,7 +19,7 @@ data class AttributeOverride(val midpoint: Double, val min: Double, val max: Dou
     companion object {
         @JvmField
         val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
-            Endec.DOUBLE.optionalFieldOf("midpoint", { it.midpoint }, 0.0),
+            Endec.DOUBLE.optionalFieldOf("fallback", { it.fallback }, 0.0),
             Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
             Endec.DOUBLE.optionalFieldOf("max", { it.max }, Double.MAX_VALUE),
             Endec.DOUBLE.fieldOf("smoothness") { it.smoothness },

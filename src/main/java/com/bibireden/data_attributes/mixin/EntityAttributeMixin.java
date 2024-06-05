@@ -29,7 +29,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Unique private Map<IEntityAttribute, AttributeFunction> data_parents, data_children;
     @Unique private StackingFormula data_formula;
     @Unique private String data_translationKey;
-    @Unique protected double data_midpoint, data_min, data_max, data_smoothness;
+    @Unique protected double data_fallback, data_min, data_max, data_smoothness;
 
     @Final
     @Shadow
@@ -43,7 +43,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void data_attributes$init(String translationKey, double fallback, CallbackInfo ci) {
         this.data_translationKey = translationKey;
-        this.data_midpoint = fallback;
+        this.data_fallback = fallback;
         this.data_min = Double.MIN_VALUE;
         this.data_max = Double.MAX_VALUE;
         this.data_formula = StackingFormula.Flat;
@@ -53,7 +53,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @ModifyReturnValue(method = "getDefaultValue", at = @At("RETURN"))
     private double data_attributes$getDefaultValue(double original) {
-        return this.data_midpoint;
+        return this.data_fallback;
     }
 
     @ModifyReturnValue(method = "isTracked", at = @At("RETURN"))
@@ -83,7 +83,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
         this.data_min = override.getMin();
         this.data_max = override.getMax();
         this.data_smoothness = override.getSmoothness();
-        this.data_midpoint = override.getMidpoint();
+        this.data_fallback = override.getFallback();
         this.data_formula = override.getFormula();
     }
 
