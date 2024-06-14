@@ -3,7 +3,7 @@ package com.bibireden.data_attributes.mixin;
 import java.util.Collection;
 
 import com.bibireden.data_attributes.data.AttributeResourceManager;
-import com.bibireden.data_attributes.endec.nbt.NbtSerializer;
+import com.bibireden.data_attributes.networking.Channels;
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,6 @@ import com.bibireden.data_attributes.DataAttributes;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.ReloadCommand;
 import net.minecraft.server.command.ServerCommandSource;
@@ -30,6 +29,6 @@ abstract class ReloadCommandMixin {
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
 		PacketByteBuf buf = AttributeResourceManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER);
-		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, DataAttributes.RELOAD, buf));
+		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
 	}
 }

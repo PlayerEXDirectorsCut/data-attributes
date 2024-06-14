@@ -1,0 +1,26 @@
+{
+  "text.config.data_attributes.title": "Data Attributes :: Configuration",
+
+  "text.config.data_attributes.section.overrides": "Attribute Overrides",
+  "text.config.data_attributes.section.functions": "Attribute Functions",
+
+  "text.config.data_attributes.enum.stackingFormula.flat": "Flat",
+  "text.config.data_attributes.enum.stackingFormula.diminished": "Diminished",
+
+  "text.config.data_attributes.enum.functionBehavior.add": "Add",
+  "text.config.data_attributes.enum.functionBehavior.multiply": "Multiply",
+
+  "text.config.data_attributes.category.overrides": "Attribute Overrides",
+  "text.config.data_attributes.category.functions": "Attribute Functions",
+
+  "text.config.data_attributes.data_entry.overrides.enabled": "Enable Override?",
+  "text.config.data_attributes.data_entry.overrides.min_fallback": "Minimum Fallback Value",
+  "text.config.data_attributes.data_entry.overrides.max_fallback": "Maximum Fallback Value",
+  "text.config.data_attributes.data_entry.overrides.min": "Minimum Value",
+  "text.config.data_attributes.data_entry.overrides.max": "Maximum Value",
+  "text.config.data_attributes.data_entry.overrides.smoothness": "Smoothness",
+  "text.config.data_attributes.data_entry.overrides.formula": "Stacking Formula",
+
+  "text.config.data_attributes.data_entry.functions.behavior": "Function Behavior",
+  "text.config.data_attributes.data_entry.functions.value": "Value"
+}

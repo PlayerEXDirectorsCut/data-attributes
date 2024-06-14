@@ -1,10 +1,21 @@
 package com.bibireden.data_attributes
 
-import com.bibireden.data_attributes.api.DataAttributesAPI
+import blue.endless.jankson.Jankson
+import blue.endless.jankson.JsonElement
+import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
+import com.bibireden.data_attributes.config.AttributeConfigManager
+import com.bibireden.data_attributes.config.DataAttributesConfig
+import com.bibireden.data_attributes.data.AttributeFunction
+import com.bibireden.data_attributes.data.AttributeFunctionConfig
+import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.AttributeResourceManager
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
+import com.bibireden.data_attributes.networking.Channels
+import com.bibireden.data_attributes.serde.PacketBufs
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
+import io.wispforest.endec.format.json.JsonDeserializer
+import io.wispforest.endec.format.json.JsonSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -21,15 +32,29 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.resource.ResourceType
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
+import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import org.apache.logging.log4j.LogManager
+import java.lang.reflect.Type
 
 class DataAttributes : ModInitializer {
     companion object {
-        @JvmField val HANDSHAKE = DataAttributesAPI.id("handshake")
-        @JvmField val RELOAD = DataAttributesAPI.id("reload")
+        const val MOD_ID = "data_attributes"
+
+        val LOGGER = LogManager.getLogger()
+
+        @JvmField val CONFIG_MANAGER = AttributeConfigManager()
 
         @JvmField var CLIENT_MANAGER = AttributeResourceManager()
         @JvmField val SERVER_MANAGER = AttributeResourceManager()
+
+        init {
+            PacketBufs.registerPacketSerializers()
+        }
+
+        fun id(str: String) = Identifier.of(MOD_ID, str)!!
+
+        val CONFIG = DataAttributesConfig.createAndLoad()
 
         /** Gets the [AttributeResourceManager] based on the world context. */
         fun getManager(world: World): AttributeResourceManager = when {
@@ -38,7 +63,7 @@ class DataAttributes : ModInitializer {
         }
 
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
-            sender.sendPacket(HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ -> ByteBufSerializer.of(PacketByteBufs.create())}, SERVER_MANAGER))
+            sender.sendPacket(Channels.HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER))
         }
 
         @JvmStatic
@@ -56,9 +81,14 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
+        CONFIG.subscribeToOverrides { data ->
+            LOGGER.info("Data Changed: $data")
+//            CONFIG_MANAGER.onDataUpdate(data)
+        }
+
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
 
-        ServerLoginNetworking.registerGlobalReceiver(HANDSHAKE) { _, _, _, _, _, _ -> }
+        ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
         ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)
 

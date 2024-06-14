@@ -1,9 +1,10 @@
 package com.bibireden.data_attributes.data
 
-import com.bibireden.data_attributes.api.DataAttributesAPI
+import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.data.merged.AttributeFunctions
 import com.bibireden.data_attributes.data.merged.EntityTypes
+import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.impl.MutableRegistryImpl
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.google.gson.GsonBuilder
@@ -44,14 +45,14 @@ class AttributeResourceManager(
         const val DIRECTORY = "attributes"
         const val PATH_SUFFIX_LENGTH = ".json".length
 
-        val ID = DataAttributesAPI.id(DIRECTORY)
+        val ID = DataAttributes.id(DIRECTORY)
         val GSON = GsonBuilder().create()
         val LOGGER = LogUtils.getLogger()
 
         @JvmField
         val ENDEC = StructEndecBuilder.of(
-            Endec.map(CodecUtils.ofCodec(Identifier.CODEC), EntityAttributeData.ENDEC).fieldOf("attributes") { it.attributes },
-            Endec.map(CodecUtils.ofCodec(Identifier.CODEC), EntityTypeData.ENDEC).fieldOf("types") { it.types },
+            Endec.map(Endecs.IDENTIFIER, EntityAttributeData.ENDEC).fieldOf("attributes") { it.attributes },
+            Endec.map(Endecs.IDENTIFIER, EntityTypeData.ENDEC).fieldOf("types") { it.types },
             ::AttributeResourceManager
         )
 

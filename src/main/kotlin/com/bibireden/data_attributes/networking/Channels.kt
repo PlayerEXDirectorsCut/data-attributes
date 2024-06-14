@@ -1,8 +1,10 @@
 package com.bibireden.data_attributes.networking
 
-import com.bibireden.data_attributes.api.DataAttributesAPI
+import com.bibireden.data_attributes.DataAttributes
 
 object Channels {
-    val HANDSHAKE = DataAttributesAPI.id("handshake")
-    val RELOAD = DataAttributesAPI.id("reload")
+    @JvmField
+    val HANDSHAKE = DataAttributes.id("handshake")
+    @JvmField
+    val RELOAD = DataAttributes.id("reload")
 }

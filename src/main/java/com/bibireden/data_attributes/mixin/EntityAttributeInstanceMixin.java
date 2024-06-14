@@ -68,6 +68,8 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	protected void onUpdate() {
 	}
 
+	@Shadow private double value;
+
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
 		this.data_identifier = Registries.ATTRIBUTE.getId(type);
@@ -175,8 +177,13 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 				e *= 1.0D + (instance.getValue() * function.value());
 			}
 		}
-
 		double value = ((EntityAttribute) attribute).clamp(e);
+
+		if (formula == StackingFormula.Diminished) {
+			value = value * (attribute.data_attributes$max() - attribute.data_attributes$min());
+			value += attribute.data_attributes$min();
+		}
+
 		ci.setReturnValue(value);
 	}
 

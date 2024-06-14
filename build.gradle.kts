@@ -1,18 +1,20 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm") version "2.0.0"
     id("fabric-loom")
+    kotlin("kapt") version "2.0.0"
     `maven-publish`
     java
 }
 
-group = property("maven_group")!!
-version = "${property("mod_version")!!}-${property("loader")!!}"
+group = "${properties["maven_group"]}"
+version = "${properties["mod_version"]}-${properties["loader"]}"
 
 repositories {
     maven("https://maven.wispforest.io")
+    maven("https://maven.terraformersmc.com")
+    maven("https://api.modrinth.com/maven")
 }
 
 dependencies {
@@ -24,6 +26,12 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
 
+    modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")?.let {
+        annotationProcessor(it)
+        kapt(it)
+    }
+    include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
+
     implementation("io.wispforest:endec:${properties["endec_version"]}")?.let(::include)
     implementation("io.wispforest.endec:gson:${properties["endec_version_2"]}")?.let(::include)
     implementation("io.wispforest.endec:codec:${properties["endec_version_2"]}")?.let(::include)
@@ -32,6 +40,10 @@ dependencies {
     implementation("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let {
         include(it)
         annotationProcessor(it)
+    }
+
+    modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
+        exclude("net.fabricmc.fabric-api")
     }
 }
 

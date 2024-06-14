@@ -5,8 +5,16 @@ import java.util.function.Function;
 import net.minecraft.util.math.MathHelper;
 
 public enum StackingFormula {
-	Flat((byte)0, x -> x, (k, k2, v, v2, m) -> k - v),
-	Diminished((byte)1, x -> MathHelper.clamp(x, -1.0D, 1.0D), (k, k2, v, v2, m) -> ((1.0D - v2) * Math.pow(1.0D - m, (v - v2) / m)) - ((1.0D - k2) * Math.pow(1.0D - m, (k - k2) / m)));
+	Flat(
+		(byte)0,
+		x -> x,
+		(k, k2, v, v2, m) -> k - v
+	),
+	Diminished(
+		(byte)1,
+		x -> MathHelper.clamp(x, -1.0D, 1.0D),
+		(k, k2, v, v2, m) -> ((1.0D - v2) * Math.pow(1.0D - m, (v - v2) / m)) - ((1.0D - k2) * Math.pow(1.0D - m, (k - k2) / m))
+	);
 	
 	private final byte id;
 	private final Function<Double, Double> clamp;

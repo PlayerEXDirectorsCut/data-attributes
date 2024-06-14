@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.api
 
-import com.bibireden.data_attributes.api.DataAttributesAPI.id
+import com.bibireden.data_attributes.DataAttributes.Companion.id
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.HostileEntity
