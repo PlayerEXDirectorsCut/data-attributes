@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.utils.DiminishingMathKt;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -75,20 +77,20 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		this.data_identifier = Registries.ATTRIBUTE.getId(type);
 	}
 
-	@Inject(method = "getAttribute", at = @At("HEAD"), cancellable = true)
-	private void data_getAttribute(CallbackInfoReturnable<EntityAttribute> ci) {
+	@ModifyReturnValue(method = "getAttribute", at = @At("RETURN"))
+	private EntityAttribute data_getAttribute(EntityAttribute original) {
 		EntityAttribute attribute = Registries.ATTRIBUTE.get(this.data_identifier);
 
 		if (attribute != null) {
-			ci.setReturnValue(attribute);
-		} else {
-			ci.setReturnValue(this.type);
+			return attribute;
 		}
+
+		return this.type;
 	}
 
 	@SuppressWarnings("all")
-	@Inject(method = "computeValue", at = @At("HEAD"), cancellable = true)
-	private void data_computeValue(CallbackInfoReturnable<Double> ci) {
+	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"))
+	private double data_computeValue(double original) {
 //		DiminishingMathKt.computeStacking((EntityAttributeInstance) (Object) this, this.type, this.data_containerCallback);
 
 		MutableEntityAttribute attribute = (MutableEntityAttribute) ((EntityAttributeInstance) (Object) this).getAttribute();
@@ -184,7 +186,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			value += attribute.data_attributes$min();
 		}
 
-		ci.setReturnValue(value);
+		return value;
 	}
 
 	@Inject(method = "addModifier", at = @At("HEAD"), cancellable = true)
@@ -218,10 +220,10 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		ci.cancel();
 	}
 
-	@Redirect(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
-	private Identifier data_toNbt(Registry<?> registry, Object type) {
+	@ModifyExpressionValue(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
+	private Identifier data_toNbt(Identifier id) {
 		if (this.data_identifier == null)
-			return Registries.ATTRIBUTE.getId((EntityAttribute) type);
+			return Registries.ATTRIBUTE.getId(this.type);
 		return this.data_identifier;
 	}
 

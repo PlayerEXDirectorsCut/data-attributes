@@ -3,6 +3,7 @@ package com.bibireden.data_attributes.mixin;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,13 +37,13 @@ abstract class EntityAttributeModifierMixin implements MutableAttributeModifier 
     }
 
     // Redirects to override the original toString and toNbt methods
-    @Redirect(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
-    private double onToString(EntityAttributeModifier modifier) {
+    @ModifyExpressionValue(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
+    private double onToString(double original) {
         return this.data_value;
     }
 
-    @Redirect(method = "toNbt", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
-    private double onToNbt(EntityAttributeModifier modifier) {
+    @ModifyExpressionValue(method = "toNbt", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
+    private double onToNbt(double original) {
         return this.data_value;
     }
 
