@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.serde
 
-import com.bibireden.data_attributes.config.DataAttributesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.AttributeFunction
 import io.wispforest.endec.Endec
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer

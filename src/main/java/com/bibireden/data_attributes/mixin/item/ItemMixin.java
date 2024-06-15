@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.mixin.item;
 
+import com.bibireden.data_attributes.DataAttributes;
 import org.spongepowered.asm.mixin.Mixin;
 
 import com.bibireden.data_attributes.api.item.ItemHelper;

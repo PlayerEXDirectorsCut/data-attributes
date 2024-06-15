@@ -12,9 +12,9 @@ import io.wispforest.owo.config.annotation.*;
 import net.minecraft.util.Identifier
 
 @Suppress("UNUSED")
-@Config(name = DataAttributes.MOD_ID, wrapperName = "DataAttributesConfig")
+@Config(name = "${DataAttributes.MOD_ID}/overrides", wrapperName = "DataAttributesOverridesConfig")
 @Sync(SyncMode.NONE)
-class DataAttributesConfigModel {
+class OverridesConfigModel {
     enum class StackingFormula { Flat, Diminished;
         companion object {
             fun of(str: String): StackingFormula {
@@ -31,16 +31,6 @@ class DataAttributesConfigModel {
     @JvmField
     @Hook
     var overrides: Map<Identifier, AttributeOverrideConfig> = mapOf()
-
-    @SectionHeader("functions")
-
-    @JvmField
-    @Hook
-    var functions: AttributeFunctionConfigData = AttributeFunctionConfigData(mapOf(
-        Identifier("ktor") to listOf(
-            AttributeFunctionConfig(Identifier("bloodshed"), StackingBehavior.Add, 29.0)
-        )
-    ))
 
     data class AttributeOverrideConfig(
         @JvmField

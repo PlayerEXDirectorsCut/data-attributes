@@ -2,13 +2,14 @@ package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
-import com.bibireden.data_attributes.config.DataAttributesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.config.DataAttributesConfigModel.StackingFormula
+import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.OverridesConfigModel.StackingFormula
 import com.bibireden.data_attributes.data.AttributeFunction
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.utils.round
 import com.google.common.base.Predicate
+import io.wispforest.owo.config.ConfigWrapper
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.ConfigScreen
 import io.wispforest.owo.config.ui.OptionComponentFactory
@@ -23,7 +24,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 @Suppress("UnstableApiUsage")
-class DataAttributesConfigScreen(parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
+open class DataAttributesConfigScreen(parent: Screen?, wrapper: ConfigWrapper<*>) : ConfigScreen(DEFAULT_MODEL_ID, wrapper, parent) {
     companion object Factory {
         fun isNumeric(str: String) = str.isEmpty() || str.matches("-?\\d+(\\.\\d+)?".toRegex())
 
@@ -227,7 +228,5 @@ class DataAttributesConfigScreen(parent: Screen?) : ConfigScreen(DEFAULT_MODEL_I
     }
 
     init {
-        this.extraFactories.put({ it.backingField().field.name.equals("overrides") }, ATTRIBUTE_OVERRIDE_FACTORY)
-        this.extraFactories.put({ it.backingField().field.name.equals("functions") }, ATTRIBUTE_FUNCTIONS_FACTORY)
     }
 }

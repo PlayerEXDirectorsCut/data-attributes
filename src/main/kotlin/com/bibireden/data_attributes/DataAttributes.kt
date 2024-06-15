@@ -1,12 +1,12 @@
 package com.bibireden.data_attributes
 
-import blue.endless.jankson.Jankson
-import blue.endless.jankson.JsonElement
+import blue.endless.jankson.JsonArray
 import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.AttributeConfigManager
-import com.bibireden.data_attributes.config.DataAttributesConfig
-import com.bibireden.data_attributes.data.AttributeFunction
+import com.bibireden.data_attributes.config.DataAttributesEntityTypesConfig
+import com.bibireden.data_attributes.config.DataAttributesFunctionsConfig
+import com.bibireden.data_attributes.config.DataAttributesOverridesConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.AttributeResourceManager
@@ -14,8 +14,6 @@ import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.networking.Channels
 import com.bibireden.data_attributes.serde.PacketBufs
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
-import io.wispforest.endec.format.json.JsonDeserializer
-import io.wispforest.endec.format.json.JsonSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -54,7 +52,32 @@ class DataAttributes : ModInitializer {
 
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
-        val CONFIG = DataAttributesConfig.createAndLoad()
+        val OVERRIDES_CONFIG = DataAttributesOverridesConfig.createAndLoad()
+        val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad({ builder ->
+            builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller ->
+                marshaller.serialize(dat.data)
+            }
+            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfigData::class.java) { obj, marshaller ->
+                val unmapped = marshaller.marshall(Map::class.java, obj)
+                val mapped = mutableMapOf<Identifier, List<AttributeFunctionConfig>>()
+
+                unmapped.forEach { (key, array) ->
+                    if (key !is String) return@forEach
+                    if (array !is JsonArray) return@forEach
+
+                    val listing = mutableListOf<AttributeFunctionConfig>()
+
+                    array.forEach { value ->
+                        val ls = marshaller.marshallCarefully(AttributeFunctionConfig::class.java, value)
+                        listing.add(ls)
+                    }
+
+                    mapped[Identifier(key)] = listing
+                }
+                AttributeFunctionConfigData(mapped)
+            }
+        })
+        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad()
 
         /** Gets the [AttributeResourceManager] based on the world context. */
         fun getManager(world: World): AttributeResourceManager = when {
@@ -81,10 +104,10 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-        CONFIG.subscribeToOverrides { data ->
-            LOGGER.info("Data Changed: $data")
-//            CONFIG_MANAGER.onDataUpdate(data)
-        }
+//        CONFIG.subscribeToOverrides { data ->
+//            LOGGER.info("Data Changed: $data")
+//           CONFIG_MANAGER.onDataUpdate(data)
+//        }
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
 

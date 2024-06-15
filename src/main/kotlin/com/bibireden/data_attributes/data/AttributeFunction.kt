@@ -1,5 +1,10 @@
 package com.bibireden.data_attributes.data
 
+import blue.endless.jankson.Jankson
+import blue.endless.jankson.JsonElement
+import blue.endless.jankson.JsonObject
+import blue.endless.jankson.annotation.Deserializer
+import blue.endless.jankson.annotation.Serializer
 import com.bibireden.data_attributes.api.attribute.IAttributeFunction
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.api.util.Maths
@@ -26,6 +31,7 @@ open class AttributeFunction(open var behavior: StackingBehavior, open var value
 
 data class AttributeFunctionConfig(var id: Identifier, override var behavior: StackingBehavior, override var value: Double) : AttributeFunction(behavior, value)
 {
+    constructor() : this(Identifier("..."), StackingBehavior.Add, 0.0)
     companion object {
         val ENDEC = StructEndecBuilder.of(
             Endecs.IDENTIFIER.fieldOf("id") { it.id },
@@ -38,6 +44,14 @@ data class AttributeFunctionConfig(var id: Identifier, override var behavior: St
 
 data class AttributeFunctionConfigData(var data: Map<Identifier, List<AttributeFunctionConfig>> = mapOf()) {
     companion object {
+        val JANKSON = Jankson.builder().build()
+
+//        @Deserializer // Take a JsonObject when you want to parse a POJO
+//        fun fromObject(`object`: JsonObject): AttributeFunctionConfigData {
+//            // Convert from an object to your POJO instance
+//            val value = JANKSON.fromJson(`object`.toJson(), Map::class.java)
+//            return
+//        }
         val ENDEC = Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf())
             .xmap(::AttributeFunctionConfigData) { it.data }
     }

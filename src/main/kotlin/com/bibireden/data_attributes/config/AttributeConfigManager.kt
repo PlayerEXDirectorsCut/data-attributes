@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.config
 
-import com.bibireden.data_attributes.config.DataAttributesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.*
 import com.bibireden.data_attributes.data.merged.EntityTypes
 import com.bibireden.data_attributes.endec.Endecs
