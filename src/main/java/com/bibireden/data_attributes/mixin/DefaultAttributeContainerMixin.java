@@ -3,15 +3,16 @@ package com.bibireden.data_attributes.mixin;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer;
 
@@ -34,7 +35,7 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 	// Injecting into the constructor to initialize the custom map
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(Map<EntityAttribute, EntityAttributeInstance> instances, CallbackInfo ci) {
-		this.data_instances = new HashMap<Identifier, EntityAttributeInstance>();
+		this.data_instances = new HashMap<>();
 
 		// Populating the custom map with identifiers and instances
 		instances.forEach((attribute, instance) -> {
@@ -47,32 +48,31 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 	}
 
 	// Redirecting the 'require' method to use the custom map
-	@Redirect(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_require(Map<?, ?> instances, Object attribute) {
-		EntityAttribute entityAttribute = (EntityAttribute) attribute;
-		Identifier identifier = Registries.ATTRIBUTE.getId(entityAttribute);
+	@ModifyExpressionValue(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	private Object data_require(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(attribute));
 	}
 
 	// Redirecting the 'createOverride' method to use the custom map
-	@Redirect(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_createOverride(Map<?, ?> instances, Object attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
+	@ModifyExpressionValue(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	private Object data_createOverride(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(attribute));
 	}
 
 	// Injecting into the 'has' method to check for the existence of attributes in
 	// the custom map
-	@Inject(method = "has", at = @At("HEAD"), cancellable = true)
-	private void data_has(EntityAttribute type, CallbackInfoReturnable<Boolean> ci) {
+	@ModifyReturnValue(method = "has", at = @At("RETURN"))
+	private boolean data_has(boolean original, @Local(argsOnly = true) EntityAttribute type) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(type);
-		ci.setReturnValue(this.data_instances.containsKey(identifier) || this.instances.containsKey(type));
+		return this.data_instances.containsKey(identifier) || this.instances.containsKey(type);
 	}
 
 	// Redirecting the 'hasModifier' method to use the custom map
-	@Redirect(method = "hasModifier", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_hasModifier(Map<?, ?> instances, Object type) {
-		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) type);
+	@ModifyExpressionValue(method = "hasModifier", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	private Object data_hasModifier(Object original, @Local(argsOnly = true) EntityAttribute type) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(type);
 		return this.data_instances.getOrDefault(identifier, this.instances.get(type));
 	}
 

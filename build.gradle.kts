@@ -77,7 +77,7 @@ tasks {
 
     compileKotlin {
         compilerOptions.freeCompilerArgs.set(listOf("-Xjvm-default=all-compatibility"))
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }
 
 }

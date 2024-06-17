@@ -3,14 +3,14 @@ package com.bibireden.data_attributes.mixin;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.bibireden.data_attributes.mutable.MutableAttributeModifier;
 
@@ -30,19 +30,19 @@ abstract class EntityAttributeModifierMixin implements MutableAttributeModifier 
     }
 
     // Injection to override the original getValue method
-    @Inject(method = "getValue", at = @At("HEAD"), cancellable = true)
-    private void onGetValue(CallbackInfoReturnable<Double> ci) {
-        ci.setReturnValue(this.data_value);
-    }
-
-    // Redirects to override the original toString and toNbt methods
-    @Redirect(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
-    private double onToString(EntityAttributeModifier modifier) {
+    @ModifyReturnValue(method = "getValue", at = @At("RETURN"))
+    private double onGetValue(double original) {
         return this.data_value;
     }
 
-    @Redirect(method = "toNbt", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
-    private double onToNbt(EntityAttributeModifier modifier) {
+    // Redirects to override the original toString and toNbt methods
+    @ModifyExpressionValue(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
+    private double onToString(double original) {
+        return this.data_value;
+    }
+
+    @ModifyExpressionValue(method = "toNbt", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D", opcode = Opcodes.GETFIELD))
+    private double onToNbt(double original) {
         return this.data_value;
     }
 
