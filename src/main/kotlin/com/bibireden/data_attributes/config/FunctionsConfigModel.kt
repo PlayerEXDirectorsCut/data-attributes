@@ -1,8 +1,6 @@
 package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.api.attribute.StackingBehavior
-import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.Config

@@ -3,6 +3,7 @@
 
   "text.config.data_attributes.section.overrides": "Attribute Overrides",
   "text.config.data_attributes.section.functions": "Attribute Functions",
+  "text.config.data_attributes.section.entity_types" : "Entity Types",
 
   "text.config.data_attributes.enum.stackingFormula.flat": "Flat",
   "text.config.data_attributes.enum.stackingFormula.diminished": "Diminished",
@@ -10,8 +11,8 @@
   "text.config.data_attributes.enum.functionBehavior.add": "Add",
   "text.config.data_attributes.enum.functionBehavior.multiply": "Multiply",
 
-  "text.config.data_attributes.category.overrides": "Attribute Overrides",
-  "text.config.data_attributes.category.functions": "Attribute Functions",
+  "text.config.data_attributes.category.overrides": "Overrides",
+  "text.config.data_attributes.category.functions": "Functions",
 
   "text.config.data_attributes.data_entry.overrides.enabled": "Enable Override?",
   "text.config.data_attributes.data_entry.overrides.min_fallback": "Minimum Fallback Value",
@@ -22,5 +23,8 @@
   "text.config.data_attributes.data_entry.overrides.formula": "Stacking Formula",
 
   "text.config.data_attributes.data_entry.functions.behavior": "Function Behavior",
-  "text.config.data_attributes.data_entry.functions.value": "Value"
+  "text.config.data_attributes.data_entry.functions.value": "Value",
+
+  "text.config.data_attributes.data_entry.entity_types.value": "Value",
+  "text.config.data_attributes.data_entry.entity_types": "Value"
 }

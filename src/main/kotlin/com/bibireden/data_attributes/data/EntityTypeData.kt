@@ -7,7 +7,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
-class EntityTypeData(val data: MutableMap<Identifier, Double> = mutableMapOf()) {
+data class EntityTypeData(val data: MutableMap<Identifier, Double> = mutableMapOf()) {
     companion object {
         @JvmField
         val ENDEC: Endec<EntityTypeData> = Endec.map(CodecUtils.ofCodec(Identifier.CODEC), Endec.DOUBLE).xmap(::EntityTypeData) { it.data }

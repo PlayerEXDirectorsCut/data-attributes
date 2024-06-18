@@ -44,14 +44,6 @@ data class AttributeFunctionConfig(var id: Identifier, override var behavior: St
 
 data class AttributeFunctionConfigData(var data: Map<Identifier, List<AttributeFunctionConfig>> = mapOf()) {
     companion object {
-        val JANKSON = Jankson.builder().build()
-
-//        @Deserializer // Take a JsonObject when you want to parse a POJO
-//        fun fromObject(`object`: JsonObject): AttributeFunctionConfigData {
-//            // Convert from an object to your POJO instance
-//            val value = JANKSON.fromJson(`object`.toJson(), Map::class.java)
-//            return
-//        }
         val ENDEC = Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf())
             .xmap(::AttributeFunctionConfigData) { it.data }
     }

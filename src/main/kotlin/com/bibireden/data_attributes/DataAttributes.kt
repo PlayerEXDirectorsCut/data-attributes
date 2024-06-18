@@ -4,12 +4,15 @@ import blue.endless.jankson.JsonArray
 import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.AttributeConfigManager
+import com.bibireden.data_attributes.config.DataAttributesConfig
 import com.bibireden.data_attributes.config.DataAttributesEntityTypesConfig
 import com.bibireden.data_attributes.config.DataAttributesFunctionsConfig
 import com.bibireden.data_attributes.config.DataAttributesOverridesConfig
+import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.AttributeResourceManager
+import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.networking.Channels
 import com.bibireden.data_attributes.serde.PacketBufs
@@ -33,7 +36,6 @@ import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
-import java.lang.reflect.Type
 
 class DataAttributes : ModInitializer {
     companion object {
@@ -52,6 +54,7 @@ class DataAttributes : ModInitializer {
 
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
+        val CONFIG = DataAttributesConfig.createAndLoad()
         val OVERRIDES_CONFIG = DataAttributesOverridesConfig.createAndLoad()
         val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad({ builder ->
             builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller ->
@@ -77,7 +80,32 @@ class DataAttributes : ModInitializer {
                 AttributeFunctionConfigData(mapped)
             }
         })
-        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad()
+        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad() { builder ->
+            builder.registerSerializer(EntityTypeData::class.java) { data, marshaller ->
+                marshaller.serialize(data.data)
+            }
+            builder.registerSerializer(EntityTypesConfigData::class.java) { data, marshaller ->
+                marshaller.serialize(data.data)
+            }
+            builder.registerDeserializer(JsonObject::class.java, EntityTypesConfigData::class.java) { obj, marshaller ->
+                val unmapped = marshaller.marshall(Map::class.java, obj)
+                val mapped = mutableMapOf<Identifier, EntityTypeData>()
+
+                unmapped.forEach { (key, obj) ->
+                    if (key !is String) return@forEach
+                    if (obj !is JsonObject) return@forEach
+
+                    val mapping = mutableMapOf<Identifier, Double>()
+
+                    obj.forEach { (id, value) ->
+                        mapping[Identifier(id)] = marshaller.marshall(Double::class.java, value)
+                    }
+
+                    mapped[Identifier(key)] = EntityTypeData(mapping)
+                }
+                EntityTypesConfigData(mapped)
+            }
+        }
 
         /** Gets the [AttributeResourceManager] based on the world context. */
         fun getManager(world: World): AttributeResourceManager = when {
@@ -104,10 +132,13 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-//        CONFIG.subscribeToOverrides { data ->
-//            LOGGER.info("Data Changed: $data")
-//           CONFIG_MANAGER.onDataUpdate(data)
-//        }
+        CONFIG_MANAGER.updateOverrides(OVERRIDES_CONFIG.overrides())
+        CONFIG_MANAGER.updateFunctions(FUNCTIONS_CONFIG.functions())
+        CONFIG_MANAGER.updateEntityTypes(ENTITY_TYPES_CONFIG.entity_types())
+
+        OVERRIDES_CONFIG.subscribeToOverrides(CONFIG_MANAGER::updateOverrides)
+        FUNCTIONS_CONFIG.subscribeToFunctions(CONFIG_MANAGER::updateFunctions)
+        ENTITY_TYPES_CONFIG.subscribeToEntity_types(CONFIG_MANAGER::updateEntityTypes)
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
 

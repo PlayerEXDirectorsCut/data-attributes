@@ -1,9 +1,6 @@
 package com.bibireden.data_attributes
 
-import com.bibireden.data_attributes.config.DataAttributesConfigScreen
-import com.bibireden.data_attributes.config.screens.EntityTypesConfigScreen
-import com.bibireden.data_attributes.config.screens.FunctionsConfigScreen
-import com.bibireden.data_attributes.config.screens.OverridesConfigScreen
+import com.bibireden.data_attributes.config.DataAttributesConfigScreenV2
 import com.bibireden.data_attributes.data.AttributeResourceManager
 import com.bibireden.data_attributes.networking.Channels
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
@@ -16,12 +13,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
-import java.io.ObjectInputFilter.Config
+import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
 @Environment(EnvType.CLIENT)
 class DataAttributesClient : ClientModInitializer {
     companion object {
+        @JvmField
+        val UI_ASSET_PATH = Identifier.of(DataAttributes.MOD_ID, "config_model")
+
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
@@ -33,9 +33,7 @@ class DataAttributesClient : ClientModInitializer {
     }
 
     override fun onInitializeClient() {
-        ConfigScreen.registerProvider("${DataAttributes.MOD_ID}/overrides", ::OverridesConfigScreen)
-        ConfigScreen.registerProvider("${DataAttributes.MOD_ID}/functions", ::FunctionsConfigScreen)
-        ConfigScreen.registerProvider("${DataAttributes.MOD_ID}/entity_types", ::EntityTypesConfigScreen)
+        ConfigScreen.registerProvider(DataAttributes.MOD_ID) { DataAttributesConfigScreenV2(DataAttributes.OVERRIDES_CONFIG, DataAttributes.FUNCTIONS_CONFIG, DataAttributes.ENTITY_TYPES_CONFIG, it) }
 
         ClientLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { client, _, buf, _ ->
             onPacketReceived(client, buf)
