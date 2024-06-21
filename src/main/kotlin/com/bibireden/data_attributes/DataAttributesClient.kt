@@ -1,7 +1,7 @@
 package com.bibireden.data_attributes
 
+import com.bibireden.data_attributes.config.AttributeConfigManager
 import com.bibireden.data_attributes.config.DataAttributesConfigScreenV2
-import com.bibireden.data_attributes.data.AttributeResourceManager
 import com.bibireden.data_attributes.networking.Channels
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
 import io.wispforest.owo.config.ui.ConfigScreen
@@ -25,7 +25,7 @@ class DataAttributesClient : ClientModInitializer {
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
-                DataAttributes.CLIENT_MANAGER = AttributeResourceManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf)
+                DataAttributes.CLIENT_MANAGER = AttributeConfigManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf)
                 DataAttributes.CLIENT_MANAGER.onDataUpdate()
                 buf.release()
             }

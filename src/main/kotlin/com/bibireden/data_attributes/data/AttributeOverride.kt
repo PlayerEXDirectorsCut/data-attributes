@@ -8,13 +8,7 @@ import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttribute
 
 data class AttributeOverride(val fallback: Double, val min: Double, val max: Double, val smoothness: Double, val formula: StackingFormula, val translationKey: String) {
-    /** Creates a **clamped** `EntityAttribute` based on the fields of this class. */
-    fun create(): EntityAttribute = ClampedEntityAttribute(this.translationKey, this.fallback, this.min, this.max)
 
-    /** Calls an override of an `MutableEntityAttribute`. */
-    fun override(mutableEntityAttribute: MutableEntityAttribute) {
-        mutableEntityAttribute.`data_attributes$override`(this)
-    }
 
     companion object {
         @JvmField

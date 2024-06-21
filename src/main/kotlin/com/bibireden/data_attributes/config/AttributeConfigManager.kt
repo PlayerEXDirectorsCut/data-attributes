@@ -13,13 +13,25 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
-class AttributeConfigManager(val data: AttributeData = AttributeData(), val handler: AttributeContainerHandler = AttributeContainerHandler()) {
-    companion object Factory
+class AttributeConfigManager(
+    val data: AttributeData = AttributeData(),
+    val handler: AttributeContainerHandler = AttributeContainerHandler(),
+) {
+    var update_flag = 0
+
+    companion object
     {
+        @JvmField
+        val ENDEC = AttributeData.ENDEC.xmap(::AttributeConfigManager) { it.data }
+
         fun getOrCreate(identifier: Identifier, attribute: EntityAttribute): EntityAttribute
         {
             return Registries.ATTRIBUTE[identifier] ?: MutableRegistryImpl.register(Registries.ATTRIBUTE, identifier, attribute)
         }
+    }
+
+    fun nextUpdateFlag() {
+        this.update_flag++
     }
 
     data class AttributeData(

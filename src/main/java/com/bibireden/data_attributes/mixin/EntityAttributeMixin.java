@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Map;
 
+import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.data.AttributeOverride;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
@@ -28,32 +29,21 @@ import net.minecraft.util.math.MathHelper;
 abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Unique private Map<IEntityAttribute, AttributeFunction> data_parents, data_children;
     @Unique private StackingFormula data_formula;
-    @Unique private String data_translationKey;
-    @Unique protected double data_fallback, data_min, data_max, data_smoothness;
+    @Unique protected boolean data_enabled;
+    @Unique protected double data_min, data_max, data_smoothness;
 
     @Final
     @Shadow
     private double fallback;
     
-    @Final
-    @Shadow
-    private String translationKey;
-    
     // Constructor injection to initialize additional fields
     @Inject(method = "<init>", at = @At("TAIL"))
     private void data_attributes$init(String translationKey, double fallback, CallbackInfo ci) {
-        this.data_translationKey = translationKey;
-        this.data_fallback = fallback;
         this.data_min = Double.MIN_VALUE;
         this.data_max = Double.MAX_VALUE;
         this.data_formula = StackingFormula.Flat;
         this.data_parents = new Object2ObjectArrayMap<>();
         this.data_children = new Object2ObjectArrayMap<>();
-    }
-
-    @ModifyReturnValue(method = "getDefaultValue", at = @At("RETURN"))
-    private double data_attributes$getDefaultValue(double original) {
-        return this.data_fallback;
     }
 
     @ModifyReturnValue(method = "isTracked", at = @At("RETURN"))
@@ -63,12 +53,11 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @ModifyReturnValue(method = "clamp", at = @At("RETURN"))
     private double data_attributes$clamp(double original) {
-       return this.data_attributes$clamped(original);
-    }
+        if (this.data_enabled) {
+            return this.data_attributes$clamped(original);
+        }
 
-    @ModifyReturnValue(method = "getTranslationKey", at = @At("RETURN"))
-    private String data_attributes$getTranslationKey(String original) {
-        return this.data_translationKey;
+        return original;
     }
 
     @Unique
@@ -78,13 +67,12 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public void data_attributes$override(AttributeOverride override) {
-        this.data_translationKey = override.getTranslationKey();
-        this.data_min = override.getMin();
-        this.data_max = override.getMax();
-        this.data_smoothness = override.getSmoothness();
-        this.data_fallback = override.getFallback();
-        this.data_formula = override.getFormula();
+    public void data_attributes$override(OverridesConfigModel.AttributeOverrideConfig override) {
+        this.data_enabled = override.enabled;
+        this.data_min = override.min;
+        this.data_max = override.max;
+        this.data_smoothness = override.smoothness;
+        this.data_formula = override.formula;
     }
 
     @Override
@@ -107,7 +95,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Override
     public void data_attributes$clear() {
-        this.data_attributes$override(new AttributeOverride(this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat, this.translationKey));
+        this.data_attributes$override(new OverridesConfigModel.AttributeOverrideConfig(this.data_enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
         this.data_attributes$clearDescendants();
     }
 

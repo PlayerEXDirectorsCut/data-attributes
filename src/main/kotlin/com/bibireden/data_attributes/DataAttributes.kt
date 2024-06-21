@@ -11,7 +11,6 @@ import com.bibireden.data_attributes.config.DataAttributesOverridesConfig
 import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
-import com.bibireden.data_attributes.data.AttributeResourceManager
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.networking.Channels
@@ -24,17 +23,14 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking.LoginSynchronizer
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.resource.ResourceType
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
-import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
 
 class DataAttributes : ModInitializer {
@@ -43,10 +39,8 @@ class DataAttributes : ModInitializer {
 
         val LOGGER = LogManager.getLogger()
 
-        @JvmField val CONFIG_MANAGER = AttributeConfigManager()
-
-        @JvmField var CLIENT_MANAGER = AttributeResourceManager()
-        @JvmField val SERVER_MANAGER = AttributeResourceManager()
+        @JvmField var CLIENT_MANAGER = AttributeConfigManager()
+        @JvmField val SERVER_MANAGER = AttributeConfigManager()
 
         init {
             PacketBufs.registerPacketSerializers()
@@ -107,14 +101,8 @@ class DataAttributes : ModInitializer {
             }
         }
 
-        /** Gets the [AttributeResourceManager] based on the world context. */
-        fun getManager(world: World): AttributeResourceManager = when {
-            world.isClient -> CLIENT_MANAGER
-            else -> SERVER_MANAGER
-        }
-
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
-            sender.sendPacket(Channels.HANDSHAKE, AttributeResourceManager.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER))
+            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER))
         }
 
         @JvmStatic
@@ -132,15 +120,13 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-        CONFIG_MANAGER.updateOverrides(OVERRIDES_CONFIG.overrides())
-        CONFIG_MANAGER.updateFunctions(FUNCTIONS_CONFIG.functions())
-        CONFIG_MANAGER.updateEntityTypes(ENTITY_TYPES_CONFIG.entity_types())
+        SERVER_MANAGER.updateOverrides(OVERRIDES_CONFIG.overrides())
+        SERVER_MANAGER.updateFunctions(FUNCTIONS_CONFIG.functions())
+        SERVER_MANAGER.updateEntityTypes(ENTITY_TYPES_CONFIG.entity_types())
 
-        OVERRIDES_CONFIG.subscribeToOverrides(CONFIG_MANAGER::updateOverrides)
-        FUNCTIONS_CONFIG.subscribeToFunctions(CONFIG_MANAGER::updateFunctions)
-        ENTITY_TYPES_CONFIG.subscribeToEntity_types(CONFIG_MANAGER::updateEntityTypes)
-
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SERVER_MANAGER)
+        OVERRIDES_CONFIG.subscribeToOverrides(SERVER_MANAGER::updateOverrides)
+        FUNCTIONS_CONFIG.subscribeToFunctions(SERVER_MANAGER::updateFunctions)
+        ENTITY_TYPES_CONFIG.subscribeToEntity_types(SERVER_MANAGER::updateEntityTypes)
 
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 

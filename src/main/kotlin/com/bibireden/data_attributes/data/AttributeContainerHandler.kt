@@ -25,13 +25,13 @@ class AttributeContainerHandler(private var implicitContainers: ImplicitContaine
      */
     fun getContainer(entityType: EntityType<out LivingEntity>, livingEntity: LivingEntity): AttributeContainer {
         val builder = DefaultAttributeContainer.Builder()
-        (DefaultAttributeRegistry.get(entityType) as? MutableDefaultAttributeContainer)?.copy(builder)
+        (DefaultAttributeRegistry.get(entityType) as? MutableDefaultAttributeContainer)?.`data_attributes$copy`(builder)
 
         this.implicitContainers.values.forEach { (type, container) ->
-            if (type.isInstance(livingEntity)) (container as MutableDefaultAttributeContainer).copy(builder)
+            if (type.isInstance(livingEntity)) (container as MutableDefaultAttributeContainer).`data_attributes$copy`(builder)
         }
 
-        (this.explicitContainers[entityType] as? MutableDefaultAttributeContainer)?.copy(builder)
+        (this.explicitContainers[entityType] as? MutableDefaultAttributeContainer)?.`data_attributes$copy`(builder)
 
         val container = AttributeContainer(builder.build()) as MutableAttributeContainer
         container.`data_attributes$setLivingEntity`(livingEntity)

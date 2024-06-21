@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import com.bibireden.data_attributes.data.AttributeFunction;
-import com.bibireden.data_attributes.utils.DiminishingMathKt;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -288,7 +287,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			return;
 
 		this.actionModifier(() -> {
-			((MutableAttributeModifier) modifier).updateValue(value);
+			((MutableAttributeModifier) modifier).data_attributes$updateValue(value);
 		}, instance, modifier, false);
 	}
 

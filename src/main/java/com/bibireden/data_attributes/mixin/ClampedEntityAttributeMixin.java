@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.mixin;
 
-import com.bibireden.data_attributes.data.AttributeOverride;
+import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,22 +25,34 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
-		this.data_attributes$override(new AttributeOverride(fallback, min, max, 0.0D, StackingFormula.Flat, translationKey));
+		this.data_attributes$override(new OverridesConfigModel.AttributeOverrideConfig(false, minValue, maxValue, min, max, 0.0D, StackingFormula.Flat));
 	}
 
 	@ModifyReturnValue(method = "getMinValue", at = @At("RETURN"))
 	private double data_attributes$getMin(double original) {
-		return this.data_attributes$min();
+		if (this.data_enabled) {
+			return this.data_attributes$min();
+		}
+
+		return original;
 	}
 
 	@ModifyReturnValue(method = "getMaxValue", at = @At("RETURN"))
 	private double data_attributes$getMax(double original) {
-		return this.data_attributes$max();
+		if (this.data_enabled) {
+			return this.data_attributes$max();
+		}
+
+		return original;
 	}
 
 	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
 	private double data_attributes$clamp(double original) {
-		return this.data_attributes$clamped(original);
+		if (this.data_enabled) {
+			return this.data_attributes$clamped(original);
+		}
+
+		return original;
 	}
 
 	@Override

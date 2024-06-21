@@ -1,8 +1,8 @@
 package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
+import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.config.OverridesConfigModel.StackingFormula
 import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData

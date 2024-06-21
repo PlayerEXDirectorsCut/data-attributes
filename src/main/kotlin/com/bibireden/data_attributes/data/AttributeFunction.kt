@@ -46,5 +46,6 @@ data class AttributeFunctionConfigData(var data: Map<Identifier, List<AttributeF
     companion object {
         val ENDEC = Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf())
             .xmap(::AttributeFunctionConfigData) { it.data }
+        
     }
 }

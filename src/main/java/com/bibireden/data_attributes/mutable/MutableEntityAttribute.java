@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
+import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.bibireden.data_attributes.data.AttributeOverride;
 
@@ -19,7 +20,7 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     }
 
     /** Overrides entity attribute properties. */
-    void data_attributes$override(AttributeOverride override);
+    void data_attributes$override(OverridesConfigModel.AttributeOverrideConfig override);
 
     /** Adds a parent attribute with a function. */
     void data_attributes$addParent(MutableEntityAttribute attributeIn, final AttributeFunction function);
