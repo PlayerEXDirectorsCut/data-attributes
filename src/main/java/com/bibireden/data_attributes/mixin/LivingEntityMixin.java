@@ -40,6 +40,7 @@ abstract class LivingEntityMixin {
 	}
 	
     // Injection at the start of the 'tick' method
+	@SuppressWarnings("ALL")
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tickActiveItemStack()V"))
 	private void data_tick(CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object)this;

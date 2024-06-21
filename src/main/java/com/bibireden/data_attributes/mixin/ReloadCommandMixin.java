@@ -2,7 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Collection;
 
-import com.bibireden.data_attributes.data.AttributeResourceManager;
+import com.bibireden.data_attributes.config.AttributeConfigManager;
 import com.bibireden.data_attributes.networking.Channels;
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +28,7 @@ abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
-		PacketByteBuf buf = AttributeResourceManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER);
+		PacketByteBuf buf = AttributeConfigManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER);
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
 	}
 }

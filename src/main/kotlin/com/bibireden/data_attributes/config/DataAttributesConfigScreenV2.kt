@@ -27,7 +27,6 @@ import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import org.apache.commons.lang3.mutable.MutableInt
-import java.util.Map
 import java.util.function.BiConsumer
 import java.util.function.Supplier
 import kotlin.math.min
@@ -172,12 +171,10 @@ class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig,
             val panelContainer = rootComponent.childById(
                 FlowLayout::class.java, "option-panel-container"
             )
-            val panelScroll = rootComponent.childById(ScrollContainer::class.java, "option-panel-scroll")!!!!
+            val panelScroll = rootComponent.childById(ScrollContainer::class.java, "option-panel-scroll")!!
             panelScroll.margins(Insets.right(10))
 
-            val buttonPanel = model.expandTemplate(
-                FlowLayout::class.java, "section-buttons", Map.of()
-            )
+            val buttonPanel = model.expandTemplate(FlowLayout::class.java, "section-buttons", mapOf())
             val widestText = MutableInt()
 
             sections.forEach(BiConsumer<Component, Text> { component: Component?, text: Text ->
@@ -232,6 +229,6 @@ class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig,
 
             rootComponent.childById(FlowLayout::class.java, "main-panel")!!
                 .child(buttonPanel)
-            }
+        }
     }
 }

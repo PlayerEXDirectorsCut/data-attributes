@@ -50,26 +50,26 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 
 	// todo: needs verification via debug that this works as intended.
 	@ModifyExpressionValue(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_require(Object original, EntityAttribute attribute) {
+	private Object data_require(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
 		return this.data_instances.getOrDefault(identifier, (EntityAttributeInstance) original);
 	}
 
 	// todo: needs verification via debug that this works as intended.
 	@ModifyExpressionValue(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$createOverride(Object original, @Local(ordinal = 0, argsOnly = true) EntityAttribute attribute) {
+	private Object data_attributes$createOverride(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
 		return this.data_instances.getOrDefault(identifier, (EntityAttributeInstance) original);
 	}
 
 	@ModifyReturnValue(method = "has", at = @At("RETURN"))
-	private boolean data_attributes$has(boolean original, EntityAttribute type) {
+	private boolean data_attributes$has(boolean original, @Local(argsOnly = true) EntityAttribute type) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(type);
 		return original || this.data_instances.containsKey(identifier);
 	}
 
 	@ModifyReturnValue(method = "hasModifier", at = @At("RETURN"))
-	private boolean data_attributes$hasModifier(boolean original, EntityAttribute type, UUID uuid) {
+	private boolean data_attributes$hasModifier(boolean original, @Local(argsOnly = true) EntityAttribute type, @Local(argsOnly = true) UUID uuid) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(type);
 		var instance = this.data_instances.get(identifier);
 		return original || (instance != null && instance.getModifier(uuid) != null);

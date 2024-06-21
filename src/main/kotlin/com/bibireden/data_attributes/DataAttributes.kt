@@ -50,7 +50,7 @@ class DataAttributes : ModInitializer {
 
         val CONFIG = DataAttributesConfig.createAndLoad()
         val OVERRIDES_CONFIG = DataAttributesOverridesConfig.createAndLoad()
-        val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad({ builder ->
+        val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad { builder ->
             builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller ->
                 marshaller.serialize(dat.data)
             }
@@ -73,29 +73,24 @@ class DataAttributes : ModInitializer {
                 }
                 AttributeFunctionConfigData(mapped)
             }
-        })
-        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad() { builder ->
-            builder.registerSerializer(EntityTypeData::class.java) { data, marshaller ->
-                marshaller.serialize(data.data)
+        }
+        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad { builder ->
+            builder.registerSerializer(EntityTypeData::class.java) { tData, marshaller ->
+                marshaller.serialize(tData.data)
             }
-            builder.registerSerializer(EntityTypesConfigData::class.java) { data, marshaller ->
-                marshaller.serialize(data.data)
+            builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
+                EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
+            }
+            builder.registerSerializer(EntityTypesConfigData::class.java) { entityTypes, marshaller ->
+                marshaller.serialize(entityTypes.data)
             }
             builder.registerDeserializer(JsonObject::class.java, EntityTypesConfigData::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
                 val mapped = mutableMapOf<Identifier, EntityTypeData>()
-
                 unmapped.forEach { (key, obj) ->
-                    if (key !is String) return@forEach
-                    if (obj !is JsonObject) return@forEach
-
-                    val mapping = mutableMapOf<Identifier, Double>()
-
-                    obj.forEach { (id, value) ->
-                        mapping[Identifier(id)] = marshaller.marshall(Double::class.java, value)
+                    if (key is String && obj is JsonObject) {
+                        mapped[Identifier(key)] = marshaller.marshall(EntityTypeData::class.java, obj)
                     }
-
-                    mapped[Identifier(key)] = EntityTypeData(mapping)
                 }
                 EntityTypesConfigData(mapped)
             }

@@ -226,7 +226,7 @@ object DataAttributesConfigProviders {
 
         override fun isValid() = true
 
-        override fun parsedValue() = EntityTypesConfigData(this.backing)
+        override fun parsedValue() = EntityTypesConfigData(backing)
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null): FlowLayout {

@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.data
 
-import com.bibireden.data_attributes.data.AttributeResourceManager.Tuple
+import com.bibireden.data_attributes.config.AttributeConfigManager.Tuple
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer
 import net.minecraft.entity.EntityType
@@ -48,7 +48,10 @@ class AttributeContainerHandler(private var implicitContainers: ImplicitContaine
         val orderedEntityTypes = mutableMapOf<Int, Tuple<Identifier>>()
 
         entityTypeDataIn.forEach { (identifier, data) ->
-            instances[identifier]?.let { (entity, value) -> orderedEntityTypes[value] = Tuple(entity, identifier) }
+            val entry = instances.get(identifier)
+            if (entry != null) {
+                orderedEntityTypes[entry.value] = Tuple(entry.livingEntity, identifier)
+            }
 
             if (!entityTypes.contains(identifier)) return@forEach
 

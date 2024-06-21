@@ -25,8 +25,8 @@ abstract class EntityAttributeModifierMixin implements MutableAttributeModifier 
         this.data_value = value;
     }
 
-    @ModifyReturnValue(method = "getValue", at = @At("HEAD"))
-    private double data_attributes$getValue(Double original) { return this.data_value; }
+    @ModifyReturnValue(method = "getValue", at = @At("RETURN"))
+    private double data_attributes$getValue(double original) { return this.data_value; }
 
     @ModifyExpressionValue(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D"))
     private double data_attributes$toString(double original) { return this.data_value; }

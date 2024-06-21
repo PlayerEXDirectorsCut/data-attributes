@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import com.bibireden.data_attributes.data.AttributeFunction;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -217,10 +218,10 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		ci.cancel();
 	}
 
-	@Redirect(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
-	private Identifier data_toNbt(Registry<?> registry, Object type) {
+	@ModifyExpressionValue(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
+	private Identifier data_toNbt(Identifier id) {
 		if (this.data_identifier == null)
-			return Registries.ATTRIBUTE.getId((EntityAttribute) type);
+			return Registries.ATTRIBUTE.getId(this.type);
 		return this.data_identifier;
 	}
 
