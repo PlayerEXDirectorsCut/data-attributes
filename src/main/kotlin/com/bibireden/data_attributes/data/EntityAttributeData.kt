@@ -26,8 +26,8 @@ class EntityAttributeData(val override: AttributeOverrideConfig? = null, val fun
     }
 
     /** Overrides a `EntityAttribute`. */
-    fun override(id: Identifier, fn: (id: Identifier, attribute: EntityAttribute) -> EntityAttribute) {
-//        this.override?.override(fn(id, this.override.create()) as MutableEntityAttribute)
+    fun override(attribute: EntityAttribute) {
+        this.override?.override(attribute as MutableEntityAttribute)
     }
 
     /** Copies to a given `EntityAttribute` by adding children to the instance via mixin. */

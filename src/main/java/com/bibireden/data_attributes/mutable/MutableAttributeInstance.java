@@ -10,10 +10,10 @@ import net.minecraft.util.Identifier;
 public interface MutableAttributeInstance {
 
     // Returns the unique identifier of the attribute instance
-    Identifier getId();
+    Identifier data_attributes$get_id();
 
     // Performs an action on the attribute modifier
-    void actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded);
+    void data_attributes$actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded);
 
     // Sets a callback for changes to the associated AttributeContainer
     void setContainerCallback(final AttributeContainer containerIn);

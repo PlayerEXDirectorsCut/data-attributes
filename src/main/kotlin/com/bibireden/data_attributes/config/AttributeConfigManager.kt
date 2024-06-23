@@ -3,7 +3,6 @@ package com.bibireden.data_attributes.config
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.*
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.impl.MutableRegistryImpl
@@ -22,13 +21,23 @@ import net.minecraft.entity.passive.PassiveEntity
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
-class AttributeConfigManager(
-    val data: AttributeData = AttributeData(),
-    val handler: AttributeContainerHandler = AttributeContainerHandler(),
-) {
+class AttributeConfigManager(var data: AttributeData = AttributeData(), val handler: AttributeContainerHandler = AttributeContainerHandler(), var updateFlag: Int = 0) {
     @JvmRecord
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
 
+    @JvmRecord
+    data class Packet(val data: AttributeData, val updateFlag: Int) {
+        companion object {
+            @JvmField
+            val ENDEC = StructEndecBuilder.of(
+                AttributeData.ENDEC.fieldOf("data") { it.data },
+                Endec.INT.fieldOf("updateFlag") { it.updateFlag },
+                ::Packet
+            )
+        }
+    }
+
+    @JvmRecord
     data class AttributeData(
         val overrides: MutableMap<Identifier, AttributeOverrideConfig> = mutableMapOf(),
         val functions: MutableMap<Identifier, List<AttributeFunctionConfig>> = mutableMapOf(),
@@ -45,12 +54,15 @@ class AttributeConfigManager(
         }
     }
 
-    var updateFlag = 0
-
     companion object
     {
-        @JvmField
-        val ENDEC = AttributeData.ENDEC.xmap(::AttributeConfigManager) { it.data }
+        /**
+         * This expects an attribute to be instantiated by the time this is called.
+         * @throws IllegalStateException
+         */
+        fun expectAttribute(identifier: Identifier): EntityAttribute {
+            return Registries.ATTRIBUTE[identifier] ?: throw IllegalStateException("Attribute $identifier is not registered! Please configure accordingly to resolve this issue.")
+        }
 
         fun getOrCreate(identifier: Identifier, attribute: EntityAttribute): EntityAttribute
         {
@@ -65,6 +77,15 @@ class AttributeConfigManager(
             EntityInstances.PASSIVE    to Tuple(PassiveEntity::class.java, 4),
             EntityInstances.ANIMAL     to Tuple(AnimalEntity::class.java, 5)
         )
+    }
+
+    /** Converts this manager to a sync-able packet. */
+    fun toPacket() = Packet(data, updateFlag)
+
+    /** Reads in the packet and applies fresh data and sets the update flag. */
+    fun readPacket(packet: Packet) {
+        this.data = packet.data
+        this.updateFlag = packet.updateFlag
     }
 
     fun nextUpdateFlag() {
@@ -88,9 +109,9 @@ class AttributeConfigManager(
     }
 
     /** Post entity types and calls the `onDataUpdate` method for sync.*/
-    fun updateEntityTypes(config: EntityTypesConfigData)
+    fun updateEntityTypes(config: Map<Identifier, EntityTypeData>)
     {
-        this.data.entity_types.putAll(config.data)
+        this.data.entity_types.putAll(config)
         onDataUpdate()
     }
 
@@ -98,9 +119,10 @@ class AttributeConfigManager(
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
         val entityTypeData = mutableMapOf<Identifier, EntityTypeData>()
+        val functions = mutableMapOf<Identifier, List<AttributeFunctionConfig>>()
 
         for ((key, value) in this.data.overrides) {
-            entityAttributeData[key] = EntityAttributeData(AttributeOverrideConfig())
+            entityAttributeData[key] = EntityAttributeData(value)
         }
 
         for ((id, value) in this.data.entity_types) {
@@ -114,9 +136,13 @@ class AttributeConfigManager(
             (attribute as MutableEntityAttribute).`data_attributes$clear`()
         }
 
+        for ((identifier, data) in entityAttributeData) {
+            data.override(expectAttribute(identifier))
+        }
+
         for ((identifier, attributeData) in entityAttributeData) {
-            attributeData.override(identifier, ::getOrCreate)
-            attributeData.copy(Registries.ATTRIBUTE[identifier] ?: continue)
+            val attribute = Registries.ATTRIBUTE[identifier] ?: continue
+            attributeData.copy(attribute)
         }
 
         this.handler.buildContainers(entityTypeData, ENTITY_TYPE_INSTANCES)

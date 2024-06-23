@@ -8,7 +8,6 @@ import com.bibireden.data_attributes.config.DataAttributesConfig
 import com.bibireden.data_attributes.config.DataAttributesEntityTypesConfig
 import com.bibireden.data_attributes.config.DataAttributesFunctionsConfig
 import com.bibireden.data_attributes.config.DataAttributesOverridesConfig
-import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
@@ -31,6 +30,7 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
 
 class DataAttributes : ModInitializer {
@@ -49,11 +49,11 @@ class DataAttributes : ModInitializer {
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
         val CONFIG = DataAttributesConfig.createAndLoad()
+        @JvmField
         val OVERRIDES_CONFIG = DataAttributesOverridesConfig.createAndLoad()
+        @JvmField
         val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad { builder ->
-            builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller ->
-                marshaller.serialize(dat.data)
-            }
+            builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfigData::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
                 val mapped = mutableMapOf<Identifier, List<AttributeFunctionConfig>>()
@@ -74,37 +74,21 @@ class DataAttributes : ModInitializer {
                 AttributeFunctionConfigData(mapped)
             }
         }
+        @JvmField
         val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad { builder ->
-            builder.registerSerializer(EntityTypeData::class.java) { tData, marshaller ->
-                marshaller.serialize(tData.data)
-            }
+            builder.registerSerializer(EntityTypeData::class.java) { tData, marshaller -> marshaller.serialize(tData.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
                 EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
-            }
-            builder.registerSerializer(EntityTypesConfigData::class.java) { entityTypes, marshaller ->
-                marshaller.serialize(entityTypes.data)
-            }
-            builder.registerDeserializer(JsonObject::class.java, EntityTypesConfigData::class.java) { obj, marshaller ->
-                val unmapped = marshaller.marshall(Map::class.java, obj)
-                val mapped = mutableMapOf<Identifier, EntityTypeData>()
-                unmapped.forEach { (key, obj) ->
-                    if (key is String && obj is JsonObject) {
-                        mapped[Identifier(key)] = marshaller.marshall(EntityTypeData::class.java, obj)
-                    }
-                }
-                EntityTypesConfigData(mapped)
             }
         }
 
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
-            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER))
+            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
         }
 
         @JvmStatic
         fun refreshAttributes(entity: Entity) {
-            if (entity is LivingEntity) {
-                (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
-            }
+            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
         }
 
         fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {

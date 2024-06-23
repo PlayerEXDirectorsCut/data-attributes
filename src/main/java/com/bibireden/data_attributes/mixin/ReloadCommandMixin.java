@@ -27,8 +27,12 @@ import net.minecraft.server.command.ServerCommandSource;
 abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
+		DataAttributes.OVERRIDES_CONFIG.load();
+		DataAttributes.FUNCTIONS_CONFIG.load();
+		DataAttributes.ENTITY_TYPES_CONFIG.load();
+
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
-		PacketByteBuf buf = AttributeConfigManager.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER);
+		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER.toPacket());
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
 	}
 }

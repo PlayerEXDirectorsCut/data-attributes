@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -33,7 +32,6 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
 @Mixin(EntityAttributeInstance.class)
 abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance, IEntityAttributeInstance {
@@ -196,7 +194,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		if (entityAttributeModifier != null) {
 			throw new IllegalArgumentException("Modifier is already applied on this attribute!");
 		} else {
-			this.actionModifier(() -> {
+			this.data_attributes$actionModifier(() -> {
 				this.idToModifiers.put(key, modifier);
 				instance.getModifiers(modifier.getOperation()).add(modifier);
 			}, instance, modifier, true);
@@ -209,7 +207,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	private void data_removeModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
 		EntityAttributeInstance instance = (EntityAttributeInstance) (Object) this;
 
-		this.actionModifier(() -> {
+		this.data_attributes$actionModifier(() -> {
 			instance.getModifiers(modifier.getOperation()).remove(modifier);
 			this.idToModifiers.remove(modifier.getId());
 			this.persistentModifiers.remove(modifier);
@@ -226,13 +224,13 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@Override
-	public Identifier getId() {
+	public Identifier data_attributes$get_id() {
 		return this.data_identifier;
 	}
 
+	@SuppressWarnings("ALL") // todo: until intellij updates
 	@Override
-	public void actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn,
-			final EntityAttributeModifier modifierIn, final boolean isWasAdded) {
+	public void data_attributes$actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded) {
 		EntityAttribute entityAttribute = ((EntityAttributeInstance) (Object) this).getAttribute();
 		MutableEntityAttribute parent = (MutableEntityAttribute) entityAttribute;
 
@@ -255,15 +253,14 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		LivingEntity livingEntity = ((MutableAttributeContainer) this.data_containerCallback).data_attributes$getLivingEntity();
 
-		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, livingEntity, modifierIn, value,
-				isWasAdded);
+		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, livingEntity, modifierIn, value, isWasAdded);
 
 		for (IEntityAttribute child : parent.data_attributes$childrenMutable().keySet()) {
 			EntityAttribute attribute = (EntityAttribute) child;
 			EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance(attribute);
 
 			if (instance != null) {
-				((MutableAttributeInstance) instance).actionModifier(() -> {
+				((MutableAttributeInstance) instance).data_attributes$actionModifier(() -> {
 				}, instance, modifierIn, isWasAdded);
 			}
 		}
@@ -287,7 +284,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		if (modifier == null)
 			return;
 
-		this.actionModifier(() -> {
+		this.data_attributes$actionModifier(() -> {
 			((MutableAttributeModifier) modifier).data_attributes$updateValue(value);
 		}, instance, modifier, false);
 	}

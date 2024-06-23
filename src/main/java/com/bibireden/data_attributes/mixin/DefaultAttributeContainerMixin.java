@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Final;
@@ -36,9 +35,7 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(Map<EntityAttribute, EntityAttributeInstance> instances, CallbackInfo ci) {
-		this.data_instances = new HashMap<Identifier, EntityAttributeInstance>();
-
-		// Populating the custom map with identifiers and instances
+		this.data_instances = new HashMap<>();
 		instances.forEach((attribute, instance) -> {
 			Identifier key = Registries.ATTRIBUTE.getId(attribute);
 
@@ -48,14 +45,12 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 		});
 	}
 
-	// todo: needs verification via debug that this works as intended.
 	@ModifyExpressionValue(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_require(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
 		return this.data_instances.getOrDefault(identifier, (EntityAttributeInstance) original);
 	}
 
-	// todo: needs verification via debug that this works as intended.
 	@ModifyExpressionValue(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
 	private Object data_attributes$createOverride(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);

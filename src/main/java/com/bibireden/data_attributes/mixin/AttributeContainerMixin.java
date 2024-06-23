@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
@@ -50,7 +49,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
-		Identifier identifier = ((MutableAttributeInstance) instance).getId();
+		Identifier identifier = ((MutableAttributeInstance) instance).data_attributes$get_id();
 		if (identifier != null) {
 			this.data_tracked.put(identifier, instance);
 		}
@@ -78,7 +77,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 				MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
 				mutable.setContainerCallback((AttributeContainer) (Object) this);
 
-				if (mutable.getId() == null) {
+				if (mutable.data_attributes$get_id() == null) {
 					mutable.updateId(identifier);
 				}
 			}
@@ -124,7 +123,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		return this.data_custom.get(identifier);
 	}
 
-	// Injection to remove custom modifiers
 	@Inject(method = "removeModifiers", at = @At("HEAD"), cancellable = true)
 	private void data_removeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers, CallbackInfo ci) {
 		attributeModifiers.asMap().forEach((attribute, collection) -> {
@@ -139,7 +137,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		ci.cancel();
 	}
 
-	// Injection to set custom attributes from another container
 	@SuppressWarnings("all") // todo: temp until intellij update
 	@Inject(method = "setFrom", at = @At("HEAD"), cancellable = true)
 	private void data_setFrom(AttributeContainer other, CallbackInfo ci) {
@@ -159,7 +156,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		ci.cancel();
 	}
 
-	// Redirecting to use custom attributes for serialization
 	@ModifyExpressionValue(method = "toNbt", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
 	private Collection<?> data_toNbt(Collection<?> original) {
 		return this.data_custom.values();

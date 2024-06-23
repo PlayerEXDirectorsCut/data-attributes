@@ -13,19 +13,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 
 @Environment(EnvType.CLIENT)
 class DataAttributesClient : ClientModInitializer {
     companion object {
-        @JvmField
-        val UI_ASSET_PATH = Identifier.of(DataAttributes.MOD_ID, "config_model")
-
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
-                DataAttributes.CLIENT_MANAGER = AttributeConfigManager.ENDEC.decodeFully(ByteBufDeserializer::of, buf)
+                DataAttributes.CLIENT_MANAGER.readPacket(AttributeConfigManager.Packet.ENDEC.decodeFully(ByteBufDeserializer::of, buf))
                 DataAttributes.CLIENT_MANAGER.onDataUpdate()
                 buf.release()
             }

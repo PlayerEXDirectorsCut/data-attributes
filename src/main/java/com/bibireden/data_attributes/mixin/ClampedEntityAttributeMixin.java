@@ -2,6 +2,9 @@ package com.bibireden.data_attributes.mixin;
 
 import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,19 +49,18 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 		return original;
 	}
 
-	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
-	private double data_attributes$clamp(double original) {
+	@WrapMethod(method = "clamp")
+	private double data_attributes$clamp(double value, Operation<Double> original) {
 		if (this.data_enabled) {
-			return this.data_attributes$clamped(original);
+			return this.data_attributes$clamped(value);
 		}
-
-		return original;
+		return original.call(value);
 	}
 
 	@Override
 	public void data_attributes$clear() {
 		super.data_attributes$clear();
-		this.data_min = this.minValue;
-		this.data_max = this.maxValue;
+//		this.data_min = this.minValue;
+//		this.data_max = this.maxValue;
 	}
 }

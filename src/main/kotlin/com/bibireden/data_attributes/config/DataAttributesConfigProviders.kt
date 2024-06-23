@@ -3,7 +3,6 @@ package com.bibireden.data_attributes.config
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.config.data.EntityTypesConfigData
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.utils.round
@@ -195,8 +194,8 @@ object DataAttributesConfigProviders {
         override fun parsedValue() = AttributeFunctionConfigData(backing)
     }
 
-    private class EntityTypesProvider(option: Option<EntityTypesConfigData>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-        val backing = option.value().data.toMutableMap()
+    private class EntityTypesProvider(option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+        val backing = option.value().toMutableMap()
 
         init {
             backing.forEach { (topID, types) ->
@@ -226,7 +225,7 @@ object DataAttributesConfigProviders {
 
         override fun isValid() = true
 
-        override fun parsedValue() = EntityTypesConfigData(backing)
+        override fun parsedValue() = backing
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null): FlowLayout {

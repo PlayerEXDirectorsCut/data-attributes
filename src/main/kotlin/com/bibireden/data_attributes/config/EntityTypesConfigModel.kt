@@ -1,14 +1,13 @@
 package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.config.data.EntityTypesConfigData
-import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.Config
 import io.wispforest.owo.config.annotation.Hook
 import io.wispforest.owo.config.annotation.SectionHeader
 import io.wispforest.owo.config.annotation.Sync
+import net.minecraft.util.Identifier
 
 @Suppress("UNUSED")
 @Config(name = "${DataAttributes.MOD_ID}/entity_types", wrapperName = "DataAttributesEntityTypesConfig")
@@ -18,5 +17,5 @@ class EntityTypesConfigModel {
 
     @JvmField
     @Hook
-    var entity_types: EntityTypesConfigData = EntityTypesConfigData()
+    var entity_types: Map<Identifier, EntityTypeData> = mapOf()
 }

@@ -39,9 +39,7 @@ class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig,
 
         super.build(rootComponent)
 
-        val optionPanel = rootComponent.childById(
-            FlowLayout::class.java, "option-panel"
-        )
+        val optionPanel = rootComponent.childById(FlowLayout::class.java, "option-panel")
         val sections = LinkedHashMap<Component, Text>()
 
         val containers = HashMap<Option.Key, FlowLayout?>()
