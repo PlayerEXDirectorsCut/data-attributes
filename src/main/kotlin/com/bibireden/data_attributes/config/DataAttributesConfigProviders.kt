@@ -242,7 +242,7 @@ object DataAttributesConfigProviders {
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null): FlowLayout {
-        val isUnchangeable = onChange != null
+        val isUnchangeable = onChange == null
         return Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
             hf.verticalAlignment(VerticalAlignment.CENTER)
             hf.gap(6)
@@ -253,7 +253,7 @@ object DataAttributesConfigProviders {
                     tb.verticalSizing(Sizing.fixed(15))
                     tb.setPlaceholder(Text.literal(obj.toString()))
                     tb.setUneditableColor(0xBBBBBB)
-                    tb.setEditableColor(0x91D8AF)
+                    tb.setEditableColor(0xA7EEC5)
                     tb.setEditable(isUnchangeable)
                     if (isUnchangeable) {
                         tb.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
