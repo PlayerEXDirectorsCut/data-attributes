@@ -53,10 +53,7 @@ class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig,
         }
 
         rootComponent.childById(ButtonComponent::class.java, "reload-button")?.onPress {
-            this.overrides.load()
-            this.functions.load()
-            this.entity_types.load()
-
+            DataAttributes.reloadConfigs()
             this.uiAdapter = null
             this.clearAndInit()
         }

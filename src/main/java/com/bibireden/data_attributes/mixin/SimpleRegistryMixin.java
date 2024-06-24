@@ -74,16 +74,8 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
     @Inject(method = "<init>(Lnet/minecraft/registry/RegistryKey;Lcom/mojang/serialization/Lifecycle;Z)V", at = @At("TAIL"))
     private void data_init(CallbackInfo ci) {
-        this.data_idCache = new HashSet<Identifier>();
+        this.data_idCache = new HashSet<>();
     }
-
-    // @SuppressWarnings("unchecked")
-    // @Inject(method = "assertNotFrozen", at = @At("HEAD"), cancellable = true)
-    // private void data_assertNotFrozen(CallbackInfo ci) {
-    // if ((SimpleRegistry<T>) (Object) this == Registries.ATTRIBUTE) {
-    // ci.cancel();
-    // }
-    // }
 
     @Inject(method = "freeze", at = @At("RETURN"))
     private void freeze(CallbackInfoReturnable<T> cir) {
@@ -91,6 +83,7 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     }
 
     @SuppressWarnings("deprecation")
+    @Unique()
     private <V extends T> void remove(RegistryKey<T> key, Lifecycle lifecycle) {
         Validate.notNull(key);
         RegistryEntry.Reference<T> reference = this.keyToEntry.get(key);

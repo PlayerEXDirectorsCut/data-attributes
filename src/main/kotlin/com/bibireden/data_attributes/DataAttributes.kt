@@ -3,11 +3,7 @@ package com.bibireden.data_attributes
 import blue.endless.jankson.JsonArray
 import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
-import com.bibireden.data_attributes.config.AttributeConfigManager
-import com.bibireden.data_attributes.config.DataAttributesConfig
-import com.bibireden.data_attributes.config.DataAttributesEntityTypesConfig
-import com.bibireden.data_attributes.config.DataAttributesFunctionsConfig
-import com.bibireden.data_attributes.config.DataAttributesOverridesConfig
+import com.bibireden.data_attributes.config.*
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
@@ -30,7 +26,6 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
 
 class DataAttributes : ModInitializer {
@@ -80,6 +75,15 @@ class DataAttributes : ModInitializer {
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
                 EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
             }
+        }
+
+        /** Reload all the data-attributes configs at once. */
+        @JvmStatic
+        fun reloadConfigs() {
+            OVERRIDES_CONFIG.load()
+            FUNCTIONS_CONFIG.load()
+            ENTITY_TYPES_CONFIG.load()
+            CONFIG.load()
         }
 
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {

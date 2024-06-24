@@ -63,8 +63,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@Shadow
-	protected void onUpdate() {
-	}
+	protected void onUpdate() {}
 
 	@Shadow private double value;
 
