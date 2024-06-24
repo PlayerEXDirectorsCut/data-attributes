@@ -252,9 +252,9 @@ object DataAttributesConfigProviders {
                     tb.text = obj.toString()
                     tb.verticalSizing(Sizing.fixed(15))
                     tb.setPlaceholder(Text.literal(obj.toString()))
-                    tb.setUneditableColor(0xBBBBBB)
                     tb.setEditableColor(0xA7EEC5)
-                    tb.setEditable(isUnchangeable)
+                    tb.setUneditableColor(0xAFAFAF)
+                    tb.setEditable(!isUnchangeable)
                     if (isUnchangeable) {
                         tb.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
                     }
