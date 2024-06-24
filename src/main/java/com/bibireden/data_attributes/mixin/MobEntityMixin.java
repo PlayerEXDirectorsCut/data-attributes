@@ -16,8 +16,6 @@ import net.minecraft.item.SwordItem;
 
 @Mixin(MobEntity.class)
 abstract class MobEntityMixin {
-	
-    // Redirecting the getAttackDamage method calls for SwordItem
 	@ModifyExpressionValue(method = "prefersNewEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/SwordItem;getAttackDamage()F", ordinal = 0))
 	private float data_getAttackDamage_0(float original, @Local(ordinal = 0) SwordItem swordItem, @Local(ordinal = 0, argsOnly = true) ItemStack newStack) {
 		return ((ItemHelper) swordItem).getAttackDamage(newStack);
@@ -38,7 +36,6 @@ abstract class MobEntityMixin {
 		return ((ItemHelper) swordItem2).getAttackDamage(oldStack);
 	}
 
-	// Redirecting the getProtection method calls for ArmorItem
 	@ModifyExpressionValue(method = "prefersNewEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ArmorItem;getProtection()I", ordinal = 0))
 	private int data_getProtection_0(int og, @Local(ordinal = 0) ArmorItem armorItem, @Local(ordinal = 0, argsOnly = true) ItemStack newStack) {
 		return ((ItemHelper) armorItem).getProtection(newStack);
@@ -59,7 +56,6 @@ abstract class MobEntityMixin {
 		return ((ItemHelper) armorItem2).getProtection(oldStack);
 	}
 
-	// Redirecting the getToughness method calls for ArmorItem
 	@ModifyExpressionValue(method = "prefersNewEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ArmorItem;getToughness()F", ordinal = 0))
 	private float data_getToughness_0(float og, @Local(ordinal = 0) ArmorItem armorItem, @Local(ordinal = 0, argsOnly = true) ItemStack newStack) {
 		return ((ItemHelper) armorItem).getToughness(newStack);
@@ -80,7 +76,6 @@ abstract class MobEntityMixin {
 		return ((ItemHelper) armorItem2).getToughness(oldStack);
 	}
 
-	// Redirecting the getAttackDamage method calls for MiningToolItem
 	@ModifyExpressionValue(method = "prefersNewEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/MiningToolItem;getAttackDamage()F", ordinal = 0))
 	private float data_getAttackDamage_0(float og, @Local(ordinal = 0) MiningToolItem miningToolItem, @Local(ordinal = 0, argsOnly = true) ItemStack newStack) {
 		return ((ItemHelper) miningToolItem).getAttackDamage(newStack);

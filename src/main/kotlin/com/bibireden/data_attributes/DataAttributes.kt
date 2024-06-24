@@ -86,6 +86,15 @@ class DataAttributes : ModInitializer {
             CONFIG.load()
         }
 
+        /** Save all the data-attributes configs at once. */
+        @JvmStatic
+        fun saveConfigs() {
+            OVERRIDES_CONFIG.save()
+            FUNCTIONS_CONFIG.save()
+            ENTITY_TYPES_CONFIG.save()
+            CONFIG.save()
+        }
+
         fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
             sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
         }

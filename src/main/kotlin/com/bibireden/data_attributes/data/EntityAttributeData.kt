@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.data
 
+import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.CodecUtils
@@ -39,7 +40,14 @@ class EntityAttributeData(val override: AttributeOverrideConfig? = null, val fun
         }
     }
 
-    fun putFunctions(functions: Map<Identifier, AttributeFunction>) {
-        this.functions.putAll(functions)
+    fun putFunctions(functions: List<AttributeFunctionConfig>) {
+        val mapping = mutableMapOf<Identifier, AttributeFunction>()
+        functions.forEachIndexed { index, (id, behavior, value) ->
+            if (!Registries.ATTRIBUTE.containsId(id)) {
+                DataAttributes.LOGGER.warn("The attribute function child [$id] does not seem to be registered. This could allude to a missing mod or registered attribute.")
+            }
+            mapping[id] = AttributeFunction(behavior, value)
+        }
+        this.functions.putAll(mapping)
     }
 }

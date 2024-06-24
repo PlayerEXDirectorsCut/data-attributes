@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config
 
+import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
@@ -58,10 +59,9 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     {
         /**
          * This expects an attribute to be instantiated by the time this is called.
-         * @throws IllegalStateException
          */
-        fun expectAttribute(identifier: Identifier): EntityAttribute {
-            return Registries.ATTRIBUTE[identifier] ?: throw IllegalStateException("Attribute $identifier is not registered! Please configure accordingly to resolve this issue.")
+        fun getAttribute(identifier: Identifier): EntityAttribute? {
+            return Registries.ATTRIBUTE[identifier]
         }
 
         fun getOrCreate(identifier: Identifier, attribute: EntityAttribute): EntityAttribute
@@ -97,6 +97,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     /** Posts overrides and calls the [onDataUpdate] method for sync. */
     fun updateOverrides(config: Map<Identifier, AttributeOverrideConfig>)
     {
+        this.data.overrides.clear()
         this.data.overrides.putAll(config)
         onDataUpdate()
     }
@@ -104,6 +105,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     /** Posts functions and calls the [onDataUpdate] method for sync. */
     fun updateFunctions(config: AttributeFunctionConfigData)
     {
+        this.data.functions.clear()
         this.data.functions.putAll(config.data)
         onDataUpdate()
     }
@@ -111,6 +113,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     /** Post entity types and calls the `onDataUpdate` method for sync.*/
     fun updateEntityTypes(config: Map<Identifier, EntityTypeData>)
     {
+        this.data.entity_types.clear()
         this.data.entity_types.putAll(config)
         onDataUpdate()
     }
@@ -119,10 +122,23 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
         val entityTypeData = mutableMapOf<Identifier, EntityTypeData>()
-        val functions = mutableMapOf<Identifier, List<AttributeFunctionConfig>>()
 
-        for ((key, value) in this.data.overrides) {
-            entityAttributeData[key] = EntityAttributeData(value)
+        for ((id, value) in this.data.overrides) {
+            if (!Registries.ATTRIBUTE.containsId(id)) {
+                DataAttributes.LOGGER.warn("Attribute [$id] that was targeted for override is not registered. This has been skipped.")
+                continue
+            }
+            entityAttributeData[id] = EntityAttributeData(value)
+        }
+
+        for ((id, configs) in this.data.functions) {
+            if (!Registries.ATTRIBUTE.containsId(id)) {
+                DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")
+            }
+            else {
+                val data = entityAttributeData.getOrPut(id, ::EntityAttributeData)
+                data.putFunctions(configs)
+            }
         }
 
         for ((id, value) in this.data.entity_types) {
@@ -136,8 +152,8 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
             (attribute as MutableEntityAttribute).`data_attributes$clear`()
         }
 
-        for ((identifier, data) in entityAttributeData) {
-            data.override(expectAttribute(identifier))
+        for ((id, data) in entityAttributeData) {
+            data.override(getAttribute(id)!!) // was already asserted to exist in L: 127
         }
 
         for ((identifier, attributeData) in entityAttributeData) {

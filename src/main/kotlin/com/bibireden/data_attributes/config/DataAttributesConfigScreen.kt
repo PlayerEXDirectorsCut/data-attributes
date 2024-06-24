@@ -31,7 +31,7 @@ import java.util.function.BiConsumer
 import java.util.function.Supplier
 import kotlin.math.min
 
-class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig, val functions: DataAttributesFunctionsConfig, val entity_types: DataAttributesEntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
+class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, val functions: DataAttributesFunctionsConfig, val entity_types: DataAttributesEntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
     override fun build(rootComponent: FlowLayout) {
         this.extraFactories.put({ it.backingField().field.name.equals("entity_types") }, DataAttributesConfigProviders.ENTITY_TYPES_FACTORY)
         this.extraFactories.put({ it.backingField().field.name.equals("overrides") }, DataAttributesConfigProviders.ATTRIBUTE_OVERRIDE_FACTORY)
@@ -46,9 +46,7 @@ class DataAttributesConfigScreenV2(val overrides: DataAttributesOverridesConfig,
         containers[Option.Key.ROOT] = optionPanel
 
         rootComponent.childById(ButtonComponent::class.java, "done-button")?.onPress {
-            this.overrides.save()
-            this.functions.save()
-            this.entity_types.save()
+            DataAttributes.saveConfigs()
             this.close()
         }
 

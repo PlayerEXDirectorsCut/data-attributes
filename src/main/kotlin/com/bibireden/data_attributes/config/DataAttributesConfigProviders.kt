@@ -15,12 +15,16 @@ import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
+import net.minecraft.registry.Registries
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 @Suppress("UnstableApiUsage")
 object DataAttributesConfigProviders {
+    fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
     fun isNumeric(str: String) = str.isEmpty() || str.matches("-?\\d+(\\.\\d+)?".toRegex())
+    fun maybeInvalidText(text: String, invalid: Boolean) = Text.literal(text).apply { formatted(if (invalid) Formatting.RED else Formatting.WHITE) }
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { model, option ->
         val provider = AttributeOverrideProvider(option)
@@ -42,8 +46,10 @@ object DataAttributesConfigProviders {
 
         init {
             backing.forEach { (id, override) ->
-                Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[$id]"), true)
+                val isOverrideInvalid = isAttributeUnregistered(id)
+                Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("$id", isOverrideInvalid), true)
                     .also {
+                        if (isOverrideInvalid) it.tooltip(Text.translatable("text.config.data_attributes.data_entry.overrides.invalid"))
                         it.gap(15)
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
@@ -145,12 +151,19 @@ object DataAttributesConfigProviders {
 
         init {
             backing.forEach { (topID, functions) ->
-                Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[$topID]"), true).also { ct ->
+                val isFunctionParentUnregistered = isAttributeUnregistered(topID)
+                Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("$topID", isFunctionParentUnregistered), true).also { ct ->
                     ct.gap(15)
+                    if (isFunctionParentUnregistered) {
+                        ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_parent.invalid"))
+                    }
                     functions.forEachIndexed { index,  function ->
-                        Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[${function.id}]"), true).also {
+                        val isFunctionChildUnregistered = isAttributeUnregistered(function.id)
+                        Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("${function.id}", isFunctionChildUnregistered), true).also {
                             it.gap(10)
-
+                            if (isFunctionChildUnregistered) {
+                                it.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_child.invalid"))
+                            }
                             it.child(textBoxComponent(
                                 Text.translatable("text.config.data_attributes.data_entry.functions.value"),
                                 function.value,
@@ -199,10 +212,10 @@ object DataAttributesConfigProviders {
 
         init {
             backing.forEach { (topID, types) ->
-                Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[$topID]"), true).also { ct ->
+                Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("$topID"), true).also { ct ->
                     ct.gap(15)
                     types.data.forEach { id,  value ->
-                        Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[${id}]"), true).also {
+                        Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[$id]"), true).also {
                             it.gap(10)
 
                             it.child(textBoxComponent(
@@ -229,6 +242,7 @@ object DataAttributesConfigProviders {
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null): FlowLayout {
+        val isUnchangeable = onChange != null
         return Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
             hf.verticalAlignment(VerticalAlignment.CENTER)
             hf.gap(6)
@@ -238,9 +252,12 @@ object DataAttributesConfigProviders {
                     tb.text = obj.toString()
                     tb.verticalSizing(Sizing.fixed(15))
                     tb.setPlaceholder(Text.literal(obj.toString()))
-                    tb.setUneditableColor(0xF05454)
-                    tb.active = onChange != null
-                    tb.setEditableColor(0x54F096)
+                    tb.setUneditableColor(0xBBBBBB)
+                    tb.setEditableColor(0x91D8AF)
+                    tb.setEditable(isUnchangeable)
+                    if (isUnchangeable) {
+                        tb.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
+                    }
                     if (onChange != null) {
                         tb.setTextPredicate {
                             if (predicate == null || predicate.apply(it)) {

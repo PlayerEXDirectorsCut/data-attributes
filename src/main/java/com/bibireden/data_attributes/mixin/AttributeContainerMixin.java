@@ -64,7 +64,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@ModifyReceiver(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
 	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
 
-	// todo: I set a ModifyReturnValue instead of an inject, but I'm not particularly sure if I need to return null on `else`. It'll need some more inspections later when tested.
 	@Nullable
 	@SuppressWarnings("all") // todo: until intellij updates
 	@ModifyReturnValue(method = "getCustomInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;", at = @At("RETURN"))

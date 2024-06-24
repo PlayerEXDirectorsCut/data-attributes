@@ -1,5 +1,8 @@
 package com.bibireden.data_attributes.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.entity.data.TrackedData;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,6 +21,12 @@ abstract class LivingEntityMixin {
 	@Mutable
 	@Shadow
 	private AttributeContainer attributes;
+
+	@Shadow @Final private static TrackedData<Float> HEALTH;
+
+	@Shadow public abstract float getHealth();
+
+	@Shadow public abstract float getMaxHealth();
 
 	@Unique
 	private int data_updateFlag;
