@@ -3,7 +3,7 @@
   "id": "data_attributes",
   "version": "${version}",
   "name": "Data Attributes: Directors Cut",
-  "description": "...",
+  "description": "This mod serves to overhaul the Entity Attribute system to be a lot more dynamic.",
   "authors": [
     "Bare Minimum Studios",
     "CleverNucleus (original author)"

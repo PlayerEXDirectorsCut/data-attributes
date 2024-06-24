@@ -123,6 +123,16 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
+    public double data_attributes$min_fallback() {
+        return Double.MIN_VALUE;
+    }
+
+    @Override
+    public double data_attributes$max_fallback() {
+        return Double.MAX_VALUE;
+    }
+
+    @Override
     public StackingFormula data_attributes$formula() {
         return this.data_formula;
     }

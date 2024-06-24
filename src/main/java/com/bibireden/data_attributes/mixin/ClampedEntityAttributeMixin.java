@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -55,6 +56,16 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 			return this.data_attributes$clamped(value);
 		}
 		return original.call(value);
+	}
+
+	@Override
+	public double data_attributes$min_fallback() {
+		return this.minValue;
+	}
+
+	@Override
+	public double data_attributes$max_fallback() {
+		return this.maxValue;
 	}
 
 	@Override

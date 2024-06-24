@@ -5,6 +5,7 @@ import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.utils.round
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.Option
@@ -15,16 +16,33 @@ import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
+import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 @Suppress("UnstableApiUsage")
 object DataAttributesConfigProviders {
+    fun entityTypeIdentifierToText(id: Identifier): MutableText {
+        val type = Registries.ENTITY_TYPE[id]
+        return Text.empty().apply {
+            append(Text.translatable(type.translationKey).append(" "))
+            append(Text.literal("($id)").formatted(Formatting.GRAY))
+        }
+    }
+    fun attributeIdentifierToText(id: Identifier): MutableText {
+        val attribute = Registries.ATTRIBUTE[id]
+        return Text.empty().apply {
+            if (attribute != null) {
+                append(Text.translatable(attribute.translationKey).append(" "))
+            }
+            append(Text.literal("($id)").formatted(if (attribute == null) Formatting.RED else Formatting.GRAY))
+        }
+    }
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
     fun isNumeric(str: String) = str.isEmpty() || str.matches("-?\\d+(\\.\\d+)?".toRegex())
-    fun maybeInvalidText(text: String, invalid: Boolean) = Text.literal(text).apply { formatted(if (invalid) Formatting.RED else Formatting.WHITE) }
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { model, option ->
         val provider = AttributeOverrideProvider(option)
@@ -46,26 +64,36 @@ object DataAttributesConfigProviders {
 
         init {
             backing.forEach { (id, override) ->
+                // extract min & max.
+                val attribute = Registries.ATTRIBUTE[id] as MutableEntityAttribute?
+                if (attribute != null) {
+                    override.min_fallback = attribute.`data_attributes$min_fallback`()
+                    override.max_fallback = attribute.`data_attributes$max_fallback`()
+                }
+
                 val isOverrideInvalid = isAttributeUnregistered(id)
-                Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("$id", isOverrideInvalid), true)
+                Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true)
                     .also {
                         if (isOverrideInvalid) it.tooltip(Text.translatable("text.config.data_attributes.data_entry.overrides.invalid"))
                         it.gap(15)
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
                             hf.gap(6)
+
                             hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.enabled"))
+                                .tooltip(Text.translatable("text.config.data_attributes.data_entry.overrides.enabled.desc"))
                                 .sizing(Sizing.content(), Sizing.fixed(20)))
 
                             hf.child(ConfigToggleButton().also { b ->
                                 b.enabled(override.enabled).positioning(Positioning.relative(100, 0))
                                 b.onPress {
-                                    val enabled = !override.enabled
                                     this.backing.remove(id)
-                                    this.backing.put(id, override.copy(enabled = enabled))
+                                    this.backing.put(id, override.copy(enabled = !override.enabled))
                                 }
                             })
                         })
+
+                        it.gap(8)
 
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min"),
@@ -87,6 +115,8 @@ object DataAttributesConfigProviders {
                             }
                         ))
 
+                        it.gap(8)
+
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min_fallback"),
                             override.min_fallback,
@@ -101,7 +131,7 @@ object DataAttributesConfigProviders {
 
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(30)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
-                            hf.gap(6)
+                            hf.gap(4)
                             hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.smoothness"))
                                 .sizing(Sizing.content(), Sizing.fixed(20)))
 
@@ -152,14 +182,14 @@ object DataAttributesConfigProviders {
         init {
             backing.forEach { (topID, functions) ->
                 val isFunctionParentUnregistered = isAttributeUnregistered(topID)
-                Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("$topID", isFunctionParentUnregistered), true).also { ct ->
+                Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
                     ct.gap(15)
                     if (isFunctionParentUnregistered) {
                         ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_parent.invalid"))
                     }
                     functions.forEachIndexed { index,  function ->
                         val isFunctionChildUnregistered = isAttributeUnregistered(function.id)
-                        Containers.collapsible(Sizing.content(), Sizing.content(), maybeInvalidText("${function.id}", isFunctionChildUnregistered), true).also {
+                        Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(function.id), true).also {
                             it.gap(10)
                             if (isFunctionChildUnregistered) {
                                 it.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_child.invalid"))
@@ -212,10 +242,10 @@ object DataAttributesConfigProviders {
 
         init {
             backing.forEach { (topID, types) ->
-                Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("$topID"), true).also { ct ->
+                Containers.collapsible(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(topID), true).also { ct ->
                     ct.gap(15)
                     types.data.forEach { id,  value ->
-                        Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("[$id]"), true).also {
+                        Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true).also {
                             it.gap(10)
 
                             it.child(textBoxComponent(

@@ -19,6 +19,12 @@ public interface IEntityAttribute {
 	 * @return The maximum value of the attribute.
 	 */
 	double data_attributes$max();
+
+	/** Returns the intended minimum fallback of this attribute. */
+	double data_attributes$min_fallback();
+
+	/** Returns the intended maximum fallback of this attribute. */
+	double data_attributes$max_fallback();
 	
 	/**
 	 * @return The attribute's {@link StackingFormula}.

@@ -28,6 +28,8 @@
   "text.config.data_attributes.data_entry.entity_types.value": "Value",
   "text.config.data_attributes.data_entry.entity_types": "Value",
 
+  "text.config.data_attributes.data_entry.overrides.enabled.desc": "If this override should be enabled and its modifications applied.",
+
   "text.config.data_attributes.data_entry.unchangeable": "This value is unchangeable.",
 
   "text.config.data_attributes.data_entry.overrides.invalid": "This override does not exist in the attribute registry. It will be ignored.",
