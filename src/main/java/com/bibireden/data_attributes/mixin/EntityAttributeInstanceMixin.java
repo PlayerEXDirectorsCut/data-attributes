@@ -8,7 +8,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import kotlin.Suppress;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +15,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.bibireden.data_attributes.api.attribute.StackingBehavior;
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
@@ -68,6 +66,8 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 	@Shadow public abstract double getBaseValue();
 
+	@Shadow public abstract EntityAttribute getAttribute();
+
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
 		this.data_identifier = Registries.ATTRIBUTE.getId(type);
@@ -79,11 +79,9 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		return attribute != null ? attribute : original;
 	}
 
-	@SuppressWarnings("ALL") // todo: until intellij updates
-	@WrapMethod(method = "computeValue")
-	private double data_computeValue(Operation<Double> original) {
-		var ref = ((EntityAttributeInstance) (Object) this);
-		MutableEntityAttribute attribute = (MutableEntityAttribute) ref.getAttribute();
+	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"), remap = false)
+	private double data_attributes$computeValue(double original) {
+		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();
 
 		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
@@ -167,9 +165,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			e += attribute.data_attributes$min();
 		}
 
-		double value = ((EntityAttribute) attribute).clamp(e);
-
-		return value;
+        return ((EntityAttribute) attribute).clamp(e);
 	}
 
 	@Inject(method = "addModifier", at = @At("HEAD"), cancellable = true)

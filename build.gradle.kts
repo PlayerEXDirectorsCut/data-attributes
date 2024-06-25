@@ -1,11 +1,11 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "2.0.0"
-    id("fabric-loom") version "1.7-SNAPSHOT"
-    kotlin("kapt") version "2.0.0"
+    id("fabric-loom")
     `maven-publish`
     java
+    kotlin("kapt") version "2.0.0"
 }
 
 group = "${properties["maven_group"]}"

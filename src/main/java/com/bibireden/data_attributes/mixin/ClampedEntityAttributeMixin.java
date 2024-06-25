@@ -2,14 +2,10 @@ package com.bibireden.data_attributes.mixin;
 
 import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -48,14 +44,6 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 			return this.data_attributes$max();
 		}
 
-		return original;
-	}
-
-	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
-	private double data_attributes$clamp(double original, @Local(argsOnly = true) double value) {
-		if (this.data_enabled) {
-			return this.data_attributes$clamped(value);
-		}
 		return original;
 	}
 
