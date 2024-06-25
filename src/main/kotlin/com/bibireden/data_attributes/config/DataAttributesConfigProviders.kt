@@ -6,8 +6,8 @@ import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverri
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
-import com.bibireden.data_attributes.ui.ColorCodes
-import com.bibireden.data_attributes.ui.components.ButtonComponents
+import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import com.bibireden.data_attributes.utils.round
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.Option
@@ -15,10 +15,10 @@ import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.ui.component.Components
+import io.wispforest.owo.ui.component.TextBoxComponent
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
-import net.minecraft.client.resource.language.I18n
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.text.MutableText
@@ -87,22 +87,26 @@ object DataAttributesConfigProviders {
                             it.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                         }
 
-                        it.gap(15)
+                        it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15)).also { hf ->
+                            hf.verticalAlignment(VerticalAlignment.BOTTOM)
 
-                        it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
-                            hf.verticalAlignment(VerticalAlignment.CENTER)
                             hf.gap(10)
 
-                            hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.enabled"))
-                                .sizing(Sizing.content(), Sizing.fixed(20)))
-
-                            hf.child(ConfigToggleButton().also { b ->
-                                b.enabled(override.enabled).positioning(Positioning.relative(100, 0))
-                                b.onPress {
-                                    this.backing.remove(id)
-                                    this.backing.put(id, override.copy(enabled = !override.enabled))
-                                }
+                            hf.child(ConfigToggleButton().apply {
+                                enabled(override.enabled)
+                                onPress { backing.replace(id, override.copy(enabled = !override.enabled)) }
+                                renderer(ButtonRenderers.STANDARD)
                             })
+
+                            hf.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
+                                {
+                                    override = override.copy(min = override.min_fallback, max = override.max_fallback)
+                                    this.childById(TextBoxComponent::class.java, "inputs.min")!!.write(override.min.toString())
+                                    this.childById(TextBoxComponent::class.java, "inputs.max")!!.write(override.max.toString())
+                                    this.backing.replace(id, override)
+                                }
+                                .renderer(ButtonRenderers.STANDARD)
+                            )
                         })
 
                         it.child(textBoxComponent(
@@ -111,10 +115,10 @@ object DataAttributesConfigProviders {
                             ::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { v ->
-                                    this.backing.remove(id)
-                                    this.backing.put(id, override.copy(min = v))
+                                    this.backing.replace(id, override.copy(min = v))
                                 }
-                            }
+                            },
+                            "inputs.min"
                         ))
 
                         it.child(textBoxComponent(
@@ -123,10 +127,10 @@ object DataAttributesConfigProviders {
                             ::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { v ->
-                                    this.backing.remove(id)
-                                    this.backing.put(id, override.copy(max = v))
+                                    this.backing.replace(id, override.copy(max = v))
                                 }
-                            }
+                            },
+                            "inputs.max"
                         ))
 
                         it.child(textBoxComponent(
@@ -174,7 +178,7 @@ object DataAttributesConfigProviders {
                                     it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
                                     this.backing.replace(id, override.copy(formula = override.formula))
                                 })
-                                    .renderer(ButtonComponents.STANDARD)
+                                    .renderer(ButtonRenderers.STANDARD)
                                     .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                             )
                         })
@@ -250,7 +254,7 @@ object DataAttributesConfigProviders {
                                         popped[index] = function.copy(behavior = function.behavior)
                                         this.backing.put(topID, popped)
                                     })
-                                        .renderer(ButtonComponents.STANDARD)
+                                        .renderer(ButtonRenderers.STANDARD)
                                         .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                                 )
                             })
@@ -302,7 +306,7 @@ object DataAttributesConfigProviders {
         override fun parsedValue() = backing
     }
 
-    fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null): FlowLayout {
+    fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null, textBoxID: String? = null): FlowLayout {
         val isUnchangeable = onChange == null
         return Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
             hf.verticalAlignment(VerticalAlignment.CENTER)
@@ -332,7 +336,7 @@ object DataAttributesConfigProviders {
                             true
                         }
                     }
-                }.positioning(Positioning.relative(100, 50))
+                }.positioning(Positioning.relative(100, 50)).id(textBoxID)
             )
         }
     }

@@ -59,9 +59,6 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	private Set<EntityAttributeModifier> persistentModifiers;
 
 	@Shadow
-	private double baseValue;
-
-	@Shadow
 	private Collection<EntityAttributeModifier> getModifiersByOperation(EntityAttributeModifier.Operation operation) {
 		return Collections.emptySet();
 	}
@@ -69,7 +66,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	@Shadow
 	protected void onUpdate() {}
 
-	@Shadow private double value;
+	@Shadow public abstract double getBaseValue();
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
@@ -91,12 +88,12 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
 
-		if (this.baseValue > 0.0D) {
-			k = formula.stack(k, this.baseValue);
-			k2 = formula.max(k2, this.baseValue);
+		if (this.getBaseValue() > 0.0D) {
+			k = formula.stack(k, this.getBaseValue());
+			k2 = formula.max(k2, this.getBaseValue());
 		} else {
-			v = formula.stack(v, this.baseValue);
-			v2 = formula.max(v2, this.baseValue);
+			v = formula.stack(v, this.getBaseValue());
+			v2 = formula.max(v2, this.getBaseValue());
 		}
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.ADDITION)) {
@@ -164,12 +161,13 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			}
 		}
 
-		double value = ((EntityAttribute) attribute).clamp(e);
 
 		if (formula == StackingFormula.Diminished) {
-			value = value * (attribute.data_attributes$max() - attribute.data_attributes$min());
-			value += attribute.data_attributes$min();
+			e = e * (attribute.data_attributes$max() - attribute.data_attributes$min());
+			e += attribute.data_attributes$min();
 		}
+
+		double value = ((EntityAttribute) attribute).clamp(e);
 
 		return value;
 	}

@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.ui
+package com.bibireden.data_attributes.ui.colors
 
 object ColorCodes {
     val BEE_YELLOW = 0xE7C14B

@@ -32,7 +32,11 @@
   "text.config.data_attributes.category.overrides": "Overrides",
   "text.config.data_attributes.category.functions": "Functions",
 
-  "text.config.data_attributes.data_entry.overrides.enabled": "Enabled",
+  "text.config.data_attributes.data_entry.reset": [
+    {"text": "♻ ", "color": "#6FD392"},
+    {"text": "Reset", "color": "white"}
+  ],
+
   "text.config.data_attributes.data_entry.overrides.min_fallback": [
     {"text": "⭳ ", "color": "#979797"},
     {"text": "Min Fallback", "color": "white"}
