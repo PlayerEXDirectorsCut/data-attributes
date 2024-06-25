@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,12 +51,12 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 		return original;
 	}
 
-	@WrapMethod(method = "clamp")
-	private double data_attributes$clamp(double value, Operation<Double> original) {
+	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
+	private double data_attributes$clamp(double original, @Local(argsOnly = true) double value) {
 		if (this.data_enabled) {
 			return this.data_attributes$clamped(value);
 		}
-		return original.call(value);
+		return original;
 	}
 
 	@Override
