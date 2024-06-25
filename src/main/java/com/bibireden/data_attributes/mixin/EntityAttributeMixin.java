@@ -118,9 +118,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     public double data_attributes$min() { return this.data_min; }
 
     @Override
-    public double data_attributes$max() {
-        return this.data_max;
-    }
+    public double data_attributes$max() { return this.data_max; }
 
     @Override
     public double data_attributes$min_fallback() {

@@ -6,6 +6,8 @@ import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverri
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
+import com.bibireden.data_attributes.ui.ColorCodes
+import com.bibireden.data_attributes.ui.components.ButtonComponents
 import com.bibireden.data_attributes.utils.round
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.Option
@@ -16,11 +18,12 @@ import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
+import net.minecraft.client.resource.language.I18n
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.text.MutableText
+import net.minecraft.text.Style
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 @Suppress("UnstableApiUsage")
@@ -28,17 +31,19 @@ object DataAttributesConfigProviders {
     fun entityTypeIdentifierToText(id: Identifier): MutableText {
         val type = Registries.ENTITY_TYPE[id]
         return Text.empty().apply {
-            append(Text.translatable(type.translationKey).append(" "))
-            append(Text.literal("($id)").formatted(Formatting.GRAY))
+            append(Text.translatable(type.translationKey).append(" ").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_YELLOW)))
+            append(Text.literal("($id)").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_BLACK)))
         }
     }
     fun attributeIdentifierToText(id: Identifier): MutableText {
         val attribute = Registries.ATTRIBUTE[id]
         return Text.empty().apply {
             if (attribute != null) {
-                append(Text.translatable(attribute.translationKey).append(" "))
+                append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(0xE7C14B))
             }
-            append(Text.literal("($id)").formatted(if (attribute == null) Formatting.RED else Formatting.GRAY))
+            append(Text.literal("($id)").also { t ->
+                t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
+            })
         }
     }
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
@@ -63,25 +68,32 @@ object DataAttributesConfigProviders {
         val backing = HashMap(option.value())
 
         init {
-            backing.forEach { (id, override) ->
-                // extract min & max.
+            backing.forEach { (id, config) ->
+                var override = config
+                // extract min & max fallbacks.
                 val attribute = Registries.ATTRIBUTE[id] as MutableEntityAttribute?
                 if (attribute != null) {
-                    override.min_fallback = attribute.`data_attributes$min_fallback`()
-                    override.max_fallback = attribute.`data_attributes$max_fallback`()
+                    override = override.copy(
+                        min_fallback = attribute.`data_attributes$min_fallback`(),
+                        max_fallback = attribute.`data_attributes$max_fallback`()
+                    )
+                    this.backing.replace(id, override)
                 }
 
                 val isOverrideInvalid = isAttributeUnregistered(id)
                 Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true)
                     .also {
-                        if (isOverrideInvalid) it.tooltip(Text.translatable("text.config.data_attributes.data_entry.overrides.invalid"))
+                        if (isOverrideInvalid) {
+                            it.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                        }
+
                         it.gap(15)
+
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
-                            hf.gap(6)
+                            hf.gap(10)
 
                             hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.enabled"))
-                                .tooltip(Text.translatable("text.config.data_attributes.data_entry.overrides.enabled.desc"))
                                 .sizing(Sizing.content(), Sizing.fixed(20)))
 
                             hf.child(ConfigToggleButton().also { b ->
@@ -93,15 +105,15 @@ object DataAttributesConfigProviders {
                             })
                         })
 
-                        it.gap(8)
-
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min"),
                             override.min,
                             ::isNumeric,
                             onChange = {
-                                this.backing.remove(id)
-                                this.backing.put(id, override.copy(min = it.toDouble()))
+                                it.toDoubleOrNull()?.let { v ->
+                                    this.backing.remove(id)
+                                    this.backing.put(id, override.copy(min = v))
+                                }
                             }
                         ))
 
@@ -110,12 +122,12 @@ object DataAttributesConfigProviders {
                             override.max,
                             ::isNumeric,
                             onChange = {
-                                this.backing.remove(id)
-                                this.backing.put(id, override.copy(max = it.toDouble()))
+                                it.toDoubleOrNull()?.let { v ->
+                                    this.backing.remove(id)
+                                    this.backing.put(id, override.copy(max = v))
+                                }
                             }
                         ))
-
-                        it.gap(8)
 
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min_fallback"),
@@ -131,7 +143,7 @@ object DataAttributesConfigProviders {
 
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(30)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
-                            hf.gap(4)
+                            hf.gap(8)
                             hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.smoothness"))
                                 .sizing(Sizing.content(), Sizing.fixed(20)))
 
@@ -140,8 +152,7 @@ object DataAttributesConfigProviders {
                                     slider.onChanged().subscribe {
                                         this.backing.remove(id)
                                         this.backing.put(id, override.copy(smoothness = slider.value().round(2)))
-                                    } //THIS IS CURSED, WHY
-
+                                    }
                                 }
                                     .positioning(Positioning.relative(100, 0))
                             )
@@ -149,21 +160,22 @@ object DataAttributesConfigProviders {
 
                         it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
-                            hf.gap(6)
+                            hf.gap(8)
                             hf.child(
                                 Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.formula"))
                                     .sizing(Sizing.content(), Sizing.fixed(20))
                             )
                             hf.child(
-                                Components.button(Text.literal(override.formula.name), {
+                                Components.button(Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}"), {
                                     override.formula = when (override.formula) {
                                         StackingFormula.Flat -> StackingFormula.Diminished
                                         StackingFormula.Diminished -> StackingFormula.Flat
                                     }
                                     it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
-                                    this.backing.remove(id)
-                                    this.backing.put(id, override.copy(formula = override.formula))
-                                }).positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
+                                    this.backing.replace(id, override.copy(formula = override.formula))
+                                })
+                                    .renderer(ButtonComponents.STANDARD)
+                                    .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                             )
                         })
                     }
@@ -185,35 +197,50 @@ object DataAttributesConfigProviders {
                 Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
                     ct.gap(15)
                     if (isFunctionParentUnregistered) {
-                        ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_parent.invalid"))
+                        ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                     }
                     functions.forEachIndexed { index,  function ->
                         val isFunctionChildUnregistered = isAttributeUnregistered(function.id)
+
                         Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(function.id), true).also {
-                            it.gap(10)
+                            it.gap(8)
                             if (isFunctionChildUnregistered) {
-                                it.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_child.invalid"))
+                                it.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                            }
+                            else {
+                                val attribute = Registries.ATTRIBUTE[function.id]
+                                if (attribute is ClampedEntityAttribute) {
+                                    it.tooltip(
+                                        Text.translatable(
+                                            "text.config.data_attributes.data_entry.function_child",
+                                            function.id,
+                                            attribute.minValue,
+                                            attribute.maxValue
+                                        )
+                                    )
+                                }
                             }
                             it.child(textBoxComponent(
                                 Text.translatable("text.config.data_attributes.data_entry.functions.value"),
                                 function.value,
                                 ::isNumeric,
                                 onChange = {
-                                    val popped = this.backing.remove(topID)?.toMutableList() ?: return@textBoxComponent
-                                    popped[index] = function.copy(value = it.toDouble())
-                                    this.backing.put(topID, popped)
+                                    it.toDoubleOrNull()?.let { v ->
+                                        val popped = this.backing.remove(topID)?.toMutableList() ?: return@textBoxComponent
+                                        popped[index] = function.copy(value = v)
+                                        this.backing.put(topID, popped)
+                                    }
                                 }
                             ))
 
                             it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                                 hf.verticalAlignment(VerticalAlignment.CENTER)
-                                hf.gap(6)
                                 hf.child(
                                     Components.label(Text.translatable("text.config.data_attributes.data_entry.functions.behavior"))
                                         .sizing(Sizing.content(), Sizing.fixed(20))
                                 )
                                 hf.child(
-                                    Components.button(Text.literal(function.behavior.name), {
+                                    Components.button(Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}"), {
                                         function.behavior = when (function.behavior) {
                                             StackingBehavior.Add -> StackingBehavior.Multiply
                                             StackingBehavior.Multiply -> StackingBehavior.Add
@@ -222,7 +249,9 @@ object DataAttributesConfigProviders {
                                         val popped = this.backing.remove(topID)?.toMutableList() ?: return@button
                                         popped[index] = function.copy(behavior = function.behavior)
                                         this.backing.put(topID, popped)
-                                    }).positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
+                                    })
+                                        .renderer(ButtonComponents.STANDARD)
+                                        .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                                 )
                             })
                             ct.child(it)
@@ -246,16 +275,18 @@ object DataAttributesConfigProviders {
                     ct.gap(15)
                     types.data.forEach { id,  value ->
                         Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true).also {
-                            it.gap(10)
+                            it.gap(8)
 
                             it.child(textBoxComponent(
                                 Text.translatable("text.config.data_attributes.data_entry.entity_types.value"),
                                 value,
                                 ::isNumeric,
                                 onChange = {
-                                    val popped = this.backing.remove(topID)?.data ?: return@textBoxComponent
-                                    popped[id] = it.toDouble()
-                                    this.backing.put(topID, EntityTypeData(popped))
+                                    it.toDoubleOrNull()?.let { value ->
+                                        val popped = this.backing.remove(topID)?.data ?: return@textBoxComponent
+                                        popped[id] = value
+                                        this.backing.put(topID, EntityTypeData(popped))
+                                    }
                                 }
                             ))
                             ct.child(it)
@@ -279,14 +310,19 @@ object DataAttributesConfigProviders {
             hf.child(Components.label(txt).sizing(Sizing.content(), Sizing.fixed(20)))
             hf.child(
                 Components.textBox(Sizing.fill(30)).also { tb ->
-                    tb.text = obj.toString()
-                    tb.verticalSizing(Sizing.fixed(15))
-                    tb.setPlaceholder(Text.literal(obj.toString()))
-                    tb.setEditableColor(0xA7EEC5)
-                    tb.setUneditableColor(0xAFAFAF)
+                    tb.verticalSizing(Sizing.fixed(16))
+                    tb.setEditableColor(ColorCodes.BEE_YELLOW)
+                    tb.setUneditableColor(ColorCodes.BEE_BLACK)
                     tb.setEditable(!isUnchangeable)
                     if (isUnchangeable) {
+                        tb.active = false
+                        tb.cursorStyle(CursorStyle.POINTER)
+                        tb.setSuggestion(obj.toString())
                         tb.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
+                    }
+                    else {
+                        tb.setPlaceholder(Text.literal(obj.toString()))
+                        tb.text = obj.toString()
                     }
                     if (onChange != null) {
                         tb.setTextPredicate {

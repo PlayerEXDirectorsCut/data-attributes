@@ -74,14 +74,11 @@ tasks {
 
         repositories {}
     }
-
-    compileKotlin {
-        compilerOptions.freeCompilerArgs.set(listOf("-Xjvm-default=all-compatibility"))
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-    }
-
 }
 
 java {
     withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.commons.lang3.Validate;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,6 @@ import com.bibireden.data_attributes.mutable.MutableSimpleRegistry;
 import com.mojang.serialization.Lifecycle;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -31,10 +31,6 @@ import net.minecraft.registry.entry.RegistryEntry;
 abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Unique
     private Collection<Identifier> data_idCache;
-
-    @Final
-    @Shadow
-    private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
 
     @Final
     @Shadow
@@ -52,10 +48,6 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Shadow
     private Map<T, RegistryEntry.Reference<T>> valueToEntry;
 
-    // @Final
-    // @Shadow
-    // private Function<T, RegistryEntry.Reference<T>> valueToEntryFunction;
-
     @Final
     @Shadow
     private Map<T, Lifecycle> entryToLifecycle;
@@ -71,6 +63,8 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
     @Shadow
     private boolean frozen;
+
+    @Shadow @Final private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
 
     @Inject(method = "<init>(Lnet/minecraft/registry/RegistryKey;Lcom/mojang/serialization/Lifecycle;Z)V", at = @At("TAIL"))
     private void data_init(CallbackInfo ci) {

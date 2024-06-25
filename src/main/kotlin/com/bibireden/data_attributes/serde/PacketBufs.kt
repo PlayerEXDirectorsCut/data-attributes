@@ -2,6 +2,8 @@ package com.bibireden.data_attributes.serde
 
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.AttributeFunction
+import com.bibireden.data_attributes.data.AttributeFunctionConfigData
+import com.bibireden.data_attributes.data.EntityTypeData
 import io.wispforest.endec.Endec
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
@@ -15,7 +17,9 @@ object PacketBufs {
     )
 
     fun registerPacketSerializers() {
+        registerSerializer(AttributeFunctionConfigData::class, AttributeFunctionConfigData.ENDEC)
         registerSerializer(AttributeOverrideConfig::class, AttributeOverrideConfig.ENDEC)
         registerSerializer(AttributeFunction::class, AttributeFunction.ENDEC)
+        registerSerializer(EntityTypeData::class, EntityTypeData.ENDEC)
     }
 }

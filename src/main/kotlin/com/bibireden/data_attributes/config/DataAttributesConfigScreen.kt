@@ -28,7 +28,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import org.apache.commons.lang3.mutable.MutableInt
 import java.util.function.BiConsumer
-import java.util.function.Supplier
 import kotlin.math.min
 
 class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, val functions: DataAttributesFunctionsConfig, val entity_types: DataAttributesEntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
@@ -39,14 +38,21 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
 
         super.build(rootComponent)
 
+        val isDetached = DataAttributes.CONFIG.optionForKey<Boolean>(DataAttributes.CONFIG.keys.locked)!!.detached() == true
         val optionPanel = rootComponent.childById(FlowLayout::class.java, "option-panel")
+
+        if (isDetached) {
+            optionPanel?.child(Components.label(Text.translatable("text.config.data_attributes.managed_by_server")).shadow(true))
+        }
+
+        if (this.client?.world != null) rootComponent.surface(Surface.blur(.55F, 2F))
+
         val sections = LinkedHashMap<Component, Text>()
 
-        val containers = HashMap<Option.Key, FlowLayout?>()
-        containers[Option.Key.ROOT] = optionPanel
+        val containers = mutableMapOf<Option.Key, FlowLayout?>(Option.Key.ROOT to optionPanel)
 
         rootComponent.childById(ButtonComponent::class.java, "done-button")?.onPress {
-            DataAttributes.saveConfigs()
+            if (!isDetached) DataAttributes.saveConfigs()
             this.close()
         }
 
@@ -59,10 +65,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
         fun optFunc(option: Option<*>) {
             if (option.backingField().hasAnnotation(ExcludeFromScreen::class.java)) return
             val parentKey = option.key().parent()
-            if (!parentKey.isRoot && config.fieldForKey(parentKey)!!.isAnnotationPresent(
-                    ExcludeFromScreen::class.java
-                )
-            ) return
+            if (!parentKey.isRoot && config.fieldForKey(parentKey)!!.isAnnotationPresent(ExcludeFromScreen::class.java)) return
 
             val factory = this.factoryForOption(option)
             if (factory == null) {
@@ -73,32 +76,20 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
             val result = factory.make(this.model, option)
             options[option] = result.optionProvider()
 
-            val expanded = !parentKey.isRoot && config.fieldForKey(parentKey)!!.isAnnotationPresent(
-                Expanded::class.java
-            )
+            val expanded = !parentKey.isRoot && config.fieldForKey(parentKey)!!.isAnnotationPresent(Expanded::class.java)
             val container = containers.getOrDefault(
                 parentKey,
                 Containers.collapsible(
                     Sizing.fill(100), Sizing.content(),
                     Text.translatable("text.config." + config.name() + ".category." + parentKey.asString()),
                     expanded
-                ).configure<CollapsibleContainer> { nestedContainer: CollapsibleContainer ->
-                    val categoryKey =
-                        "text.config." + config.name() + ".category." + parentKey.asString()
+                ).configure<CollapsibleContainer> { cc ->
+                    val categoryKey = "text.config." + config.name() + ".category." + parentKey.asString()
                     if (I18n.hasTranslation("$categoryKey.tooltip")) {
-                        nestedContainer.titleLayout().tooltip(Text.translatable("$categoryKey.tooltip"))
+                        cc.titleLayout().tooltip(Text.translatable("$categoryKey.tooltip"))
                     }
-                    nestedContainer.titleLayout().child(SearchAnchorComponent(
-                        nestedContainer.titleLayout(),
-                        option.key(),
-                        Supplier {
-                            I18n.translate(
-                                categoryKey
-                            )
-                        }
-                    ).highlightConfigurator { highlight: SearchHighlighterComponent ->
-                        highlight.positioning(Positioning.absolute(-5, -5))
-                            .verticalSizing(Sizing.fixed(19))
+                    cc.titleLayout().child(SearchAnchorComponent(cc.titleLayout(), option.key(), { I18n.translate(categoryKey) }).highlightConfigurator { highlight ->
+                        highlight.positioning(Positioning.absolute(-5, -5)).verticalSizing(Sizing.fixed(19))
                     })
                 }
             )
@@ -108,32 +99,17 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
                     this.appendSection(sections, config.fieldForKey(parentKey), containers.get(parentKey.parent()))
                 }
 
-                containers.put(parentKey, container)
+                containers[parentKey] = container
                 containers.get(parentKey.parent())?.child(container)
             }
 
-            if (option.detached()) {
-                result.baseComponent().tooltip(
-                    client!!.textRenderer.wrapLines(
-                        Text.translatable("text.owo.config.managed_by_server"),
-                        Int.MAX_VALUE
-                    )
-                        .stream().map { text: OrderedText? ->
-                            TooltipComponent.of(
-                                text
-                            )
-                        }.toList()
-                )
-            } else {
+            if (!option.detached()) {
                 val tooltipText = ArrayList<OrderedText>()
                 val tooltipTranslationKey = option.translationKey() + ".tooltip"
 
                 if (I18n.hasTranslation(tooltipTranslationKey)) {
                     tooltipText.addAll(
-                        client!!.textRenderer.wrapLines(
-                            Text.translatable(tooltipTranslationKey),
-                            Int.MAX_VALUE
-                        )
+                        client!!.textRenderer.wrapLines(Text.translatable(tooltipTranslationKey), Int.MAX_VALUE)
                     )
                 }
 
@@ -142,11 +118,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
                 }
 
                 if (!tooltipText.isEmpty()) {
-                    result.baseComponent().tooltip(tooltipText.stream().map { text: OrderedText? ->
-                        TooltipComponent.of(
-                            text
-                        )
-                    }.toList())
+                    result.baseComponent().tooltip(tooltipText.stream().map { text -> TooltipComponent.of(text) }.toList())
                 }
             }
 
@@ -161,9 +133,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
         entity_types.forEachOption(::optFunc);
 
         if (!sections.isEmpty()) {
-            val panelContainer = rootComponent.childById(
-                FlowLayout::class.java, "option-panel-container"
-            )
+            val panelContainer = rootComponent.childById(FlowLayout::class.java, "option-panel-container")
             val panelScroll = rootComponent.childById(ScrollContainer::class.java, "option-panel-scroll")!!
             panelScroll.margins(Insets.right(10))
 
@@ -198,11 +168,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
             panelContainer!!.mouseDown().subscribe(MouseDown { mouseX: Double, mouseY: Double, button: Int ->
                 if (mouseX < panelContainer!!.width() - 10) return@MouseDown false
                 if (buttonPanel.horizontalSizing().animation() == null) {
-                    val percentage = min(
-                        Math.round(((widestText.toInt() + 25f) / panelContainer!!.width()) * 100)
-                            .toDouble(), 50.0
-                    )
-                        .toInt()
+                    val percentage = min(Math.round(((widestText.toInt() + 25f) / panelContainer!!.width()) * 100).toDouble(), 50.0).toInt()
 
                     buttonPanel.horizontalSizing().animate(350, Easing.CUBIC, Sizing.fill(percentage))
                     panelContainer!!.horizontalSizing().animate(350, Easing.CUBIC, Sizing.fill(100 - percentage))

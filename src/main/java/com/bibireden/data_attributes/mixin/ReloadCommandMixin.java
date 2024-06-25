@@ -19,17 +19,24 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.ReloadCommand;
 import net.minecraft.server.command.ServerCommandSource;
 
-/**
- * Intended to inject to the `tryReloadDataPacks` method to send a reload packet based on the server's manager data
- * for the client(s) to obtain.
- */
+/** Hooks onto the reload command on the server to update the manager and post changes to the client. */
 @Mixin(ReloadCommand.class)
 abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.reloadConfigs();
+		DataAttributes.SERVER_MANAGER.onDataUpdate();
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
+
 		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER.toPacket());
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
+
+		DataAttributes.LOGGER.info(
+			"Updated manager with {} override(s), {} function(s) and {} entity types :: update flag [#{}]",
+			DataAttributes.OVERRIDES_CONFIG.overrides().size(),
+			DataAttributes.FUNCTIONS_CONFIG.functions().getData().size(),
+			DataAttributes.ENTITY_TYPES_CONFIG.entity_types().size(),
+			DataAttributes.SERVER_MANAGER.getUpdateFlag()
+		);
 	}
 }

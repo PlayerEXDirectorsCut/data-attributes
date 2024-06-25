@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import kotlin.Suppress;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -79,12 +82,11 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		return attribute != null ? attribute : original;
 	}
 
-	@SuppressWarnings("all")
-	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"))
-	private double data_computeValue(double original) {
-//		DiminishingMathKt.computeStacking((EntityAttributeInstance) (Object) this, this.type, this.data_containerCallback);
-
-		MutableEntityAttribute attribute = (MutableEntityAttribute) ((EntityAttributeInstance) (Object) this).getAttribute();
+	@SuppressWarnings("ALL") // todo: until intellij updates
+	@WrapMethod(method = "computeValue")
+	private double data_computeValue(Operation<Double> original) {
+		var ref = ((EntityAttributeInstance) (Object) this);
+		MutableEntityAttribute attribute = (MutableEntityAttribute) ref.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();
 
 		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
@@ -110,8 +112,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		}
 
 		if (this.data_containerCallback != null) {
-			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute)
-					.data_attributes$parentsMutable();
+			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute).data_attributes$parentsMutable();
 
 			for (IEntityAttribute parent : parents.keySet()) {
 				EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance((EntityAttribute) parent);

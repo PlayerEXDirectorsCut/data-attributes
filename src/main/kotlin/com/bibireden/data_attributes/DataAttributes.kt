@@ -26,13 +26,14 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
 
 class DataAttributes : ModInitializer {
     companion object {
         const val MOD_ID = "data_attributes"
 
-        val LOGGER = LogManager.getLogger()
+        @JvmField val LOGGER = LogManager.getLogger()
 
         @JvmField var CLIENT_MANAGER = AttributeConfigManager()
         @JvmField val SERVER_MANAGER = AttributeConfigManager()
@@ -106,7 +107,7 @@ class DataAttributes : ModInitializer {
 
         fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {
             if (entity?.world?.isClient == false && attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
-                entity.health = (entity.health * entity.maxHealth / previous).toFloat()
+                entity.health = MathHelper.clamp(entity.health, 0.0F, entity.maxHealth)
             }
         }
     }
