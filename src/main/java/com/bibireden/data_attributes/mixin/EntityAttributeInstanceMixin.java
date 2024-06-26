@@ -79,7 +79,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		return attribute != null ? attribute : original;
 	}
 
-	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"), remap = false)
+	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"))
 	private double data_attributes$computeValue(double original) {
 		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();

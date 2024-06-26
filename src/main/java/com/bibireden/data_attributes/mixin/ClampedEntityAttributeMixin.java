@@ -47,6 +47,14 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 		return original;
 	}
 
+	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
+	private double data_attributes$clamp(double original, @Local(argsOnly = true) double value) {
+		if (this.data_enabled) {
+			return this.data_attributes$clamped(value);
+		}
+		return original;
+	}
+
 	@Override
 	public double data_attributes$min_fallback() {
 		return this.minValue;
