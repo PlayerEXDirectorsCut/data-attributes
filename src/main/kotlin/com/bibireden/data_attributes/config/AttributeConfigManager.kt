@@ -6,7 +6,6 @@ import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
 import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.*
 import com.bibireden.data_attributes.endec.Endecs
-import com.bibireden.data_attributes.impl.MutableRegistryImpl
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
@@ -116,8 +115,6 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         for ((id, value) in this.data.entity_types) {
             entityTypeData[id] = value
         }
-
-        MutableRegistryImpl.unregister(Registries.ATTRIBUTE)
 
         for (id in Registries.ATTRIBUTE.ids) {
             val attribute = Registries.ATTRIBUTE[id] ?: continue
