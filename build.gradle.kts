@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm") version "2.0.0"
     id("fabric-loom")
@@ -32,15 +30,10 @@ dependencies {
     }
     include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
 
-    implementation("io.wispforest:endec:${properties["endec_version"]}")?.let(::include)
-    implementation("io.wispforest.endec:gson:${properties["endec_version_2"]}")?.let(::include)
-    implementation("io.wispforest.endec:codec:${properties["endec_version_2"]}")?.let(::include)
-    implementation("io.wispforest.endec:netty:${properties["endec_version_2"]}")?.let(::include)
-
-    implementation("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let {
-        include(it)
-        annotationProcessor(it)
-    }
+    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:gson:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:codec:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${properties["endec_version"]}")!!.let(::include)
 
     modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
         exclude("net.fabricmc.fabric-api")

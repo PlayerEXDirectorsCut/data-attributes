@@ -65,7 +65,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
 
 	@Nullable
-	@SuppressWarnings("all") // todo: until intellij updates
 	@ModifyReturnValue(method = "getCustomInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;", at = @At("RETURN"))
 	private EntityAttributeInstance data_getCustomInstance(EntityAttributeInstance original, EntityAttribute attribute2) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
@@ -74,10 +73,10 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 			EntityAttributeInstance entityAttributeInstance = this.data_custom.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
 			if (entityAttributeInstance != null) {
 				MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
-				mutable.setContainerCallback((AttributeContainer) (Object) this);
+				mutable.data_attributes$setContainerCallback((AttributeContainer) (Object) this);
 
 				if (mutable.data_attributes$get_id() == null) {
-					mutable.updateId(identifier);
+					mutable.data_attributes$updateId(identifier);
 				}
 			}
 			return entityAttributeInstance;
@@ -178,7 +177,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Override
 	public void data_attributes$refresh() {
 		for (EntityAttributeInstance instance : this.data_custom.values()) {
-			((MutableAttributeInstance) instance).refresh();
+			((MutableAttributeInstance) instance).data_attributes$refresh();
 		}
 	}
 

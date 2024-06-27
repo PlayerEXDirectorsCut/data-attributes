@@ -90,30 +90,6 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
 
     fun getContainer(type: EntityType<out LivingEntity>, entity: LivingEntity): AttributeContainer = this.handler.getContainer(type, entity)
 
-    /** Posts overrides and calls the [onDataUpdate] method for sync. */
-    fun updateOverrides(config: Map<Identifier, AttributeOverrideConfig>)
-    {
-        this.data.overrides.clear()
-        this.data.overrides.putAll(config)
-        onDataUpdate()
-    }
-
-    /** Posts functions and calls the [onDataUpdate] method for sync. */
-    fun updateFunctions(config: AttributeFunctionConfigData)
-    {
-        this.data.functions.clear()
-        this.data.functions.putAll(config.data)
-        onDataUpdate()
-    }
-
-    /** Post entity types and calls the `onDataUpdate` method for sync.*/
-    fun updateEntityTypes(config: Map<Identifier, EntityTypeData>)
-    {
-        this.data.entity_types.clear()
-        this.data.entity_types.putAll(config)
-        onDataUpdate()
-    }
-
     /** Whenever new [Data] is applied. */
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()

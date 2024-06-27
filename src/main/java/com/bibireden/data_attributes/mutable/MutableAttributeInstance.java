@@ -16,11 +16,11 @@ public interface MutableAttributeInstance {
     void data_attributes$actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded);
 
     // Sets a callback for changes to the associated AttributeContainer
-    void setContainerCallback(final AttributeContainer containerIn);
+    void data_attributes$setContainerCallback(final AttributeContainer containerIn);
 
     // Updates the identifier of the attribute instance
-    void updateId(final Identifier identifierIn);
+    void data_attributes$updateId(final Identifier identifierIn);
 
     // Refreshes the attribute instance
-    void refresh();
+    void data_attributes$refresh();
 }

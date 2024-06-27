@@ -64,8 +64,8 @@ object DataAttributesConfigProviders {
         return@OptionComponentFactory OptionComponentFactory.Result(provider, provider)
     }
 
-    private class AttributeOverrideProvider(option: Option<Map<Identifier, AttributeOverrideConfig>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-        val backing = HashMap(option.value())
+    private class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverrideConfig>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+        val backing = option.value().toMutableMap()
 
         init {
             backing.forEach { (id, config) ->
@@ -192,12 +192,12 @@ object DataAttributesConfigProviders {
             }
         }
 
-        override fun isValid() = true
+        override fun isValid() = !this.option.detached()
 
         override fun parsedValue() = backing
     }
 
-    private class AttributeFunctionsProvider(option: Option<AttributeFunctionConfigData>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+    private class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfigData>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
         val backing = option.value().data.toMutableMap()
 
         init {
@@ -271,11 +271,11 @@ object DataAttributesConfigProviders {
             }
         }
 
-        override fun isValid() = true
+        override fun isValid() = !this.option.detached()
         override fun parsedValue() = AttributeFunctionConfigData(backing)
     }
 
-    private class EntityTypesProvider(option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+    private class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
         val backing = HashMap(option.value())
 
         init {
@@ -320,7 +320,7 @@ object DataAttributesConfigProviders {
             }
         }
 
-        override fun isValid() = true
+        override fun isValid() = !this.option.detached()
 
         override fun parsedValue() = backing
     }

@@ -113,14 +113,6 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-        SERVER_MANAGER.updateOverrides(OVERRIDES_CONFIG.overrides())
-        SERVER_MANAGER.updateFunctions(FUNCTIONS_CONFIG.functions())
-        SERVER_MANAGER.updateEntityTypes(ENTITY_TYPES_CONFIG.entity_types())
-
-        OVERRIDES_CONFIG.subscribeToOverrides(SERVER_MANAGER::updateOverrides)
-        FUNCTIONS_CONFIG.subscribeToFunctions(SERVER_MANAGER::updateFunctions)
-        ENTITY_TYPES_CONFIG.subscribeToEntity_types(SERVER_MANAGER::updateEntityTypes)
-
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
         ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)

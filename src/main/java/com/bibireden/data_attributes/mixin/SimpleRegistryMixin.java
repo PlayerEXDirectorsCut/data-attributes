@@ -6,12 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.commons.lang3.Validate;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.bibireden.data_attributes.mutable.MutableSimpleRegistry;
 import com.mojang.serialization.Lifecycle;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -31,10 +28,6 @@ import net.minecraft.registry.entry.RegistryEntry;
 abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Unique
     private Collection<Identifier> data_idCache;
-
-    @Final
-    @Shadow
-    private Object2IntMap<T> entryToRawId;
 
     @Final
     @Shadow
@@ -64,20 +57,23 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     @Shadow
     private boolean frozen;
 
-    @Shadow @Final private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
+    @Shadow
+    @Final
+    private ObjectList<RegistryEntry.Reference<T>> rawIdToEntry;
 
-    @Inject(method = "<init>(Lnet/minecraft/registry/RegistryKey;Lcom/mojang/serialization/Lifecycle;Z)V", at = @At("TAIL"))
-    private void data_init(CallbackInfo ci) {
+    @Shadow
+    @Final
+    private Object2IntMap<T> entryToRawId;
+
+    @Inject(method = "<init>*", at = @At("TAIL"))
+    private void data_attributes$init(CallbackInfo ci) {
         this.data_idCache = new HashSet<>();
     }
 
     @Inject(method = "freeze", at = @At("RETURN"))
-    private void freeze(CallbackInfoReturnable<T> cir) {
-        this.frozen = false;
-    }
+    private void freeze(CallbackInfoReturnable<T> cir) { this.frozen = false; }
 
-    @SuppressWarnings("deprecation")
-    @Unique()
+    @Unique
     private <V extends T> void remove(RegistryKey<T> key, Lifecycle lifecycle) {
         Validate.notNull(key);
         RegistryEntry.Reference<T> reference = this.keyToEntry.get(key);
@@ -96,7 +92,6 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
 
         for (T t : this.entryToRawId.keySet()) {
             int i = this.entryToRawId.get(t);
-
             if (i > rawId) {
                 this.entryToRawId.replace(t, i - 1);
             }
@@ -104,17 +99,16 @@ abstract class SimpleRegistryMixin<T> implements MutableSimpleRegistry<T> {
     }
 
     @Override
-    public void removeCachedIds(Registry<T> registry) {
+    public void data_attributes$removeCachedIds(Registry<T> registry) {
         for (Iterator<Identifier> iterator = this.data_idCache.iterator(); iterator.hasNext();) {
             Identifier id = iterator.next();
-
             this.remove(RegistryKey.of(registry.getKey(), id), Lifecycle.stable());
             iterator.remove();
         }
     }
 
     @Override
-    public void cacheId(Identifier id) {
+    public void data_attributes$cacheID(Identifier id) {
         this.data_idCache.add(id);
     }
 }

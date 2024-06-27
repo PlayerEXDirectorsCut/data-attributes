@@ -6,8 +6,6 @@ import java.util.function.Consumer;
 import com.bibireden.data_attributes.data.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -186,8 +184,8 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		ci.cancel();
 	}
 
-	@Inject(method = "removeModifier", at = @At("HEAD"), cancellable = true)
-	private void data_removeModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
+	@Inject(method = "removeModifier(Lnet/minecraft/entity/attribute/EntityAttributeModifier;)V", at = @At("HEAD"), cancellable = true)
+	private void data_attributes$removeModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
 		EntityAttributeInstance instance = (EntityAttributeInstance) (Object) this;
 
 		this.data_attributes$actionModifier(() -> {
@@ -200,7 +198,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@ModifyExpressionValue(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
-	private Identifier data_toNbt(Identifier id) {
+	private Identifier data_attributes$toNbt(Identifier id) {
 		if (this.data_identifier == null)
 			return Registries.ATTRIBUTE.getId(this.type);
 		return this.data_identifier;
@@ -211,7 +209,6 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		return this.data_identifier;
 	}
 
-	@SuppressWarnings("ALL") // todo: until intellij updates
 	@Override
 	public void data_attributes$actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded) {
 		EntityAttribute entityAttribute = ((EntityAttributeInstance) (Object) this).getAttribute();
@@ -250,12 +247,12 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@Override
-	public void setContainerCallback(final AttributeContainer containerIn) {
+	public void data_attributes$setContainerCallback(final AttributeContainer containerIn) {
 		this.data_containerCallback = containerIn;
 	}
 
 	@Override
-	public void updateId(final Identifier identifierIn) {
+	public void data_attributes$updateId(final Identifier identifierIn) {
 		this.data_identifier = identifierIn;
 	}
 
@@ -273,7 +270,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@Override
-	public void refresh() {
+	public void data_attributes$refresh() {
 		this.onUpdate();
 	}
 }

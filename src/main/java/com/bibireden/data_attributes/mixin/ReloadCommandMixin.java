@@ -25,6 +25,12 @@ abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.reloadConfigs();
+		// process new manager data from config(s) on server.
+		DataAttributes.SERVER_MANAGER.setData(new AttributeConfigManager.Data(
+			DataAttributes.OVERRIDES_CONFIG.overrides(),
+			DataAttributes.FUNCTIONS_CONFIG.functions().getData(),
+			DataAttributes.ENTITY_TYPES_CONFIG.entity_types()
+		));
 		DataAttributes.SERVER_MANAGER.onDataUpdate();
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
 
