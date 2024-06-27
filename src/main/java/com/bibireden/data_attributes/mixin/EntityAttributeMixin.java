@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
-import com.bibireden.data_attributes.data.AttributeOverride;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

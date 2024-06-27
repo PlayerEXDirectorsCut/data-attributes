@@ -22,16 +22,16 @@ import net.minecraft.entity.passive.PassiveEntity
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
-class AttributeConfigManager(var data: AttributeData = AttributeData(), val handler: AttributeContainerHandler = AttributeContainerHandler(), var updateFlag: Int = 0) {
+class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler(), var updateFlag: Int = 0) {
     @JvmRecord
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
 
     @JvmRecord
-    data class Packet(val data: AttributeData, val updateFlag: Int) {
+    data class Packet(val data: Data, val updateFlag: Int) {
         companion object {
             @JvmField
             val ENDEC = StructEndecBuilder.of(
-                AttributeData.ENDEC.fieldOf("data") { it.data },
+                Data.ENDEC.fieldOf("data") { it.data },
                 Endec.INT.fieldOf("updateFlag") { it.updateFlag },
                 ::Packet
             )
@@ -39,7 +39,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     }
 
     @JvmRecord
-    data class AttributeData(
+    data class Data(
         val overrides: MutableMap<Identifier, AttributeOverrideConfig> = mutableMapOf(),
         val functions: MutableMap<Identifier, List<AttributeFunctionConfig>> = mutableMapOf(),
         val entity_types: MutableMap<Identifier, EntityTypeData> = mutableMapOf()
@@ -50,7 +50,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
                 Endec.map(Endecs.IDENTIFIER, AttributeOverrideConfig.ENDEC).fieldOf("overrides") { it.overrides },
                 Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf()).fieldOf("functions") { it.functions },
                 Endec.map(Endecs.IDENTIFIER, EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
-                ::AttributeData
+                ::Data
             )
         }
     }
@@ -58,15 +58,11 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
     companion object
     {
         /**
-         * This expects an attribute to be instantiated by the time this is called.
+         * Obtains an `EntityAttribute` from the [Registries.ATTRIBUTE] registry.
+         * Will return `null` if the [Identifier] is not present.
          */
         fun getAttribute(identifier: Identifier): EntityAttribute? {
             return Registries.ATTRIBUTE[identifier]
-        }
-
-        fun getOrCreate(identifier: Identifier, attribute: EntityAttribute): EntityAttribute
-        {
-            return Registries.ATTRIBUTE[identifier] ?: MutableRegistryImpl.register(Registries.ATTRIBUTE, identifier, attribute)
         }
 
         val ENTITY_TYPE_INSTANCES = mapOf(
@@ -118,7 +114,7 @@ class AttributeConfigManager(var data: AttributeData = AttributeData(), val hand
         onDataUpdate()
     }
 
-    /** Whenever new [AttributeData] is applied. */
+    /** Whenever new [Data] is applied. */
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
         val entityTypeData = mutableMapOf<Identifier, EntityTypeData>()

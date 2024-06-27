@@ -58,6 +58,8 @@ class AttributeContainerHandler(private var implicitContainers: ImplicitContaine
             val entityType = Registries.ENTITY_TYPE[identifier] as EntityType<out LivingEntity>
             val entityTypeData = entityTypeDataIn[identifier] ?: return@forEach
 
+
+
             val builder = DefaultAttributeContainer.Builder()
             entityTypeData.build(builder, DefaultAttributeRegistry.get(entityType))
             explicits[entityType] = builder.build()

@@ -7,6 +7,7 @@ import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import com.bibireden.data_attributes.utils.round
 import com.google.common.base.Predicate
@@ -82,12 +83,12 @@ object DataAttributesConfigProviders {
 
                 val isOverrideInvalid = isAttributeUnregistered(id)
                 Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true)
-                    .also {
+                    .also { topContainer ->
                         if (isOverrideInvalid) {
-                            it.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                            topContainer.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                         }
 
-                        it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15)).also { hf ->
+                        topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.BOTTOM)
 
                             hf.gap(10)
@@ -98,18 +99,23 @@ object DataAttributesConfigProviders {
                                 renderer(ButtonRenderers.STANDARD)
                             })
 
-                            hf.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
-                                {
-                                    override = override.copy(min = override.min_fallback, max = override.max_fallback)
-                                    this.childById(TextBoxComponent::class.java, "inputs.min")!!.write(override.min.toString())
-                                    this.childById(TextBoxComponent::class.java, "inputs.max")!!.write(override.max.toString())
-                                    this.backing.replace(id, override)
-                                }
-                                .renderer(ButtonRenderers.STANDARD)
-                            )
+//                            hf.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
+//                                {
+//                                    override = override.copy(min = override.min_fallback, max = override.max_fallback)
+//
+//                                    val inputMinBox = this.childById(TextBoxComponent::class.java, "inputs.min")!!
+//                                    inputMinBox.text = override.min.toString()
+//
+//                                    val inputMaxBox = this.childById(TextBoxComponent::class.java, "inputs.max")!!
+//                                    inputMaxBox.text = override.max.toString()
+//
+//                                    this.backing.replace(id, override)
+//                                }
+//                                .renderer(ButtonRenderers.STANDARD)
+//                            )
                         })
 
-                        it.child(textBoxComponent(
+                        topContainer.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min"),
                             override.min,
                             ::isNumeric,
@@ -121,7 +127,7 @@ object DataAttributesConfigProviders {
                             "inputs.min"
                         ))
 
-                        it.child(textBoxComponent(
+                        topContainer.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.max"),
                             override.max,
                             ::isNumeric,
@@ -133,19 +139,19 @@ object DataAttributesConfigProviders {
                             "inputs.max"
                         ))
 
-                        it.child(textBoxComponent(
+                        topContainer.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.min_fallback"),
                             override.min_fallback,
                             ::isNumeric
                         ))
 
-                        it.child(textBoxComponent(
+                        topContainer.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.overrides.max_fallback"),
                             override.max_fallback,
                             ::isNumeric
                         ))
 
-                        it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(30)).also { hf ->
+                        topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(30)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
                             hf.gap(8)
                             hf.child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.smoothness"))
@@ -162,7 +168,7 @@ object DataAttributesConfigProviders {
                             )
                         })
 
-                        it.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
+                        topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
                             hf.verticalAlignment(VerticalAlignment.CENTER)
                             hf.gap(8)
                             hf.child(
@@ -198,7 +204,7 @@ object DataAttributesConfigProviders {
         init {
             backing.forEach { (topID, functions) ->
                 val isFunctionParentUnregistered = isAttributeUnregistered(topID)
-                Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
+                CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
                     ct.gap(15)
                     if (isFunctionParentUnregistered) {
                         ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
@@ -271,11 +277,11 @@ object DataAttributesConfigProviders {
     }
 
     private class EntityTypesProvider(option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-        val backing = option.value().toMutableMap()
+        val backing = HashMap(option.value())
 
         init {
             backing.forEach { (topID, types) ->
-                Containers.collapsible(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(topID), true).also { ct ->
+                CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(topID), true).also { ct ->
                     ct.gap(15)
                     types.data.forEach { id,  value ->
                         Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true).also {
@@ -287,12 +293,14 @@ object DataAttributesConfigProviders {
                                 ::isNumeric,
                                 onChange = {
                                     it.toDoubleOrNull()?.let { value ->
-                                        val popped = this.backing.remove(topID)?.data ?: return@textBoxComponent
-                                        popped[id] = value
-                                        this.backing.put(topID, EntityTypeData(popped))
+                                        val data = this.backing.remove(topID)?: return@let
+                                        val mapping = data.data
+                                        mapping[id] = value
+                                        this.backing.put(topID, data.copy(data = mapping))
                                     }
                                 }
                             ))
+
                             ct.child(it)
                         }
                     }
@@ -329,11 +337,10 @@ object DataAttributesConfigProviders {
                         tb.text = obj.toString()
                     }
                     if (onChange != null) {
-                        tb.setTextPredicate {
-                            if (predicate == null || predicate.apply(it)) {
-                                onChange.invoke(it)
+                        tb.onChanged().subscribe { v ->
+                            if (predicate == null || predicate.apply(v)) {
+                                onChange.invoke(v)
                             }
-                            true
                         }
                     }
                 }.positioning(Positioning.relative(100, 50)).id(textBoxID)

@@ -6,7 +6,6 @@ import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.config.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
-import com.bibireden.data_attributes.data.AttributeOverride;
 
 public interface MutableEntityAttribute extends IEntityAttribute {
     /** Checks if one attribute contains another via the child-parent relationship. */

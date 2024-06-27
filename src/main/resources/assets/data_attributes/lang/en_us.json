@@ -93,5 +93,8 @@
     {"text": "It will be ignored as a result of this.\n\nPlease use a valid identifier and press ", "color": "gray", "italic": true},
     {"text":  "Reload ", "italic": true, "color": "green"},
     {"text":  "when ready.", "italic": true, "color": "gray"}
-  ]
+  ],
+
+  "ui.data_attributes.collapsiblefoldablecontainer.collapse_all": "Collapse",
+  "ui.data_attributes.collapsiblefoldablecontainer.uncollapse_all": "Uncollapse"
 }
