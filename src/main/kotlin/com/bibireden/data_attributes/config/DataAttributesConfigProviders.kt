@@ -16,7 +16,6 @@ import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.component.TextBoxComponent
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
@@ -158,7 +157,7 @@ object DataAttributesConfigProviders {
                                 .sizing(Sizing.content(), Sizing.fixed(20)))
 
                             hf.child(
-                                Components.discreteSlider(Sizing.fill(25), 0.01, 100.0).value(override.smoothness).also { slider ->
+                                Components.discreteSlider(Sizing.fill(30), 0.01, 100.0).value(override.smoothness).also { slider ->
                                     slider.onChanged().subscribe {
                                         this.backing.remove(id)
                                         this.backing.put(id, override.copy(smoothness = slider.value().round(2)))
@@ -300,6 +299,18 @@ object DataAttributesConfigProviders {
                                     }
                                 }
                             ))
+
+                            val attribute = Registries.ATTRIBUTE[id]
+                            if (attribute is ClampedEntityAttribute) {
+                                it.tooltip(
+                                    Text.translatable(
+                                        "text.config.data_attributes.data_entry.entity_type_value",
+                                        id,
+                                        attribute.minValue,
+                                        attribute.maxValue
+                                    )
+                                )
+                            }
 
                             ct.child(it)
                         }

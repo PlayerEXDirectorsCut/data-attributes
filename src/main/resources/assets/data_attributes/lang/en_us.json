@@ -85,6 +85,13 @@
     {"text": "⭳ min: ", "color": "white"}, {"index": 1, "color": "#F25D81"}, "\n",
     {"text": "⭱ max: ", "color": "white"}, {"index": 2, "color": "#F25D81"}
   ],
+  "text.config.data_attributes.data_entry.entity_type_value": [
+    {"text": "✱ ", "color": "#5DF2AE"},
+    {"text": "Value Details\n", "color": "white"},
+    {"index": 0, "color": "#636363", "italic": "true"}, "\n\n",
+    {"text": "⭳ min: ", "color": "white"}, {"index": 1, "color": "#5DF2AE"}, "\n",
+    {"text": "⭱ max: ", "color": "white"}, {"index": 2, "color": "#5DF2AE"}
+  ],
 
   "text.config.data_attributes.data_entry.invalid": [
     {"text": "⚑ ", "color": "#DB9A2F"},
