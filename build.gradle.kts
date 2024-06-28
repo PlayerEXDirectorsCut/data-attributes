@@ -1,5 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("jvm") version "2.0.0"
+//    id("org.jetbrains.dokka") version "1.9.20"
     id("fabric-loom")
     `maven-publish`
     java
@@ -30,10 +33,8 @@ dependencies {
     }
     include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
 
-    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:gson:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:codec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${properties["endec_version"]}")!!.let(::include)
+    include("io.wispforest:endec:${properties["endec_version"]}")!!.let(::api)
+    include("io.wispforest.endec:netty:${properties["endec_version"]}")!!.let(::api)
 
     modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
         exclude("net.fabricmc.fabric-api")

@@ -2,8 +2,8 @@ package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
-import io.wispforest.endec.CodecUtils
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
@@ -21,7 +21,7 @@ class EntityAttributeData(val override: AttributeOverrideConfig? = null, val fun
         @JvmField
         val ENDEC = StructEndecBuilder.of(
             AttributeOverrideConfig.ENDEC.nullableOf().fieldOf("override") { it.override },
-            Endec.map(CodecUtils.ofCodec(Identifier.CODEC), AttributeFunction.ENDEC).fieldOf("functions") { it.functions },
+            Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC).fieldOf("functions") { it.functions },
             ::EntityAttributeData,
         )
     }

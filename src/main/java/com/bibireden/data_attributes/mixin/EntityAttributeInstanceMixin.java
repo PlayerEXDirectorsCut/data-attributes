@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import com.bibireden.data_attributes.data.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
@@ -82,6 +81,9 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	private double data_attributes$computeValue(double original) {
 		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();
+
+		// If the formula is set to Flat and there is no associated container, provide original.
+		if (formula == StackingFormula.Flat && this.data_containerCallback == null) return original;
 
 		AtomicReference<Double> k = new AtomicReference<>(0.0D);
 		AtomicReference<Double> v = new AtomicReference<>(0.0D);

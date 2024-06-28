@@ -2,7 +2,6 @@ package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer
-import io.wispforest.endec.CodecUtils
 import io.wispforest.endec.Endec
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.registry.Registries
