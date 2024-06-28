@@ -117,8 +117,8 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
 
         for (id in Registries.ATTRIBUTE.ids) {
-            val attribute = Registries.ATTRIBUTE[id] ?: continue
-            (attribute as MutableEntityAttribute).`data_attributes$clear`()
+            val attribute = Registries.ATTRIBUTE[id] as? MutableEntityAttribute ?: continue
+            attribute.`data_attributes$clear`()
         }
 
         for ((id, data) in entityAttributeData) {

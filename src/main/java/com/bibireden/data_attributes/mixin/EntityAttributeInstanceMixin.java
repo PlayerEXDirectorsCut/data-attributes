@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.mixin;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.bibireden.data_attributes.data.AttributeFunction;
@@ -82,13 +83,17 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();
 
-		double k = 0.0D, v = 0.0D, k2 = 0.0D, v2 = 0.0D;
+		AtomicReference<Double> k = new AtomicReference<>(0.0D);
+		AtomicReference<Double> v = new AtomicReference<>(0.0D);
+
+		double k2 = 0.0D;
+		double v2 = 0.0D;
 
 		if (this.getBaseValue() > 0.0D) {
-			k = formula.stack(k, this.getBaseValue());
+			k.set(formula.stack(k.get(), this.getBaseValue()));
 			k2 = formula.max(k2, this.getBaseValue());
 		} else {
-			v = formula.stack(v, this.getBaseValue());
+			v.set(formula.stack(v.get(), this.getBaseValue()));
 			v2 = formula.max(v2, this.getBaseValue());
 		}
 
@@ -96,74 +101,62 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			double value = modifier.getValue();
 
 			if (value > 0.0D) {
-				k = formula.stack(k, value);
+				k.set(formula.stack(k.get(), value));
 				k2 = formula.max(k2, value);
 			} else {
-				v = formula.stack(v, value);
+				v.set(formula.stack(v.get(), value));
 				v2 = formula.max(v2, value);
 			}
 		}
 
 		if (this.data_containerCallback != null) {
-			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute).data_attributes$parentsMutable();
+			attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
+				if (function.behavior() != StackingBehavior.Add) return;
 
-			for (IEntityAttribute parent : parents.keySet()) {
-				EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance((EntityAttribute) parent);
+				EntityAttributeInstance parentInstance = this.data_containerCallback.getCustomInstance((EntityAttribute) parentAttribute);
+				if (parentInstance == null) return;
 
-				if (instance == null) continue;
-				AttributeFunction function = parents.get(parent);
-
-				if (function.behavior() != StackingBehavior.Add) continue;
 				double multiplier = function.value();
-				double value = multiplier * instance.getValue();
+				double value = multiplier * parentInstance.getValue();
 
 				if (value > 0.0D) {
-					k = formula.stack(k, value);
-					// We don't put this here because follow-on attribute values should always be
-					// diminishing (if the attribute supports it).
-					// k2 = behaviour.max(k2, value);
+					k.set(formula.stack(k.get(), value));
 				} else {
-					v = formula.stack(v, value);
-					// We don't put this here because follow-on attribute values should always be
-					// diminishing (if the attribute supports it).
-					// v2 = behaviour.max(v2, value);
+					v.set(formula.stack(v.get(), value));
 				}
-			}
+			});
 		}
 
-		double d = attribute.data_attributes$sum(k, k2, v, v2);
-		double e = d;
+		double d = attribute.data_attributes$sum(k.get(), k2, v.get(), v2);
+		AtomicReference<Double> e = new AtomicReference<>(d);
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.MULTIPLY_BASE)) {
-			e += d * modifier.getValue();
+			e.set(e.get() + d * modifier.getValue());
 		}
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.MULTIPLY_TOTAL)) {
-			e *= 1.0D + modifier.getValue();
+			e.set(e.get() * 1.0D + modifier.getValue());
 		}
 
 		if (this.data_containerCallback != null) {
-			Map<IEntityAttribute, AttributeFunction> parents = ((MutableEntityAttribute) attribute).data_attributes$parentsMutable();
+            attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
+				if (function.behavior() != StackingBehavior.Multiply) return;
 
-			for (IEntityAttribute parent : parents.keySet()) {
-				EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance((EntityAttribute) parent);
+				EntityAttributeInstance parentInstance = this.data_containerCallback.getCustomInstance((EntityAttribute) parentAttribute);
+				if (parentInstance == null) return;
 
-				if (instance == null) continue;
-				AttributeFunction function = parents.get(parent);
-
-				if (function.behavior() != StackingBehavior.Multiply)
-					continue;
-				e *= 1.0D + (instance.getValue() * function.value());
-			}
+				e.set(e.get() * 1.0D + (parentInstance.getValue() * function.value()));
+			});
+			e.set(e.get());
 		}
 
 
 		if (formula == StackingFormula.Diminished) {
-			e = e * (attribute.data_attributes$max() - attribute.data_attributes$min());
-			e += attribute.data_attributes$min();
+			e.set(e.get() * (attribute.data_attributes$max() - attribute.data_attributes$min()));
+			e.set(e.get() + attribute.data_attributes$min());
 		}
 
-        return ((EntityAttribute) attribute).clamp(e);
+        return ((EntityAttribute) attribute).clamp(e.get());
 	}
 
 	@Inject(method = "addModifier", at = @At("HEAD"), cancellable = true)
