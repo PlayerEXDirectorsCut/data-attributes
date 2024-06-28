@@ -43,7 +43,7 @@ dependencies {
         exclude("net.fabricmc.fabric-api")
     }
 
-    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")))
+    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let { implementation(it)?.let { include(it) } }
 
     modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")
 

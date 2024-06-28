@@ -49,12 +49,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
 
         super.build(rootComponent)
 
-        val isDetached = !MinecraftClient.getInstance().isInSingleplayer
         val optionPanel = rootComponent.childById(FlowLayout::class.java, "option-panel")
-
-        if (isDetached) {
-            optionPanel?.child(Components.label(Text.translatable("text.config.data_attributes.managed_by_server")).shadow(true))
-        }
 
         if (this.client?.world != null) rootComponent.surface(Surface.blur(.55F, 2F))
 
@@ -63,7 +58,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
         val containers = mutableMapOf<Option.Key, FlowLayout?>(Option.Key.ROOT to optionPanel)
 
         rootComponent.childById(ButtonComponent::class.java, "done-button")?.onPress {
-            if (!isDetached) DataAttributes.saveConfigs()
+            DataAttributes.saveConfigs()
             this.close()
         }
 
@@ -159,7 +154,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
                 label.mouseEnter().subscribe(MouseEnter { label.text(hoveredText) })
                 label.mouseLeave().subscribe(MouseLeave { label.text(text) })
 
-                label.mouseDown().subscribe(MouseDown { mouseX: Double, mouseY: Double, button: Int ->
+                label.mouseDown().subscribe(MouseDown { _, _, _ ->
                     panelScroll.scrollTo(component)
                     UISounds.playInteractionSound()
                     true
@@ -172,17 +167,17 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
                 .margins(Insets.right(2))
 
             panelContainer!!.child(closeButton)
-            panelContainer!!.mouseDown().subscribe(MouseDown { mouseX: Double, mouseY: Double, button: Int ->
-                if (mouseX < panelContainer!!.width() - 10) return@MouseDown false
+            panelContainer.mouseDown().subscribe(MouseDown { mouseX: Double, _: Double, _: Int ->
+                if (mouseX < panelContainer.width() - 10) return@MouseDown false
                 if (buttonPanel.horizontalSizing().animation() == null) {
-                    val percentage = min(Math.round(((widestText.toInt() + 25f) / panelContainer!!.width()) * 100).toDouble(), 50.0).toInt()
+                    val percentage = min(Math.round(((widestText.toInt() + 25f) / panelContainer.width()) * 100).toDouble(), 50.0).toInt()
 
                     buttonPanel.horizontalSizing().animate(350, Easing.CUBIC, Sizing.fill(percentage))
-                    panelContainer!!.horizontalSizing().animate(350, Easing.CUBIC, Sizing.fill(100 - percentage))
+                    panelContainer.horizontalSizing().animate(350, Easing.CUBIC, Sizing.fill(100 - percentage))
                 }
 
                 buttonPanel.horizontalSizing().animation()!!.reverse()
-                panelContainer!!.horizontalSizing().animation()!!.reverse()
+                panelContainer.horizontalSizing().animation()!!.reverse()
 
                 closeButton.text(
                     Text.literal(if (closeButton.text().string == ">") "<" else ">")

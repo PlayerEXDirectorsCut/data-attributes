@@ -44,6 +44,7 @@ jobs:
           loader_val=$(grep "loader" gradle.properties | cut -d'=' -f2 | tr -d '\n')
           mod_version_val=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d '\n')
           echo "mod_version=$mod_version_val-$loader_val" >> $GITHUB_OUTPUT
+          echo "commitish=$mod_version_val/$loader_val" >> $GITHUB_OUTPUT
       - name: get minecraft version
         if: github.ref == 'refs/heads/${{ env.BRANCH_PREFIX }}'
         id: minecraft_version
@@ -59,7 +60,7 @@ jobs:
 
           github-tag: ${{ steps.mod_version.outputs.mod_version }}
           github-token: ${{ secrets.REPOSITORY_TOKEN }}
-          github-commitish: ${{ env.BRANCH_PREFIX }}
+          github-commitish: ${{ steps.commitish.outputs.commitish }}
 
           version: "${{ steps.outputs.mod_version }}"
           changelog-file: CHANGELOG.md
