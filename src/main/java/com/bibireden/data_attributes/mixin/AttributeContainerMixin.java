@@ -5,6 +5,8 @@ import java.util.*;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -47,6 +49,8 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Shadow
 	private void updateTrackedStatus(EntityAttributeInstance instance) {}
 
+	@Shadow @Final private Map<EntityAttribute, EntityAttributeInstance> custom;
+
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
 		Identifier identifier = ((MutableAttributeInstance) instance).data_attributes$get_id();
@@ -62,7 +66,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	}
 
 	@ModifyReceiver(method = "getAttributesToSend", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
-	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instance) { return this.data_custom; }
+	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instances) { return this.data_custom; }
 
 	@Nullable
 	@ModifyReturnValue(method = "getCustomInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;", at = @At("RETURN"))
@@ -85,22 +89,20 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		}
 	}
 
-	@ModifyExpressionValue(
-		method = "hasAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;)Z",
-		at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
-	)
-	private Object data_attributes$hasAttribute(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
+	@ModifyReturnValue(method = "hasAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;)Z", at = @At("RETURN"))
+	private boolean data_attributes$hasAttribute(boolean original, EntityAttribute attribute) {
 		var identifier = Registries.ATTRIBUTE.getId(attribute);
-		return this.data_custom.get(identifier);
+		return this.data_custom.get(identifier) != null || original;
 	}
 
-	@ModifyExpressionValue(
+	@WrapOperation(
 		method = "hasModifierForAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;Ljava/util/UUID;)Z",
 		at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
 	)
-	private Object data_attributes$hasModifierForAttribute(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
-		return this.data_custom.get(identifier);
+	private <V> Object data_attributes$hasModifierForAttribute(Map<?, ?> instances, Object attribute, Operation<V> original) {
+		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
+		var value = this.data_custom.get(identifier);
+		return value != null ? value : original.call(instances, attribute);
 	}
 
 	@ModifyExpressionValue(method = "getValue", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))

@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.config
+package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingFormula
@@ -53,7 +53,7 @@ class OverridesConfigModel {
                     { x -> if (x.uppercase() === "DIMINISHED") StackingFormula.Diminished else StackingFormula.Flat },
                     { x -> x.name.uppercase() }
                 ).fieldOf("formula") { it.formula },
-                ::AttributeOverrideConfig,
+                OverridesConfigModel::AttributeOverrideConfig,
             )
         }
     }

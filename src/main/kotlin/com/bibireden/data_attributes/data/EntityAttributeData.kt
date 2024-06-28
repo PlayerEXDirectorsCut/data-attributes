@@ -1,7 +1,7 @@
 package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.CodecUtils
 import io.wispforest.endec.Endec

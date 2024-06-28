@@ -1,6 +1,6 @@
 package com.bibireden.data_attributes.mixin;
 
-import com.bibireden.data_attributes.config.OverridesConfigModel;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Final;

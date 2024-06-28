@@ -1,8 +1,8 @@
 package com.bibireden.data_attributes
 
 import com.bibireden.data_attributes.config.AttributeConfigManager
-import com.bibireden.data_attributes.config.DataAttributesConfigScreen
 import com.bibireden.data_attributes.networking.Channels
+import com.bibireden.data_attributes.ui.DataAttributesConfigScreen
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
 import io.wispforest.owo.config.ui.ConfigScreen
 import net.fabricmc.api.ClientModInitializer
@@ -15,11 +15,13 @@ import java.util.concurrent.CompletableFuture
 
 class DataAttributesClient : ClientModInitializer {
     companion object {
+        @JvmField var CLIENT_MANAGER = AttributeConfigManager()
+
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
-                DataAttributes.CLIENT_MANAGER.readPacket(AttributeConfigManager.Packet.ENDEC.decodeFully(ByteBufDeserializer::of, buf))
-                DataAttributes.CLIENT_MANAGER.onDataUpdate()
+                CLIENT_MANAGER.readPacket(AttributeConfigManager.Packet.ENDEC.decodeFully(ByteBufDeserializer::of, buf))
+                CLIENT_MANAGER.onDataUpdate()
                 buf.release()
             }
         }

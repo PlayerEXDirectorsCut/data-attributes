@@ -14,8 +14,8 @@ data class EntityTypeData(val data: MutableMap<Identifier, Double> = mutableMapO
         val ENDEC: Endec<EntityTypeData> = Endec.map(Endecs.IDENTIFIER, Endec.DOUBLE).xmap(::EntityTypeData) { it.data }
     }
 
-    fun build(builder: DefaultAttributeContainer.Builder, container: DefaultAttributeContainer?) {
-        if (container != null) (container as MutableDefaultAttributeContainer).`data_attributes$copy`(builder)
+    fun build(builder: DefaultAttributeContainer.Builder, container: MutableDefaultAttributeContainer?) {
+        container?.`data_attributes$copy`(builder)
         for ((key, value) in this.data) {
             val attribute = Registries.ATTRIBUTE[key] ?: continue
             builder.add(attribute, attribute.clamp(value))

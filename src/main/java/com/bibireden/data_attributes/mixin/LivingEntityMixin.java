@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.mixin;
 
+import com.bibireden.data_attributes.ext.LivingEntityKt;
 import net.minecraft.entity.data.TrackedData;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -58,8 +59,8 @@ abstract class LivingEntityMixin {
 			this.attributes = container2;
             
 			this.data_updateFlag = updateFlag;
-			
-			DataAttributes.refreshAttributes(livingEntity);
+
+			LivingEntityKt.refreshAttributes(livingEntity);
 		}
 	}
 }

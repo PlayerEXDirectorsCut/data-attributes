@@ -27,11 +27,11 @@ import net.minecraft.registry.Registries;
 @Mixin(DefaultAttributeContainer.class)
 abstract class DefaultAttributeContainerMixin implements MutableDefaultAttributeContainer {
 	@Unique
-	private Map<Identifier, EntityAttributeInstance> data_instances; // Custom map for attribute instances
+	private Map<Identifier, EntityAttributeInstance> data_instances;
 
 	@Final
 	@Shadow
-	private Map<EntityAttribute, EntityAttributeInstance> instances; // Original map of attribute instances
+	private Map<EntityAttribute, EntityAttributeInstance> instances;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(Map<EntityAttribute, EntityAttributeInstance> instances, CallbackInfo ci) {
@@ -60,14 +60,14 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 	@ModifyReturnValue(method = "has", at = @At("RETURN"))
 	private boolean data_attributes$has(boolean original, @Local(argsOnly = true) EntityAttribute type) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(type);
-		return original || this.data_instances.containsKey(identifier);
+		return this.data_instances.containsKey(identifier) || original;
 	}
 
 	@ModifyReturnValue(method = "hasModifier", at = @At("RETURN"))
 	private boolean data_attributes$hasModifier(boolean original, @Local(argsOnly = true) EntityAttribute type, @Local(argsOnly = true) UUID uuid) {
 		Identifier identifier = Registries.ATTRIBUTE.getId(type);
 		var instance = this.data_instances.get(identifier);
-		return original || (instance != null && instance.getModifier(uuid) != null);
+		return (instance != null && instance.getModifier(uuid) != null) || original;
 	}
 
 	@Override

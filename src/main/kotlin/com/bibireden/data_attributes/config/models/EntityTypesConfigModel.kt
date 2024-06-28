@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.config
+package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.data.EntityTypeData

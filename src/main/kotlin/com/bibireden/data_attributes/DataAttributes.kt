@@ -4,51 +4,39 @@ import blue.endless.jankson.JsonArray
 import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.*
+import com.bibireden.data_attributes.config.models.DataAttributesConfig
+import com.bibireden.data_attributes.config.models.DataAttributesEntityTypesConfig
+import com.bibireden.data_attributes.config.models.DataAttributesFunctionsConfig
+import com.bibireden.data_attributes.config.models.DataAttributesOverridesConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.AttributeFunctionConfigData
 import com.bibireden.data_attributes.data.EntityTypeData
-import com.bibireden.data_attributes.mutable.MutableAttributeContainer
+import com.bibireden.data_attributes.ext.refreshAttributes
 import com.bibireden.data_attributes.networking.Channels
-import com.bibireden.data_attributes.serde.PacketBufs
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
-import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking.LoginSynchronizer
-import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.network.ServerLoginNetworkHandler
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 class DataAttributes : ModInitializer {
     companion object {
         const val MOD_ID = "data_attributes"
 
-        @JvmField val LOGGER = LogManager.getLogger()
+        @JvmField val LOGGER: Logger = LogManager.getLogger()
 
-        @JvmField var CLIENT_MANAGER = AttributeConfigManager()
         @JvmField val SERVER_MANAGER = AttributeConfigManager()
 
-        init {
-            PacketBufs.registerPacketSerializers()
-        }
-
-        fun id(str: String) = Identifier.of(MOD_ID, str)!!
-
-        val CONFIG = DataAttributesConfig.createAndLoad()
-        @JvmField
-        val OVERRIDES_CONFIG = DataAttributesOverridesConfig.createAndLoad()
-        @JvmField
-        val FUNCTIONS_CONFIG = DataAttributesFunctionsConfig.createAndLoad { builder ->
+        @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
+        @JvmField val OVERRIDES_CONFIG: DataAttributesOverridesConfig = DataAttributesOverridesConfig.createAndLoad()
+        @JvmField val FUNCTIONS_CONFIG: DataAttributesFunctionsConfig = DataAttributesFunctionsConfig.createAndLoad { builder ->
             builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfigData::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
@@ -70,13 +58,14 @@ class DataAttributes : ModInitializer {
                 AttributeFunctionConfigData(mapped)
             }
         }
-        @JvmField
-        val ENTITY_TYPES_CONFIG = DataAttributesEntityTypesConfig.createAndLoad { builder ->
-            builder.registerSerializer(EntityTypeData::class.java) { tData, marshaller -> marshaller.serialize(tData.data) }
+        @JvmField val ENTITY_TYPES_CONFIG: DataAttributesEntityTypesConfig = DataAttributesEntityTypesConfig.createAndLoad { builder ->
+            builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
                 EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
             }
         }
+
+        fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
         /** Reload all the data-attributes configs at once. */
         @JvmStatic
@@ -96,30 +85,27 @@ class DataAttributes : ModInitializer {
             CONFIG.save()
         }
 
-        fun loginQueryStart(handler: ServerLoginNetworkHandler, server: MinecraftServer, sender: PacketSender, synchronizer: LoginSynchronizer) {
-            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
-        }
-
-        @JvmStatic
-        fun refreshAttributes(entity: Entity) {
-            if (entity is LivingEntity) (entity.attributes as MutableAttributeContainer).`data_attributes$refresh`()
-        }
-
-        fun onHealthModified(attribute: EntityAttribute, entity: LivingEntity?, modifier: EntityAttributeModifier?, previous: Double, added: Boolean) {
-            if (entity?.world?.isClient == false && attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
-                entity.health = MathHelper.clamp(entity.health, 0.0F, entity.maxHealth)
-            }
+        init {
+            ConfigPacketBufs.registerPacketSerializers()
         }
     }
 
     override fun onInitialize() {
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
-        ServerLoginConnectionEvents.QUERY_START.register(::loginQueryStart)
+        ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
+            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
+        }
 
-        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ -> refreshAttributes(newEntity) }
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> refreshAttributes(player) }
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ ->
+            if (newEntity is LivingEntity) newEntity.refreshAttributes()
+        }
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> player.refreshAttributes() }
 
-        EntityAttributeModifiedEvents.MODIFIED.register(::onHealthModified)
+        EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
+            if (attribute == EntityAttributes.GENERIC_MAX_HEALTH && entity?.world?.isClient == false) {
+                entity.health = MathHelper.clamp(entity.health, 0.0F, entity.maxHealth)
+            }
+        }
     }
 }

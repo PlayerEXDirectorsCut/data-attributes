@@ -3,7 +3,7 @@ package com.bibireden.data_attributes.config
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
-import com.bibireden.data_attributes.config.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.data.*
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute

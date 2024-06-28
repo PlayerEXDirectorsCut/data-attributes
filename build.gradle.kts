@@ -10,7 +10,7 @@ group = "${properties["maven_group"]}"
 version = "${properties["mod_version"]}-${properties["loader"]}"
 
 repositories {
-    maven("https://maven.wispforest.io")
+    maven("https://maven.wispforest.io/releases")
     maven("https://maven.terraformersmc.com")
     maven("https://api.modrinth.com/maven")
 }

@@ -1,6 +1,10 @@
-package com.bibireden.data_attributes.config
+package com.bibireden.data_attributes.ui
 
 import com.bibireden.data_attributes.DataAttributes
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders
+import com.bibireden.data_attributes.config.models.DataAttributesEntityTypesConfig
+import com.bibireden.data_attributes.config.models.DataAttributesFunctionsConfig
+import com.bibireden.data_attributes.config.models.DataAttributesOverridesConfig
 import io.wispforest.owo.Owo
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.annotation.ExcludeFromScreen
@@ -32,9 +36,15 @@ import kotlin.math.min
 
 class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, val functions: DataAttributesFunctionsConfig, val entity_types: DataAttributesEntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
     override fun build(rootComponent: FlowLayout) {
-        this.extraFactories.put({ it.backingField().field.name.equals("entity_types") }, DataAttributesConfigProviders.ENTITY_TYPES_FACTORY)
-        this.extraFactories.put({ it.backingField().field.name.equals("overrides") }, DataAttributesConfigProviders.ATTRIBUTE_OVERRIDE_FACTORY)
-        this.extraFactories.put({ it.backingField().field.name.equals("functions") }, DataAttributesConfigProviders.ATTRIBUTE_FUNCTIONS_FACTORY)
+        this.extraFactories.put({ it.backingField().field.name.equals("entity_types") },
+            DataAttributesConfigProviders.ENTITY_TYPES_FACTORY
+        )
+        this.extraFactories.put({ it.backingField().field.name.equals("overrides") },
+            DataAttributesConfigProviders.ATTRIBUTE_OVERRIDE_FACTORY
+        )
+        this.extraFactories.put({ it.backingField().field.name.equals("functions") },
+            DataAttributesConfigProviders.ATTRIBUTE_FUNCTIONS_FACTORY
+        )
 
         super.build(rootComponent)
 
@@ -79,11 +89,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
             val expanded = !parentKey.isRoot && config.fieldForKey(parentKey)!!.isAnnotationPresent(Expanded::class.java)
             val container = containers.getOrDefault(
                 parentKey,
-                Containers.collapsible(
-                    Sizing.fill(100), Sizing.content(),
-                    Text.translatable("text.config." + config.name() + ".category." + parentKey.asString()),
-                    expanded
-                ).configure<CollapsibleContainer> { cc ->
+                Containers.collapsible(Sizing.fill(100), Sizing.content(), Text.translatable("text.config." + config.name() + ".category." + parentKey.asString()), expanded).configure<CollapsibleContainer> { cc ->
                     val categoryKey = "text.config." + config.name() + ".category." + parentKey.asString()
                     if (I18n.hasTranslation("$categoryKey.tooltip")) {
                         cc.titleLayout().tooltip(Text.translatable("$categoryKey.tooltip"))

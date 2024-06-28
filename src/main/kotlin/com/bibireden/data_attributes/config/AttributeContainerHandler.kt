@@ -1,6 +1,7 @@
-package com.bibireden.data_attributes.data
+package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.config.AttributeConfigManager.Tuple
+import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer
 import net.minecraft.entity.EntityType
@@ -58,10 +59,8 @@ class AttributeContainerHandler(private var implicitContainers: ImplicitContaine
             val entityType = Registries.ENTITY_TYPE[identifier] as EntityType<out LivingEntity>
             val entityTypeData = entityTypeDataIn[identifier] ?: return@forEach
 
-
-
             val builder = DefaultAttributeContainer.Builder()
-            entityTypeData.build(builder, DefaultAttributeRegistry.get(entityType))
+            entityTypeData.build(builder, DefaultAttributeRegistry.get(entityType) as? MutableDefaultAttributeContainer)
             explicits[entityType] = builder.build()
         }
 

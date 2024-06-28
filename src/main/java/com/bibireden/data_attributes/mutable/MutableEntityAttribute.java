@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
-import com.bibireden.data_attributes.config.OverridesConfigModel;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
 
 public interface MutableEntityAttribute extends IEntityAttribute {
