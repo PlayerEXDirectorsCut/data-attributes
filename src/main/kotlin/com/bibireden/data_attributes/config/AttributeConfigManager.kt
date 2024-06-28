@@ -92,7 +92,6 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     /** Whenever new [Data] is applied. */
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
-        val entityTypeData = this.data.entity_types
 
         for ((id, value) in this.data.overrides) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
@@ -107,8 +106,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
                 DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")
             }
             else {
-                val data = entityAttributeData.getOrPut(id, ::EntityAttributeData)
-                data.putFunctions(configs)
+                entityAttributeData.getOrPut(id, ::EntityAttributeData).putFunctions(configs)
             }
         }
 
@@ -124,7 +122,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
             Registries.ATTRIBUTE[identifier]?.let(attributeData::copy)
         }
 
-        this.handler.buildContainers(entityTypeData, ENTITY_TYPE_INSTANCES)
+        this.handler.buildContainers(this.data.entity_types, ENTITY_TYPE_INSTANCES)
 
         AttributesReloadedEvent.EVENT.invoker().onCompletedReload()
     }

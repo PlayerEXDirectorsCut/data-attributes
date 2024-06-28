@@ -131,11 +131,11 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		AtomicReference<Double> e = new AtomicReference<>(d);
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.MULTIPLY_BASE)) {
-			e.set(e.get() + d * modifier.getValue());
+			e.set(e.get() + (d * modifier.getValue()));
 		}
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.MULTIPLY_TOTAL)) {
-			e.set(e.get() * 1.0D + modifier.getValue());
+			e.set(e.get() * (1.0D + modifier.getValue()));
 		}
 
 		if (this.data_containerCallback != null) {
@@ -145,9 +145,8 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 				EntityAttributeInstance parentInstance = this.data_containerCallback.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
 
-				e.set(e.get() * 1.0D + (parentInstance.getValue() * function.value()));
+				e.set(e.get() * (1.0D + (parentInstance.getValue() * function.value())));
 			});
-			e.set(e.get());
 		}
 
 
