@@ -24,6 +24,7 @@ import io.wispforest.owo.ui.event.MouseDown
 import io.wispforest.owo.ui.event.MouseEnter
 import io.wispforest.owo.ui.event.MouseLeave
 import io.wispforest.owo.ui.util.UISounds
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.resource.language.I18n
@@ -48,7 +49,7 @@ class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, v
 
         super.build(rootComponent)
 
-        val isDetached = DataAttributes.CONFIG.optionForKey<Boolean>(DataAttributes.CONFIG.keys.locked)!!.detached() == true
+        val isDetached = !MinecraftClient.getInstance().isInSingleplayer
         val optionPanel = rootComponent.childById(FlowLayout::class.java, "option-panel")
 
         if (isDetached) {

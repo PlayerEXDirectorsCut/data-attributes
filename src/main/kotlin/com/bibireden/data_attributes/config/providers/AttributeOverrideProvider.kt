@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.config.providers
 
 import com.bibireden.data_attributes.api.attribute.StackingFormula
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
@@ -75,7 +76,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.min"),
                         override.min,
-                        _root_ide_package_.com.bibireden.data_attributes.config.DataAttributesConfigProviders::isNumeric,
+                        DataAttributesConfigProviders::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
                                 this.backing.replace(id, override.copy(min = v))
@@ -89,7 +90,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.max"),
                         override.max,
-                        _root_ide_package_.com.bibireden.data_attributes.config.DataAttributesConfigProviders::isNumeric,
+                        DataAttributesConfigProviders::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
                                 this.backing.replace(id, override.copy(max = v))
@@ -103,7 +104,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.min_fallback"),
                         override.min_fallback,
-                        _root_ide_package_.com.bibireden.data_attributes.config.DataAttributesConfigProviders::isNumeric
+                        DataAttributesConfigProviders::isNumeric
                     )
                     )
 
@@ -111,7 +112,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.max_fallback"),
                         override.max_fallback,
-                        _root_ide_package_.com.bibireden.data_attributes.config.DataAttributesConfigProviders::isNumeric
+                        DataAttributesConfigProviders::isNumeric
                     )
                     )
 
