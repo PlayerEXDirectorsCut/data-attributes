@@ -17,6 +17,7 @@ class DataAttributesClient : ClientModInitializer {
     companion object {
         @JvmField var CLIENT_MANAGER = AttributeConfigManager()
 
+        /** Whenever the client receives a sync packet from the server to update the configuration. */
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {

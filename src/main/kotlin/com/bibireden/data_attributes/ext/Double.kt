@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.utils
+package com.bibireden.data_attributes.ext
 
 import java.math.BigDecimal
 import java.math.RoundingMode

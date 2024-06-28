@@ -7,7 +7,7 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBo
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
-import com.bibireden.data_attributes.utils.round
+import com.bibireden.data_attributes.ext.round
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider

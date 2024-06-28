@@ -11,6 +11,7 @@ import com.bibireden.data_attributes.api.util.Maths
 import com.bibireden.data_attributes.endec.Endecs
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
+import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
 /** Represents a function normally tied to an `Identifier` that contains a `StackingBehavior` and a `Double` value. */
@@ -29,6 +30,7 @@ open class AttributeFunction(open var behavior: StackingBehavior, open var value
     override fun value(): Double = this.value
 }
 
+/** Configuration for attribute functions that will be applied to the game. */
 data class AttributeFunctionConfig(var id: Identifier, override var behavior: StackingBehavior, override var value: Double) : AttributeFunction(behavior, value)
 {
     constructor() : this(Identifier("..."), StackingBehavior.Add, 0.0)
@@ -42,6 +44,9 @@ data class AttributeFunctionConfig(var id: Identifier, override var behavior: St
     }
 }
 
+/**
+ * Container for data that applies modifiers to specific [EntityAttribute]'s based on a [AttributeFunctionConfig].
+ */
 data class AttributeFunctionConfigData(var data: Map<Identifier, List<AttributeFunctionConfig>> = mapOf()) {
     companion object {
         val ENDEC = Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf())
