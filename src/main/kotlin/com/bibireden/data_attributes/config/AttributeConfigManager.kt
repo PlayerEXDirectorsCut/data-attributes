@@ -92,7 +92,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     /** Whenever new [Data] is applied. */
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
-        val entityTypeData = mutableMapOf<Identifier, EntityTypeData>()
+        val entityTypeData = this.data.entity_types
 
         for ((id, value) in this.data.overrides) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
@@ -112,13 +112,8 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
             }
         }
 
-        for ((id, value) in this.data.entity_types) {
-            entityTypeData[id] = value
-        }
-
         for (id in Registries.ATTRIBUTE.ids) {
-            val attribute = Registries.ATTRIBUTE[id] as? MutableEntityAttribute ?: continue
-            attribute.`data_attributes$clear`()
+            (Registries.ATTRIBUTE[id] as? MutableEntityAttribute)?.`data_attributes$clear`()
         }
 
         for ((id, data) in entityAttributeData) {
@@ -126,8 +121,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
 
         for ((identifier, attributeData) in entityAttributeData) {
-            val attribute = Registries.ATTRIBUTE[identifier] ?: continue
-            attributeData.copy(attribute)
+            Registries.ATTRIBUTE[identifier]?.let(attributeData::copy)
         }
 
         this.handler.buildContainers(entityTypeData, ENTITY_TYPE_INSTANCES)

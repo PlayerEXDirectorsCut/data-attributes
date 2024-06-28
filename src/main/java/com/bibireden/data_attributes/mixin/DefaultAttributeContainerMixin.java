@@ -72,10 +72,6 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 
 	@Override
 	public void data_attributes$copy(DefaultAttributeContainer.Builder builder) {
-		for (EntityAttribute entityAttribute : this.instances.keySet()) {
-			EntityAttributeInstance entityAttributeInstance = this.instances.get(entityAttribute);
-			double value = entityAttributeInstance.getBaseValue();
-			builder.add(entityAttribute, value);
-		}
+		this.instances.forEach((entityAttribute, instance) -> builder.add(entityAttribute, instance.getBaseValue()));
 	}
 }
