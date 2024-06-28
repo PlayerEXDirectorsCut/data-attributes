@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config.providers
 
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.entityTypeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
@@ -29,7 +30,7 @@ class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityType
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.entity_types.value"),
                             value,
-                            _root_ide_package_.com.bibireden.data_attributes.config.DataAttributesConfigProviders::isNumeric,
+                            DataAttributesConfigProviders::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { value ->
                                     val data = this.backing.remove(topID)?: return@let

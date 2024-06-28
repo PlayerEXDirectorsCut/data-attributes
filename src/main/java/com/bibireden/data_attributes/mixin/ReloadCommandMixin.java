@@ -27,9 +27,9 @@ abstract class ReloadCommandMixin {
 		DataAttributes.reloadConfigs();
 		// process new manager data from config(s) on server.
 		DataAttributes.SERVER_MANAGER.setData(new AttributeConfigManager.Data(
-			DataAttributes.OVERRIDES_CONFIG.overrides(),
-			DataAttributes.FUNCTIONS_CONFIG.functions().getData(),
-			DataAttributes.ENTITY_TYPES_CONFIG.entity_types()
+			DataAttributes.OVERRIDES_CONFIG.getOverrides(),
+			DataAttributes.FUNCTIONS_CONFIG.getFunctions().getData(),
+			DataAttributes.ENTITY_TYPES_CONFIG.getEntity_types()
 		));
 		DataAttributes.SERVER_MANAGER.onDataUpdate();
 		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
@@ -39,9 +39,9 @@ abstract class ReloadCommandMixin {
 
 		DataAttributes.LOGGER.info(
 			"Updated manager with {} override(s), {} function(s) and {} entity types :: update flag [#{}]",
-			DataAttributes.OVERRIDES_CONFIG.overrides().size(),
-			DataAttributes.FUNCTIONS_CONFIG.functions().getData().size(),
-			DataAttributes.ENTITY_TYPES_CONFIG.entity_types().size(),
+			DataAttributes.OVERRIDES_CONFIG.getOverrides().size(),
+			DataAttributes.FUNCTIONS_CONFIG.getFunctions().getData().size(),
+			DataAttributes.ENTITY_TYPES_CONFIG.getEntity_types().size(),
 			DataAttributes.SERVER_MANAGER.getUpdateFlag()
 		);
 	}
