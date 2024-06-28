@@ -24,6 +24,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registries;
 
+/** Swaps out the default instances map for a custom one that has an {@link Identifier} as a key instead. */
 @Mixin(DefaultAttributeContainer.class)
 abstract class DefaultAttributeContainerMixin implements MutableDefaultAttributeContainer {
 	@Unique
