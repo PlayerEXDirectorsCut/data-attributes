@@ -15,7 +15,6 @@ abstract class ItemStackMixin {
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     private void data_init(ItemConvertible item, int count, CallbackInfo ci) {
         ItemStack stack = (ItemStack) (Object) this;
-
         if (item != null) {
             ((ItemHelper) item.asItem()).onStackCreated(stack, count);
         }

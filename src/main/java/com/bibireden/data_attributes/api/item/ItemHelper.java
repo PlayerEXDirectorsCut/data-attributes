@@ -23,8 +23,7 @@ public interface ItemHelper {
 	 * @param itemStack
 	 * @param count
 	 */
-	default void onStackCreated(final ItemStack itemStack, final int count) {
-	}
+	default void onStackCreated(final ItemStack itemStack, final int count) {}
 
 	/**
 	 * ItemStack dependent version of SwordItem#getAttackDamage and
@@ -34,9 +33,7 @@ public interface ItemHelper {
 	 * @param itemStack
 	 * @return
 	 */
-	default float getAttackDamage(final ItemStack itemStack) {
-		return 0.0F;
-	}
+	default Float getAttackDamage(final ItemStack itemStack) { return null; }
 
 	/**
 	 * ItemStack dependent version of ArmorItem#getProtection. Default
@@ -45,19 +42,19 @@ public interface ItemHelper {
 	 * @param itemStack
 	 * @return
 	 */
-	default int getProtection(final ItemStack itemStack) {
-		return 0;
+	default Integer getProtection(final ItemStack itemStack) {
+		return null;
 	}
 
 	/**
 	 * ItemStack dependent version of ArmorItem#getToughness. Default implementation
-	 * returns aforementioned.
+	 * returns the aforementioned.
 	 * 
 	 * @param itemStack
 	 * @return
 	 */
-	default float getToughness(final ItemStack itemStack) {
-		return 0.0F;
+	default Float getToughness(final ItemStack itemStack) {
+		return null;
 	}
 
 	/**

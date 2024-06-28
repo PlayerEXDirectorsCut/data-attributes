@@ -10,7 +10,7 @@ abstract class MiningToolItemMixin extends ItemMixin {
 
     // Overrides the getAttackDamage method from ItemMixin
     @Override
-    public float getAttackDamage(final ItemStack itemStack) {
+    public Float getAttackDamage(final ItemStack itemStack) {
         // Calls the original getAttackDamage method from MiningToolItem
         return ((MiningToolItem) (Object) this).getAttackDamage();
     }

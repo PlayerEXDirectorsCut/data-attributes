@@ -7,14 +7,13 @@ import net.minecraft.item.ItemStack;
 
 @Mixin(ArmorItem.class)
 abstract class ArmorItemMixin extends ItemMixin {
-
     @Override
-    public int getProtection(final ItemStack itemStack) {
+    public Integer getProtection(final ItemStack itemStack) {
         return ((ArmorItem) (Object) this).getProtection();
     }
 
     @Override
-    public float getToughness(final ItemStack itemStack) {
+    public Float getToughness(final ItemStack itemStack) {
         return ((ArmorItem) (Object) this).getToughness();
     }
 }
