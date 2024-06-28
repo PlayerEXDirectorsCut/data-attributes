@@ -1,0 +1,107 @@
+{
+  "text.config.data_attributes.title": "Data Attributes • Configuration",
+
+  "text.config.data_attributes.managed_by_server": [
+    {"text": "⚑ ", "color": "#EB1D36"},
+    {"text": "This configuration is managed by the server.\n", "color": "white"},
+    {"text": "You must disconnect in order to edit it.\n", "color": "white", "italic":  true}
+  ],
+
+  "text.config.data_attributes.section.overrides": "Attribute Overrides",
+  "text.config.data_attributes.section.functions": "Attribute Functions",
+  "text.config.data_attributes.section.entity_types" : "Entity Types",
+
+  "text.config.data_attributes.enum.stackingFormula.flat": [
+    {"text": "░ ", "color": "#E7C14B"},
+    {"text": "Flat", "color": "white"}
+  ],
+  "text.config.data_attributes.enum.stackingFormula.diminished": [
+    {"text": "\uD834\uDF3C ", "color": "#EB1D36"},
+    {"text": "Diminished", "color": "gray"}
+  ],
+
+  "text.config.data_attributes.enum.functionBehavior.add": [
+    {"text": "+ ", "color": "#62DB89"},
+    {"text": "Add", "color": "white"}
+  ],
+  "text.config.data_attributes.enum.functionBehavior.multiply": [
+    {"text": "× ", "color": "#E35454"},
+    {"text": "Multiply", "color": "white"}
+  ],
+
+  "text.config.data_attributes.category.overrides": "Overrides",
+  "text.config.data_attributes.category.functions": "Functions",
+
+  "text.config.data_attributes.data_entry.reset": [
+    {"text": "♻ ", "color": "#6FD392"},
+    {"text": "Reset", "color": "white"}
+  ],
+
+  "text.config.data_attributes.data_entry.overrides.min_fallback": [
+    {"text": "⭳ ", "color": "#979797"},
+    {"text": "Min Fallback", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.max_fallback": [
+    {"text": "⭱ ", "color": "#979797"},
+    {"text": "Max Fallback", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.min": [
+    {"text": "⭳ ", "color": "white"},
+    {"text": "Min", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.max": [
+    {"text": "⭱ ", "color": "white"},
+    {"text": "Max", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.smoothness": [
+    {"text": "⭾ ", "color": "#5BB9DC"},
+    {"text": "Smoothness", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.formula": [
+    {"text": "\uD83E\uDDEA ", "color": "#83DEB7"},
+    {"text": "Stacking Formula", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.functions.behavior": [
+    {"text": "\uD835\uDC53 ", "color": "#83DEB7"},
+    {"text": "Behavior", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.functions.value": [
+    {"text": "⩴ ", "color": "#E7C14B"},
+    {"text": "Value", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.entity_types.value": [
+    {"text": "⩴ ", "color": "#E7C14B"},
+    {"text": "Value", "color": "white"}
+  ],
+
+  "text.config.data_attributes.data_entry.overrides.enabled.desc": "If this override should be enabled and its modifications applied.",
+
+  "text.config.data_attributes.data_entry.unchangeable": "This value is unchangeable.",
+
+  "text.config.data_attributes.data_entry.function_child": [
+    {"text": "❤ ", "color": "#F25D81"},
+    {"text": "Child Details\n", "color": "white"},
+    {"index": 0, "color": "#636363", "italic": "true"}, "\n\n",
+    {"text": "⭳ min: ", "color": "white"}, {"index": 1, "color": "#F25D81"}, "\n",
+    {"text": "⭱ max: ", "color": "white"}, {"index": 2, "color": "#F25D81"}
+  ],
+  "text.config.data_attributes.data_entry.entity_type_value": [
+    {"text": "✱ ", "color": "#5DF2AE"},
+    {"text": "Value Details\n", "color": "white"},
+    {"index": 0, "color": "#636363", "italic": "true"}, "\n\n",
+    {"text": "⭳ min: ", "color": "white"}, {"index": 1, "color": "#5DF2AE"}, "\n",
+    {"text": "⭱ max: ", "color": "white"}, {"index": 2, "color": "#5DF2AE"}
+  ],
+
+  "text.config.data_attributes.data_entry.invalid": [
+    {"text": "⚑ ", "color": "#DB9A2F"},
+    {"text": "Warning\n\n", "color": "white"},
+    {"text": "This value does not exist in the registry it is meant to belong to.\n", "color": "gray"},
+    {"text": "It will be ignored as a result of this.\n\nPlease use a valid identifier and press ", "color": "gray", "italic": true},
+    {"text":  "Reload ", "italic": true, "color": "green"},
+    {"text":  "when ready.", "italic": true, "color": "gray"}
+  ],
+
+  "ui.data_attributes.collapsiblefoldablecontainer.collapse_all": "Collapse",
+  "ui.data_attributes.collapsiblefoldablecontainer.uncollapse_all": "Uncollapse"
+}

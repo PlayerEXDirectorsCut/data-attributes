@@ -1,17 +1,29 @@
-<img src="img/logo.png" alt="Data Attributes" height="100" />
-<hr />
+![Data Attributes Banner](https://cdn.modrinth.com/data/cached_images/464354cc9d34d3778ad4a9db3816adc86c0f6b84.png)
+[![GitHub license](https://img.shields.io/badge/MIT-MIT?style=for-the-badge&label=LICENCE&labelColor=1A1A1A&color=FFFFFF&link=https%3A%2F%2Fgithub.com%2FPlayerEXDirectorsCut%2Fdata-attributes%2Fblob%2F1.20.1%2Fmain%2FLICENSE)](https://github.com/PlayerEXDirectorsCut/data-attributes/blob/1.20.1/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/PlayerEXDirectorsCut/data-attributes?style=for-the-badge&logo=github&labelColor=1A1A1A&color=FFFFFF&link=https%3A%2F%2Fgithub.com%2FPlayerEXDirectorsCut%2Fdata-attributes%2Fstargazers
+)](https://github.com/PlayerEXDirectorsCut/data-attributes/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/PlayerEXDirectorsCut/data-attributes?style=for-the-badge&logo=github&labelColor=1A1A1A&color=FFFFFF&link=https%3A%2F%2Fgithub.com%2FPlayerEXDirectorsCut%2Fdata-attributes%2Fforks
+)](https://github.com/PlayerEXDirectorsCut/data-attributes/forks)
+[![GitHub issues](https://img.shields.io/github/issues/PlayerEXDirectorsCut/data-attributes?style=for-the-badge&logo=github&label=ISSUES&labelColor=1A1A1A&link=https%3A%2F%2Fgithub.com%2FPlayerEXDirectorsCut%2Fdata-attributes%2Fissues
+)](https://github.com/PlayerEXDirectorsCut/data-attributes/issues)
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/CleverNucleus/data-attributes?label=latest)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/CleverNucleus/data-attributes/build-and-deploy.yml)
-![GitHub](https://img.shields.io/github/license/CleverNucleus/data-attributes)
+[![docs](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/documentation/generic_vector.svg)](https://playerexdirectorscut.github.io/Bare-Minimum-Docs/)
+![mkdocs](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/built-with/mkdocs_vector.svg)
+![java17](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/built-with/java17_vector.svg)
+[![curseforge](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg)](https://www.curseforge.com/minecraft/mc-mods/data-attributes-directors-cut)
+[![modrinth](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg)](https://modrinth.com/mod/data-attributes-directors-cut)
 
-### What is Data Attributes?
+## Preamble
 
-Data Attributes is a Minecraft mod, initially released for Minecraft 1.17.1 using the Fabric ecosystem. The mod does two things: overhauls Minecraft's entity attribute system to be more dynamic and to include follow on attributes (something found in many other games); and exposes entity attributes to datapack manipulation - allowing servers/pack makers easy customisation of every aspect of the entity attribute system.
+**Data Attributes: Directors Cut** is a Minecraft mod that has been ported from 1.19.2. **[Original Mod](https://www.curseforge.com/minecraft/mc-mods/data-attributes)**
 
-### Usage
+It serves two functions:
+- Overhauling Minecraft's Entity Attribute system to be more **dynamic**
+- Allowing attributes to be **exposed to datapack manipulation**, so it's easy for pack developers to customize everything about the attribute system
 
-Data Attributes has a [Curseforge](https://www.curseforge.com/minecraft/mc-mods/data-attributes) and [Modrinth](https://modrinth.com/mod/data-attributes) page. For developers, add the following to your `build.gradle`. 
+## Usage
+
+Data Attributes has a [Curseforge](https://www.curseforge.com/minecraft/mc-mods/data-attributes-directors-cut) and [Modrinth](https://modrinth.com/mod/data-attributes-directors-cut) page. For developers, add the following to your `build.gradle`.
 
 ```gradle
 repositories {
@@ -25,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "maven.modrinth:data-attributes:<version>"
+    modImplementation "maven.modrinth:data-attributes-directors-cut:<version>"
 }
 ```
 
@@ -40,23 +52,16 @@ repositories {
 }
 
 dependencies {
-    modImplementation "curse.maven:data-attributes-514734:<version-file-id>"
+    modImplementation "curse.maven:data-attributes-directors-cut-955929:<version-file-id>"
 }
 ```
 
 </details>
 
-Note that Data Attributes depends on [Fabric API](https://github.com/FabricMC/fabric), so you will need to consider this as well.
+Note that Data Attributes: Directors Cut depends on [Fabric API](https://github.com/FabricMC/fabric), so you will need to consider this as well.
 
-### F.A.Q
+It also does not support `Attributefix`, as they have the same capabilities, and are incompatible.
 
-- Will you make a Forge version?
-  - No, but the license allows you to do so yourself.
+### • F.A.Q
 - I think that I've found a bug/crash, where can I report it?
-  - Please make an entry to the [Issue Tracker](https://github.com/CleverNucleus/Data-Attributes/issues).
-
-Please also note that the mod AttributeFix is incompatible with Data Attributes - they have the same capabilities!
-
-### Wiki
-
-For more detailed documentation, please see the [wiki](https://github.com/CleverNucleus/Data-Attributes/wiki).
+    - Please make an entry to the [Issue Tracker](https://github.com/PlayerEXDirectorsCut/data-attributes/issues).
