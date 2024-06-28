@@ -7,6 +7,11 @@ import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.data.AttributeFunction;
 
+/**
+ * Extends the {@link net.minecraft.entity.attribute.EntityAttribute} class
+ * to implement child-parent relationships with other attributes,
+ * allow overrides, and sum calculations of the attribute.
+ */
 public interface MutableEntityAttribute extends IEntityAttribute {
     /** Checks if one attribute contains another via the child-parent relationship. */
     static boolean contains(MutableEntityAttribute lhs, MutableEntityAttribute rhs) {
