@@ -18,7 +18,7 @@ object AttributesReloadedEvent {
      */
     @JvmField
     val EVENT: Event<Reloaded> = EventFactory.createArrayBacked(Reloaded::class.java) {
-        Reloaded { for (callback in it) callback.onReloadCompleted() }
+        Reloaded { it.forEach(Reloaded::onReloadCompleted) }
     }
 
     fun interface Reloaded {
