@@ -4,6 +4,7 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.entityTypeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
+import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import io.wispforest.owo.config.Option
@@ -30,7 +31,7 @@ class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityType
                         it.child(textBoxComponent(
                             Text.translatable("text.config.data_attributes.data_entry.entity_types.value"),
                             value,
-                            DataAttributesConfigProviders::isNumeric,
+                            Validators::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { value ->
                                     val data = this.backing.remove(topID)?: return@let

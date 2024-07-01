@@ -5,7 +5,7 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attrib
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
-import com.bibireden.data_attributes.data.AttributeFunctionConfig
+import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option

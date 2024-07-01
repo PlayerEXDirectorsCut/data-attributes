@@ -10,7 +10,7 @@ import io.wispforest.owo.config.annotation.Sync
 import net.minecraft.util.Identifier
 
 @Suppress("UNUSED")
-@Config(name = "${DataAttributes.MOD_ID}/entity_types", wrapperName = "DataAttributesEntityTypesConfig")
+@Config(name = "${DataAttributes.MOD_ID}/entity_types", wrapperName = "EntityTypesConfig")
 @Sync(SyncMode.NONE)
 class EntityTypesConfigModel {
     @SectionHeader("entity_types")

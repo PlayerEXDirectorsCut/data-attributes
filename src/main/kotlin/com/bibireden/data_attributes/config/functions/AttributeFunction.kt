@@ -1,4 +1,4 @@
-package com.bibireden.data_attributes.data
+package com.bibireden.data_attributes.config.functions
 
 import com.bibireden.data_attributes.api.attribute.IAttributeFunction
 import com.bibireden.data_attributes.api.attribute.StackingBehavior

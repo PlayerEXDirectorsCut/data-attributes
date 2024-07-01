@@ -5,11 +5,11 @@ import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.*
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
-import com.bibireden.data_attributes.config.models.DataAttributesEntityTypesConfig
-import com.bibireden.data_attributes.config.models.DataAttributesFunctionsConfig
-import com.bibireden.data_attributes.config.models.DataAttributesOverridesConfig
-import com.bibireden.data_attributes.data.AttributeFunction
-import com.bibireden.data_attributes.data.AttributeFunctionConfig
+import com.bibireden.data_attributes.config.models.EntityTypesConfig
+import com.bibireden.data_attributes.config.models.FunctionsConfig
+import com.bibireden.data_attributes.config.models.OverridesConfig
+import com.bibireden.data_attributes.config.functions.AttributeFunction
+import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ext.refreshAttributes
 import com.bibireden.data_attributes.networking.Channels
@@ -34,8 +34,8 @@ class DataAttributes : ModInitializer {
         @JvmField val SERVER_MANAGER = AttributeConfigManager()
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
-        @JvmField val OVERRIDES_CONFIG: DataAttributesOverridesConfig = DataAttributesOverridesConfig.createAndLoad()
-        @JvmField val FUNCTIONS_CONFIG: DataAttributesFunctionsConfig = DataAttributesFunctionsConfig.createAndLoad { builder ->
+        @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
+        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
             builder.registerSerializer(AttributeFunctionConfig::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
@@ -54,7 +54,7 @@ class DataAttributes : ModInitializer {
                 AttributeFunctionConfig(mapped)
             }
         }
-        @JvmField val ENTITY_TYPES_CONFIG: DataAttributesEntityTypesConfig = DataAttributesEntityTypesConfig.createAndLoad { builder ->
+        @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
             builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
                 EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
@@ -89,7 +89,7 @@ class DataAttributes : ModInitializer {
     override fun onInitialize() {
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
-        ServerLoginConnectionEvents.INIT.register { _, _ -> SERVER_MANAGER.updateData() }
+        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) SERVER_MANAGER.updateData() }
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
             sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
         }

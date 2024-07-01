@@ -1,7 +1,8 @@
 package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.functions.AttributeFunction
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
@@ -14,13 +15,13 @@ import net.minecraft.util.Identifier
  * Data that might contain a `AttributeOverrideConfig` and contains
  * `AttributeFunctions` to be used to override or copy to `EntityAttributes`.
  */
-class EntityAttributeData(val override: AttributeOverrideConfig? = null, val functions: MutableMap<Identifier, AttributeFunction> = mutableMapOf()) {
-    constructor(value: AttributeOverrideConfig) : this(value, mutableMapOf())
+class EntityAttributeData(val override: AttributeOverride? = null, val functions: MutableMap<Identifier, AttributeFunction> = mutableMapOf()) {
+    constructor(value: AttributeOverride) : this(value, mutableMapOf())
 
     companion object {
         @JvmField
         val ENDEC = StructEndecBuilder.of(
-            AttributeOverrideConfig.ENDEC.nullableOf().fieldOf("override") { it.override },
+            AttributeOverride.ENDEC.nullableOf().fieldOf("override") { it.override },
             Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC).fieldOf("functions") { it.functions },
             ::EntityAttributeData,
         )

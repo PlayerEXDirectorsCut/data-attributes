@@ -36,7 +36,6 @@ object DataAttributesConfigProviders {
         }
     }
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
-    fun isNumeric(str: String) = str.isEmpty() || str.matches("-?\\d+(\\.\\d+)?".toRegex())
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }

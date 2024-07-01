@@ -1,11 +1,11 @@
 package com.bibireden.data_attributes.config.providers
 
 import com.bibireden.data_attributes.api.attribute.StackingFormula
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
-import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
+import com.bibireden.data_attributes.config.Validators
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import com.bibireden.data_attributes.ext.round
@@ -22,7 +22,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverrideConfig>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverride>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     val backing = option.value().toMutableMap()
 
     init {
@@ -76,7 +76,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.min"),
                         override.min,
-                        DataAttributesConfigProviders::isNumeric,
+                        Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
                                 this.backing.replace(id, override.copy(min = v))
@@ -90,7 +90,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.max"),
                         override.max,
-                        DataAttributesConfigProviders::isNumeric,
+                        Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
                                 this.backing.replace(id, override.copy(max = v))
@@ -104,7 +104,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.min_fallback"),
                         override.min_fallback,
-                        DataAttributesConfigProviders::isNumeric
+                        Validators::isNumeric,
                     )
                     )
 
@@ -112,7 +112,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         textBoxComponent(
                         Text.translatable("text.config.data_attributes.data_entry.overrides.max_fallback"),
                         override.max_fallback,
-                        DataAttributesConfigProviders::isNumeric
+                        Validators::isNumeric,
                     )
                     )
 

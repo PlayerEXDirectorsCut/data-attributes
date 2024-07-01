@@ -3,8 +3,8 @@ package com.bibireden.data_attributes.config
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
-import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.data.AttributeFunction
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
+import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.data.EntityAttributeData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
@@ -41,14 +41,14 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
 
     @JvmRecord
     data class Data(
-        val overrides: MutableMap<Identifier, AttributeOverrideConfig> = mutableMapOf(),
+        val overrides: MutableMap<Identifier, AttributeOverride> = mutableMapOf(),
         val functions: MutableMap<Identifier, List<AttributeFunction>> = mutableMapOf(),
         val entity_types: MutableMap<Identifier, EntityTypeData> = mutableMapOf()
     )
     {
         companion object {
             val ENDEC = StructEndecBuilder.of(
-                Endec.map(Endecs.IDENTIFIER, AttributeOverrideConfig.ENDEC).fieldOf("overrides") { it.overrides },
+                Endec.map(Endecs.IDENTIFIER, AttributeOverride.ENDEC).fieldOf("overrides") { it.overrides },
                 Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC.listOf()).fieldOf("functions") { it.functions },
                 Endec.map(Endecs.IDENTIFIER, EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
                 ::Data

@@ -5,7 +5,7 @@ import java.util.Map;
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel;
-import com.bibireden.data_attributes.data.AttributeFunction;
+import com.bibireden.data_attributes.config.functions.AttributeFunction;
 
 /**
  * Extends the {@link net.minecraft.entity.attribute.EntityAttribute} class
@@ -24,7 +24,7 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     }
 
     /** Overrides entity attribute properties. */
-    void data_attributes$override(OverridesConfigModel.AttributeOverrideConfig override);
+    void data_attributes$override(OverridesConfigModel.AttributeOverride override);
 
     /** Adds a parent attribute with a function. */
     void data_attributes$addParent(MutableEntityAttribute attributeIn, final AttributeFunction function);
