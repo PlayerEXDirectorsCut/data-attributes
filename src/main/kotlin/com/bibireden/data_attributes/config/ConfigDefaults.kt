@@ -20,7 +20,7 @@ object ConfigDefaults {
     @JvmField
     val OVERRIDES: Map<Identifier, AttributeOverride> = mapOf(
         MAX_HEALTH_ID to AttributeOverride(
-            false,
+            true,
             0.0,
             1_000_000.0,
             0.0,
@@ -28,7 +28,7 @@ object ConfigDefaults {
             1024.0
         ),
         GENERIC_ARMOR_ID to AttributeOverride(
-            false,
+            true,
             0.0,
             1_000_000.0,
             0.0,
@@ -36,7 +36,7 @@ object ConfigDefaults {
             1024.0
         ),
         Registries.ATTRIBUTE[EntityAttributes.GENERIC_ARMOR_TOUGHNESS]!! to AttributeOverride(
-            false,
+            true,
             0.0,
             1_000_000.0,
             0.0,
@@ -44,12 +44,12 @@ object ConfigDefaults {
             1024.0
         ),
         Registries.ATTRIBUTE[EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE]!! to AttributeOverride(
-            false,
-            0.0,
-            1_000_000.0,
+            true,
             0.0,
             1.0,
-            1024.0,
+            0.0,
+            0.0,
+            1.0,
             StackingFormula.Diminished
         )
     )
