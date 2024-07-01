@@ -4,7 +4,9 @@ import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverrideConfig
-import com.bibireden.data_attributes.data.*
+import com.bibireden.data_attributes.data.AttributeFunction
+import com.bibireden.data_attributes.data.EntityAttributeData
+import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
@@ -40,14 +42,14 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     @JvmRecord
     data class Data(
         val overrides: MutableMap<Identifier, AttributeOverrideConfig> = mutableMapOf(),
-        val functions: MutableMap<Identifier, List<AttributeFunctionConfig>> = mutableMapOf(),
+        val functions: MutableMap<Identifier, List<AttributeFunction>> = mutableMapOf(),
         val entity_types: MutableMap<Identifier, EntityTypeData> = mutableMapOf()
     )
     {
         companion object {
             val ENDEC = StructEndecBuilder.of(
                 Endec.map(Endecs.IDENTIFIER, AttributeOverrideConfig.ENDEC).fieldOf("overrides") { it.overrides },
-                Endec.map(Endecs.IDENTIFIER, AttributeFunctionConfig.ENDEC.listOf()).fieldOf("functions") { it.functions },
+                Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC.listOf()).fieldOf("functions") { it.functions },
                 Endec.map(Endecs.IDENTIFIER, EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
                 ::Data
             )
@@ -72,6 +74,19 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
             EntityInstances.PASSIVE    to Tuple(PassiveEntity::class.java, 4),
             EntityInstances.ANIMAL     to Tuple(AnimalEntity::class.java, 5)
         )
+    }
+
+    /**
+     * Updates the data with the latest from the provided config.
+     * This applies the data immediately afterward.
+     */
+    fun updateData() {
+        this.data = Data(
+            DataAttributes.OVERRIDES_CONFIG.overrides.toMutableMap(),
+            DataAttributes.FUNCTIONS_CONFIG.functions.data.toMutableMap(),
+            DataAttributes.ENTITY_TYPES_CONFIG.entity_types.toMutableMap()
+        )
+        this.onDataUpdate()
     }
 
     /** Converts this manager to a sync-able packet. */

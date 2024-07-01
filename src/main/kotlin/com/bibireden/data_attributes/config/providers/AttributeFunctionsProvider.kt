@@ -5,7 +5,7 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attrib
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
-import com.bibireden.data_attributes.data.AttributeFunctionConfigData
+import com.bibireden.data_attributes.data.AttributeFunctionConfig
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -20,7 +20,7 @@ import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 
-class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfigData>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     val backing = option.value().data.toMutableMap()
 
     init {
@@ -95,5 +95,5 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfigData>
     }
 
     override fun isValid() = !this.option.detached()
-    override fun parsedValue() = AttributeFunctionConfigData(backing)
+    override fun parsedValue() = AttributeFunctionConfig(backing)
 }
