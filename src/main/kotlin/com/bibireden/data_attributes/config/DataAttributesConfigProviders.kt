@@ -38,15 +38,15 @@ object DataAttributesConfigProviders {
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
     fun isNumeric(str: String) = str.isEmpty() || str.matches("-?\\d+(\\.\\d+)?".toRegex())
 
-    val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { model, option ->
+    val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
-    val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { model, option ->
+    val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeFunctionsProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
-    val ENTITY_TYPES_FACTORY = OptionComponentFactory { model, option ->
+    val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeEntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 

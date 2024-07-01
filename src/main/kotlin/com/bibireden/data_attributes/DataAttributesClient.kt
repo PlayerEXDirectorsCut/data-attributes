@@ -15,9 +15,9 @@ import java.util.concurrent.CompletableFuture
 
 class DataAttributesClient : ClientModInitializer {
     companion object {
-        @JvmField var CLIENT_MANAGER = AttributeConfigManager()
+        @JvmField val CLIENT_MANAGER = AttributeConfigManager()
 
-        /** Whenever the client receives a sync packet from the server to update the configuration. */
+        /** Whenever the client receives a sync packet from the server to update the world-state via. configuration. */
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
@@ -35,8 +35,7 @@ class DataAttributesClient : ClientModInitializer {
             onPacketReceived(client, buf)
             CompletableFuture.completedFuture(PacketByteBufs.empty())
         }
-
-        ClientPlayNetworking.registerGlobalReceiver(Channels.RELOAD) { client, _, buf, sender ->
+        ClientPlayNetworking.registerGlobalReceiver(Channels.RELOAD) { client, _, buf, _ ->
             onPacketReceived(client, buf)
         }
     }

@@ -97,14 +97,18 @@ class DataAttributes : ModInitializer {
             sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
         }
 
-        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ ->
-            if (newEntity is LivingEntity) newEntity.refreshAttributes()
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, current, _, _ ->
+            if (current is LivingEntity) current.refreshAttributes()
         }
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> player.refreshAttributes() }
 
         EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
-            if (attribute == EntityAttributes.GENERIC_MAX_HEALTH && entity?.world?.isClient == false) {
-                entity.health = MathHelper.clamp(entity.health, 0.0F, entity.maxHealth)
+            if (entity?.world == null) return@register // no entity & no world, skip
+            
+            if (entity.world.isClient == false) {
+                if (attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
+                    entity.health = attribute.clamp(entity.health.toDouble()).toFloat()
+                }
             }
         }
     }

@@ -48,15 +48,12 @@ class AttributeContainerHandler(private var implicitContainers: ImplicitContaine
 
         val orderedEntityTypes = mutableMapOf<Int, Tuple<Identifier>>()
 
-        entityTypeDataIn.forEach { (identifier, data) ->
+        entityTypeDataIn.forEach { (identifier, entityTypeData) ->
             val entry = instances.get(identifier)
-            if (entry != null) {
-                orderedEntityTypes[entry.value] = Tuple(entry.livingEntity, identifier)
-            }
+            if (entry != null) orderedEntityTypes[entry.value] = Tuple(entry.livingEntity, identifier)
 
             if (!entityTypes.contains(identifier)) return@forEach
 
-            val entityTypeData = entityTypeDataIn[identifier] ?: return@forEach
             val entityType = Registries.ENTITY_TYPE[identifier] as EntityType<out LivingEntity>
 
             val builder = DefaultAttributeContainer.Builder()

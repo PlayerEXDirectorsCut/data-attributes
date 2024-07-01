@@ -42,7 +42,7 @@ class EntityAttributeData(val override: AttributeOverrideConfig? = null, val fun
 
     fun putFunctions(functions: List<AttributeFunctionConfig>) {
         val mapping = mutableMapOf<Identifier, AttributeFunction>()
-        functions.forEachIndexed { index, (id, behavior, value) ->
+        functions.forEach { (id, behavior, value) ->
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("The attribute function child [$id] does not seem to be registered. This could allude to a missing mod or registered attribute.")
             }
