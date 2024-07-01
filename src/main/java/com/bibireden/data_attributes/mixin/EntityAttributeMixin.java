@@ -3,7 +3,7 @@ package com.bibireden.data_attributes.mixin;
 import java.util.Map;
 
 import com.bibireden.data_attributes.config.models.OverridesConfigModel;
-import com.bibireden.data_attributes.data.AttributeFunction;
+import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -66,7 +66,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public void data_attributes$override(OverridesConfigModel.AttributeOverrideConfig override) {
+    public void data_attributes$override(OverridesConfigModel.AttributeOverride override) {
         this.data_enabled = override.enabled;
         this.data_min = override.min;
         this.data_max = override.max;
@@ -94,7 +94,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Override
     public void data_attributes$clear() {
-        this.data_attributes$override(new OverridesConfigModel.AttributeOverrideConfig(this.data_enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
+        this.data_attributes$override(new OverridesConfigModel.AttributeOverride(this.data_enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
         this.data_attributes$clearDescendants();
     }
 

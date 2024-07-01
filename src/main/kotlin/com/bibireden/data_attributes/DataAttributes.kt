@@ -5,11 +5,11 @@ import blue.endless.jankson.JsonObject
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.*
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
-import com.bibireden.data_attributes.config.models.DataAttributesEntityTypesConfig
-import com.bibireden.data_attributes.config.models.DataAttributesFunctionsConfig
-import com.bibireden.data_attributes.config.models.DataAttributesOverridesConfig
-import com.bibireden.data_attributes.data.AttributeFunctionConfig
-import com.bibireden.data_attributes.data.AttributeFunctionConfigData
+import com.bibireden.data_attributes.config.models.EntityTypesConfig
+import com.bibireden.data_attributes.config.models.FunctionsConfig
+import com.bibireden.data_attributes.config.models.OverridesConfig
+import com.bibireden.data_attributes.config.functions.AttributeFunction
+import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ext.refreshAttributes
 import com.bibireden.data_attributes.networking.Channels
@@ -22,7 +22,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.MathHelper
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -35,30 +34,27 @@ class DataAttributes : ModInitializer {
         @JvmField val SERVER_MANAGER = AttributeConfigManager()
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
-        @JvmField val OVERRIDES_CONFIG: DataAttributesOverridesConfig = DataAttributesOverridesConfig.createAndLoad()
-        @JvmField val FUNCTIONS_CONFIG: DataAttributesFunctionsConfig = DataAttributesFunctionsConfig.createAndLoad { builder ->
-            builder.registerSerializer(AttributeFunctionConfigData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
-            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfigData::class.java) { obj, marshaller ->
+        @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
+        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
+            builder.registerSerializer(AttributeFunctionConfig::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
+            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
-                val mapped = mutableMapOf<Identifier, List<AttributeFunctionConfig>>()
+                val mapped = mutableMapOf<Identifier, List<AttributeFunction>>()
 
                 unmapped.forEach { (key, array) ->
                     if (key !is String) return@forEach
                     if (array !is JsonArray) return@forEach
 
-                    val listing = mutableListOf<AttributeFunctionConfig>()
+                    val listing = mutableListOf<AttributeFunction>()
 
-                    array.forEach { value ->
-                        val ls = marshaller.marshallCarefully(AttributeFunctionConfig::class.java, value)
-                        listing.add(ls)
-                    }
+                    array.forEach { value -> listing.add(marshaller.marshall(AttributeFunction::class.java, value)) }
 
                     mapped[Identifier(key)] = listing
                 }
-                AttributeFunctionConfigData(mapped)
+                AttributeFunctionConfig(mapped)
             }
         }
-        @JvmField val ENTITY_TYPES_CONFIG: DataAttributesEntityTypesConfig = DataAttributesEntityTypesConfig.createAndLoad { builder ->
+        @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
             builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
                 EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
@@ -93,18 +89,23 @@ class DataAttributes : ModInitializer {
     override fun onInitialize() {
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
+        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) SERVER_MANAGER.updateData() }
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
             sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
         }
 
-        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, newEntity, _, _ ->
-            if (newEntity is LivingEntity) newEntity.refreshAttributes()
+        ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, current, _, _ ->
+            if (current is LivingEntity) current.refreshAttributes()
         }
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> player.refreshAttributes() }
 
         EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
-            if (attribute == EntityAttributes.GENERIC_MAX_HEALTH && entity?.world?.isClient == false) {
-                entity.health = MathHelper.clamp(entity.health, 0.0F, entity.maxHealth)
+            if (entity?.world == null) return@register // no entity & no world, skip
+
+            if (entity.world.isClient == false) {
+                if (attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
+                    entity.health = attribute.clamp(entity.health.toDouble()).toFloat()
+                }
             }
         }
     }

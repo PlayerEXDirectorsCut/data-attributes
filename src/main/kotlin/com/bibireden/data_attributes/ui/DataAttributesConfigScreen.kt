@@ -2,9 +2,9 @@ package com.bibireden.data_attributes.ui
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders
-import com.bibireden.data_attributes.config.models.DataAttributesEntityTypesConfig
-import com.bibireden.data_attributes.config.models.DataAttributesFunctionsConfig
-import com.bibireden.data_attributes.config.models.DataAttributesOverridesConfig
+import com.bibireden.data_attributes.config.models.EntityTypesConfig
+import com.bibireden.data_attributes.config.models.FunctionsConfig
+import com.bibireden.data_attributes.config.models.OverridesConfig
 import io.wispforest.owo.Owo
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.annotation.ExcludeFromScreen
@@ -35,7 +35,7 @@ import org.apache.commons.lang3.mutable.MutableInt
 import java.util.function.BiConsumer
 import kotlin.math.min
 
-class DataAttributesConfigScreen(val overrides: DataAttributesOverridesConfig, val functions: DataAttributesFunctionsConfig, val entity_types: DataAttributesEntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
+class DataAttributesConfigScreen(val overrides: OverridesConfig, val functions: FunctionsConfig, val entity_types: EntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
     override fun build(rootComponent: FlowLayout) {
         this.extraFactories.put({ it.backingField().field.name.equals("entity_types") },
             DataAttributesConfigProviders.ENTITY_TYPES_FACTORY

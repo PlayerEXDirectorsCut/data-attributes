@@ -26,7 +26,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
-		this.data_attributes$override(new OverridesConfigModel.AttributeOverrideConfig(false, minValue, maxValue, min, max, 0.0D, StackingFormula.Flat));
+		this.data_attributes$override(new OverridesConfigModel.AttributeOverride(false, minValue, maxValue, min, max, 0.0D, StackingFormula.Flat));
 	}
 
 	@ModifyReturnValue(method = "getMinValue", at = @At("RETURN"))

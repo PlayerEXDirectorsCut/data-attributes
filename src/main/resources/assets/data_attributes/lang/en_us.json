@@ -1,10 +1,12 @@
 {
   "text.config.data_attributes.title": "Data Attributes • Configuration",
 
+  "text.config.data_attributes.option.applyOnWorldStart": "Apply Config on World Start",
+
   "text.config.data_attributes.managed_by_server": [
     {"text": "⚑ ", "color": "#EB1D36"},
     {"text": "This configuration is managed by the server.\n", "color": "white"},
-    {"text": "You must disconnect in order to edit it.\n", "color": "white", "italic":  true}
+    {"text": "You must disconnect in order to edit it.\n", "color": "white", "italic": true}
   ],
 
   "text.config.data_attributes.section.overrides": "Attribute Overrides",

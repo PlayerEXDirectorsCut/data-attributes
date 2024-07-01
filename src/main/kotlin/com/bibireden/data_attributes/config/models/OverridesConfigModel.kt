@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingFormula
+import com.bibireden.data_attributes.config.ConfigDefaults
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
@@ -10,16 +11,16 @@ import io.wispforest.owo.config.annotation.*;
 import net.minecraft.util.Identifier
 
 @Suppress("UNUSED")
-@Config(name = "${DataAttributes.MOD_ID}/overrides", wrapperName = "DataAttributesOverridesConfig")
+@Config(name = "${DataAttributes.MOD_ID}/overrides", wrapperName = "OverridesConfig")
 @Sync(SyncMode.NONE)
 class OverridesConfigModel {
     @SectionHeader("overrides")
 
     @JvmField
     @Hook
-    var overrides: Map<Identifier, AttributeOverrideConfig> = mapOf()
+    var overrides: Map<Identifier, AttributeOverride> = ConfigDefaults.OVERRIDES
 
-    data class AttributeOverrideConfig(
+    data class AttributeOverride(
         @JvmField
         var enabled: Boolean = true,
         @JvmField
@@ -42,7 +43,7 @@ class OverridesConfigModel {
 
         companion object {
             @JvmField
-            val ENDEC: Endec<AttributeOverrideConfig> = StructEndecBuilder.of(
+            val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
                 Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max", { it.max }, 1_000_000.0),
@@ -53,7 +54,7 @@ class OverridesConfigModel {
                     { x -> if (x.uppercase() === "DIMINISHED") StackingFormula.Diminished else StackingFormula.Flat },
                     { x -> x.name.uppercase() }
                 ).fieldOf("formula") { it.formula },
-                OverridesConfigModel::AttributeOverrideConfig,
+                OverridesConfigModel::AttributeOverride,
             )
         }
     }
