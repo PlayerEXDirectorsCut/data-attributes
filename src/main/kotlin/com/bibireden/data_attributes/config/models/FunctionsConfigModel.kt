@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
+import com.bibireden.data_attributes.config.ConfigDefaults
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.Config
@@ -16,5 +17,5 @@ class FunctionsConfigModel {
 
     @JvmField
     @Hook
-    var functions: AttributeFunctionConfig = AttributeFunctionConfig()
+    var functions: AttributeFunctionConfig = ConfigDefaults.FUNCTIONS
 }

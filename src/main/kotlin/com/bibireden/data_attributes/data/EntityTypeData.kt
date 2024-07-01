@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier
 /**
  * Container for data that modifies the specific [Registries.ENTITY_TYPE] entry with an associated base value.
  */
-data class EntityTypeData(val data: MutableMap<Identifier, Double> = mutableMapOf()) {
+data class EntityTypeData(val data: Map<Identifier, Double> = mapOf()) {
     companion object {
         @JvmField
         val ENDEC: Endec<EntityTypeData> = Endec.map(Endecs.IDENTIFIER, Endec.DOUBLE).xmap(::EntityTypeData) { it.data }

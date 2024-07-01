@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingFormula
+import com.bibireden.data_attributes.config.ConfigDefaults
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
@@ -17,7 +18,7 @@ class OverridesConfigModel {
 
     @JvmField
     @Hook
-    var overrides: Map<Identifier, AttributeOverride> = mapOf()
+    var overrides: Map<Identifier, AttributeOverride> = ConfigDefaults.OVERRIDES
 
     data class AttributeOverride(
         @JvmField
