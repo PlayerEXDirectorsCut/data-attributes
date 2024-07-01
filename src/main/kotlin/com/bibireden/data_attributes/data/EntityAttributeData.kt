@@ -4,8 +4,8 @@ import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.endec.Endecs
+import com.bibireden.data_attributes.ext.keyOf
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
-import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
@@ -22,33 +22,38 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
         @JvmField
         val ENDEC = StructEndecBuilder.of(
             AttributeOverride.ENDEC.nullableOf().fieldOf("override") { it.override },
-            Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC).fieldOf("functions") { it.functions },
+            Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC).fieldOf("functions") { it.functions },
             ::EntityAttributeData,
         )
     }
 
-    /** Overrides a `EntityAttribute`. */
+    /**
+     * Sets the override for an [EntityAttribute].
+     *
+     * This will completely overwrite any other override set and replace it with the one present in this class.
+     * If there is none present, then no override will be done.
+     */
     fun override(attribute: EntityAttribute) {
         this.override?.override(attribute as MutableEntityAttribute)
     }
 
-    /** Copies to a given `EntityAttribute` by adding children to the instance via mixin. */
-    fun copy(attributeIn: EntityAttribute) {
-        val attribute = attributeIn as MutableEntityAttribute
-        for ((id, function) in functions) {
-            val childAttribute = Registries.ATTRIBUTE[id] ?: continue
-            attribute.`data_attributes$addChild`(childAttribute as MutableEntityAttribute, function)
+    /** Copies to a provided [EntityAttribute] by adding children to itself. */
+    fun copy(attribute: EntityAttribute) {
+        with(attribute as MutableEntityAttribute) {
+            for ((id, function) in functions) {
+                val childAttribute = Registries.ATTRIBUTE[id] as? MutableEntityAttribute ?: continue
+                this.`data_attributes$addChild`(childAttribute, function)
+            }
         }
     }
-
+    
+    /** Joins a [List] of [AttributeFunction]'s with the data in this class. */
     fun putFunctions(functions: List<AttributeFunction>) {
-        val mapping = mutableMapOf<Identifier, AttributeFunction>()
-        functions.forEach { (id, behavior, value) ->
+        this.functions.putAll(functions.map { (id, behavior, value) ->
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("The attribute function child [$id] does not seem to be registered. This could allude to a missing mod or registered attribute.")
             }
-            mapping[id] = AttributeFunction(id, behavior, value)
-        }
-        this.functions.putAll(mapping)
+            id to AttributeFunction(id, behavior, value)
+        })
     }
 }

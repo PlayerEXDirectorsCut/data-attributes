@@ -1,7 +1,9 @@
 package com.bibireden.data_attributes.config.functions
 
 import com.bibireden.data_attributes.endec.Endecs
+import com.bibireden.data_attributes.ext.keyOf
 import io.wispforest.endec.Endec
+import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
 /**
@@ -10,7 +12,7 @@ import net.minecraft.util.Identifier
 data class AttributeFunctionConfig(var data: Map<Identifier, List<AttributeFunction>> = mapOf()) {
     companion object {
         @JvmField
-        val ENDEC = Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC.listOf())
+        val ENDEC = Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf())
             .xmap(::AttributeFunctionConfig) { it.data }
     }
 }

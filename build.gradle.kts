@@ -1,9 +1,9 @@
 plugins {
     id("fabric-loom")
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "2.0.0"
     java
     `maven-publish`
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -43,14 +43,17 @@ dependencies {
         exclude("net.fabricmc.fabric-api")
     }
 
-    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let { implementation(it)?.let { include(it) } }
+    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let {
+        implementation(it)
+        include(it)
+    }
 
     modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:2.0.0-1.0.22")
-    implementation("com.squareup:kotlinpoet-ksp:1.17.0")
+    implementation("com.google.devtools.ksp:symbol-processing-api:${properties["ksp_version"]}")
+    implementation("com.squareup:kotlinpoet-ksp:${properties["kotlinpoet_version"]}")
 
-    ksp("dev.kosmx.kowoconfig:ksp-owo-config:0.1.0")
+    ksp("dev.kosmx.kowoconfig:ksp-owo-config:${properties["ksp_owo_config_version"]}")
 }
 
 tasks {
