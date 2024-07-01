@@ -6,7 +6,7 @@
   "description": "This mod serves to overhaul the Entity Attribute system to be a lot more dynamic.",
   "authors": [
     "Bare Minimum Studios",
-    "CleverNucleus (original author)"
+    "CleverNucleus (former author)"
   ],
   "contact": {
     "homepage": "https://github.com/PlayerEXDirectorsCut/data-attributes",
@@ -18,13 +18,13 @@
   "entrypoints": {
     "main": [
       {
-        "adapter": "default",
+        "adapter": "kotlin",
         "value": "com.bibireden.data_attributes.DataAttributes"
       }
     ],
     "client": [
       {
-        "adapter": "default",
+        "adapter": "kotlin",
         "value": "com.bibireden.data_attributes.DataAttributesClient"
       }
     ]
@@ -47,10 +47,7 @@
     "mc-publish": {
       "modrinth": "KCGxOJsE",
       "curseforge": 955929,
-      "loaders": [
-        "fabric",
-        "quilt"
-      ],
+      "loaders": ["fabric", "quilt"],
       "dependencies": [
         "fabric-api@0.92.2+1.20.1(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
         "fabric-language-kotlin@1.9.5+kotlin.1.8.22(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
