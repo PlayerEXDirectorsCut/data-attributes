@@ -2,6 +2,7 @@
 - First instance of an API created.
 - Dropped `EntityAttributeSupplier`, and instead offering support in the API for suppliers & attributes.
 - Upon launch, any provided config is now applied by default.
-  - All the provided entries of the config will be applied upon launch.
+  - All the provided entries of the config will be applied upon launch of the world.
+  - You can disable this behavior through the config.
 - Some cleanup of the internals was done.
 - A default template is now provided (with default/disabled config) to present each section purpose better.
