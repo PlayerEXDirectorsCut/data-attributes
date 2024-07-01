@@ -46,7 +46,7 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
             }
         }
     }
-
+    
     /** Joins a [List] of [AttributeFunction]'s with the data in this class. */
     fun putFunctions(functions: List<AttributeFunction>) {
         this.functions.putAll(functions.map { (id, behavior, value) ->
