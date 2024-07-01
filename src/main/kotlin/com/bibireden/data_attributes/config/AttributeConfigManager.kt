@@ -8,6 +8,7 @@ import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.data.EntityAttributeData
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
+import com.bibireden.data_attributes.ext.keyOf
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
@@ -39,18 +40,21 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
     }
 
+    /**
+     * Wrapper for the config manager to use internally to send as [Packet] data and to reflect changes based on what it contains.
+     */
     @JvmRecord
     data class Data(
-        val overrides: MutableMap<Identifier, AttributeOverride> = mutableMapOf(),
-        val functions: MutableMap<Identifier, List<AttributeFunction>> = mutableMapOf(),
-        val entity_types: MutableMap<Identifier, EntityTypeData> = mutableMapOf()
+        val overrides: Map<Identifier, AttributeOverride> = mapOf(),
+        val functions: Map<Identifier, List<AttributeFunction>> = mapOf(),
+        val entity_types: Map<Identifier, EntityTypeData> = mapOf()
     )
     {
         companion object {
             val ENDEC = StructEndecBuilder.of(
-                Endec.map(Endecs.IDENTIFIER, AttributeOverride.ENDEC).fieldOf("overrides") { it.overrides },
-                Endec.map(Endecs.IDENTIFIER, AttributeFunction.ENDEC.listOf()).fieldOf("functions") { it.functions },
-                Endec.map(Endecs.IDENTIFIER, EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
+                Endecs.IDENTIFIER.keyOf(AttributeOverride.ENDEC).fieldOf("overrides") { it.overrides },
+                Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf()).fieldOf("functions") { it.functions },
+                Endecs.IDENTIFIER.keyOf(EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
                 ::Data
             )
         }
@@ -59,7 +63,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     companion object
     {
         /**
-         * Obtains an `EntityAttribute` from the [Registries.ATTRIBUTE] registry.
+         * Obtains an [EntityAttribute] from the [Registries.ATTRIBUTE] registry.
          * Will return `null` if the [Identifier] is not present.
          */
         fun getAttribute(identifier: Identifier): EntityAttribute? {
@@ -82,9 +86,9 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
      */
     fun updateData() {
         this.data = Data(
-            DataAttributes.OVERRIDES_CONFIG.overrides.toMutableMap(),
-            DataAttributes.FUNCTIONS_CONFIG.functions.data.toMutableMap(),
-            DataAttributes.ENTITY_TYPES_CONFIG.entity_types.toMutableMap()
+            DataAttributes.OVERRIDES_CONFIG.overrides,
+            DataAttributes.FUNCTIONS_CONFIG.functions.data,
+            DataAttributes.ENTITY_TYPES_CONFIG.entity_types
         )
         this.onDataUpdate()
     }
@@ -98,10 +102,16 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         this.updateFlag = packet.updateFlag
     }
 
-    fun nextUpdateFlag() {
-        this.updateFlag++
-    }
+    /**
+     * Increments to the next flag, usually signaling an update from the manager.
+     * @return [Int] The update flag's current value.
+     */
+    fun nextUpdateFlag() = this.updateFlag++
 
+    /**
+     * Gets an [AttributeContainer] based on the given [EntityType] and the provided [LivingEntity].
+     * Useful for constructing a container based on the handler's state.
+     */
     fun getContainer(type: EntityType<out LivingEntity>, entity: LivingEntity): AttributeContainer = this.handler.getContainer(type, entity)
 
     /** Whenever new [Data] is applied. */
@@ -130,15 +140,15 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
 
         for ((id, data) in entityAttributeData) {
-            data.override(getAttribute(id)!!) // was already asserted to exist in L: 127
+            data.override(getAttribute(id)!!) // was already asserted to exist in L: 124
         }
 
         for ((identifier, attributeData) in entityAttributeData) {
-            Registries.ATTRIBUTE[identifier]?.let(attributeData::copy)
+            attributeData.copy(Registries.ATTRIBUTE[identifier]!!) // was already asserted to exist in L: 124
         }
 
-        this.handler.buildContainers(this.data.entity_types, ENTITY_TYPE_INSTANCES)
+        this.handler.buildContainers(this.data.entity_types)
 
-        AttributesReloadedEvent.EVENT.invoker().onCompletedReload()
+        AttributesReloadedEvent.EVENT.invoker().onReloadCompleted()
     }
 }

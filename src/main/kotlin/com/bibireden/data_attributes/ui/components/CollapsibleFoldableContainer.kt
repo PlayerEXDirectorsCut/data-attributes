@@ -41,7 +41,9 @@ class CollapsibleFoldableContainer(horizontalSizing: Sizing, verticalSizing: Siz
         }
             .also { this.titleLayout().child(2, it) }
             .renderer(ButtonRenderers.STANDARD)
+            .zIndex(10)
             .verticalSizing(Sizing.fixed(10))
+            .horizontalSizing(Sizing.content())
             .id("collapsible_foldable.button")
     }
 }

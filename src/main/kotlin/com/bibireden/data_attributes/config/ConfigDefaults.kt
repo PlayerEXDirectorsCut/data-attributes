@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
+import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
@@ -21,21 +22,42 @@ object ConfigDefaults {
         MAX_HEALTH_ID to AttributeOverride(
             false,
             0.0,
-            1024.0,
+            1_000_000.0,
             0.0,
             1.0,
             1024.0
+        ),
+        GENERIC_ARMOR_ID to AttributeOverride(
+            false,
+            0.0,
+            1_000_000.0,
+            0.0,
+            1.0,
+            1024.0
+        ),
+        Registries.ATTRIBUTE[EntityAttributes.GENERIC_ARMOR_TOUGHNESS]!! to AttributeOverride(
+            false,
+            0.0,
+            1_000_000.0,
+            0.0,
+            1.0,
+            1024.0
+        ),
+        Registries.ATTRIBUTE[EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE]!! to AttributeOverride(
+            false,
+            0.0,
+            1_000_000.0,
+            0.0,
+            1.0,
+            1024.0,
+            StackingFormula.Diminished
         )
     )
 
     @JvmField
     val FUNCTIONS: AttributeFunctionConfig = AttributeFunctionConfig(mapOf(
         GENERIC_ARMOR_ID to listOf(
-            AttributeFunction(
-                MAX_HEALTH_ID,
-                StackingBehavior.Add,
-                1.0,
-            )
+            AttributeFunction(MAX_HEALTH_ID, StackingBehavior.Add, 1.0)
         )
     ))
 
