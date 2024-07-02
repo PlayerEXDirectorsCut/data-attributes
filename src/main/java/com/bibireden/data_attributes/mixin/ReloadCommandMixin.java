@@ -26,10 +26,10 @@ abstract class ReloadCommandMixin {
 	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.reloadConfigs();
 		// process new manager data from config(s) on server.
-		DataAttributes.SERVER_MANAGER.updateData();
-		DataAttributes.SERVER_MANAGER.nextUpdateFlag();
+		DataAttributes.MANAGER.update();
+		DataAttributes.MANAGER.nextUpdateFlag();
 
-		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.SERVER_MANAGER.toPacket());
+		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.MANAGER.toPacket());
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
 
 		DataAttributes.LOGGER.info(
@@ -37,7 +37,7 @@ abstract class ReloadCommandMixin {
 			DataAttributes.OVERRIDES_CONFIG.getOverrides().size(),
 			DataAttributes.FUNCTIONS_CONFIG.getFunctions().getData().size(),
 			DataAttributes.ENTITY_TYPES_CONFIG.getEntity_types().size(),
-			DataAttributes.SERVER_MANAGER.getUpdateFlag()
+			DataAttributes.MANAGER.getUpdateFlag()
 		);
 	}
 }

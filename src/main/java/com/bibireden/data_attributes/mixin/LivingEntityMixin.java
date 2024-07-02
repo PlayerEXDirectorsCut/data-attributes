@@ -35,9 +35,9 @@ abstract class LivingEntityMixin {
 	private void data_init(EntityType<? extends LivingEntity> entityType, World world, CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object)this;
         // Initializing the attributes container using DataAttributes
-		this.attributes = DataAttributes.SERVER_MANAGER.getContainer(entityType, livingEntity);
+		this.attributes = DataAttributes.MANAGER.getContainer(entityType, livingEntity);
         // Initializing the update flag
-		this.data_updateFlag = DataAttributes.SERVER_MANAGER.getUpdateFlag();
+		this.data_updateFlag = DataAttributes.MANAGER.getUpdateFlag();
         // Setting the entity's health to its maximum health
 		livingEntity.setHealth(livingEntity.getMaxHealth());
 	}
@@ -47,13 +47,13 @@ abstract class LivingEntityMixin {
 	private void data_tick(CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object)this;
 
-		final int updateFlag = DataAttributes.SERVER_MANAGER.getUpdateFlag();
+		final int updateFlag = DataAttributes.MANAGER.getUpdateFlag();
 		
 		if (this.data_updateFlag != updateFlag) {
 			AttributeContainer container = livingEntity.getAttributes();
 			
 			@SuppressWarnings("unchecked")
-			AttributeContainer container2 = DataAttributes.SERVER_MANAGER.getContainer((EntityType<? extends LivingEntity>) livingEntity.getType(), livingEntity);
+			AttributeContainer container2 = DataAttributes.MANAGER.getContainer((EntityType<? extends LivingEntity>) livingEntity.getType(), livingEntity);
             
 			container2.setFrom(container);
 			this.attributes = container2;

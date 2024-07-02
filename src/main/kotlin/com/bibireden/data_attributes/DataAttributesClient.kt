@@ -15,14 +15,14 @@ import java.util.concurrent.CompletableFuture
 
 class DataAttributesClient : ClientModInitializer {
     companion object {
-        @JvmField val CLIENT_MANAGER = AttributeConfigManager()
+        private val MANAGER = AttributeConfigManager()
 
         /** Whenever the client receives a sync packet from the server to update the world-state via. configuration. */
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {
             buf.retain()
             client.execute {
-                CLIENT_MANAGER.readPacket(AttributeConfigManager.Packet.ENDEC.decodeFully(ByteBufDeserializer::of, buf))
-                CLIENT_MANAGER.onDataUpdate()
+                MANAGER.readPacket(AttributeConfigManager.Packet.ENDEC.decodeFully(ByteBufDeserializer::of, buf))
+                MANAGER.onDataUpdate()
                 buf.release()
             }
         }

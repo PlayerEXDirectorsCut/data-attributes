@@ -31,7 +31,7 @@ class DataAttributes : ModInitializer {
 
         @JvmField val LOGGER: Logger = LogManager.getLogger()
 
-        @JvmField val SERVER_MANAGER = AttributeConfigManager()
+        @JvmField val MANAGER = AttributeConfigManager()
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
@@ -61,6 +61,7 @@ class DataAttributes : ModInitializer {
             }
         }
 
+        /** Creates an [Identifier] associated with the [MOD_ID]. */
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
         /** Reload all the data-attributes configs at once. */
@@ -89,9 +90,9 @@ class DataAttributes : ModInitializer {
     override fun onInitialize() {
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
-        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) SERVER_MANAGER.updateData() }
+        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) MANAGER.update() }
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
-            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
+            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket()))
         }
 
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, current, _, _ ->
