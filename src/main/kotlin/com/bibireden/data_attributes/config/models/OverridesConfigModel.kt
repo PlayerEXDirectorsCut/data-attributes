@@ -8,6 +8,7 @@ import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.*;
+import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
 @Suppress("UNUSED")
@@ -37,8 +38,8 @@ class OverridesConfigModel {
         var formula: StackingFormula = StackingFormula.Flat
     ) {
         /** Calls an override of an `MutableEntityAttribute`. */
-        fun override(mutableEntityAttribute: MutableEntityAttribute) {
-            mutableEntityAttribute.`data_attributes$override`(this)
+        fun override(attribute: EntityAttribute) {
+            (attribute as MutableEntityAttribute).`data_attributes$override`(this)
         }
 
         companion object {
@@ -46,14 +47,11 @@ class OverridesConfigModel {
             val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
                 Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
-                Endec.DOUBLE.optionalFieldOf("max", { it.max }, 1_000_000.0),
+                Endec.DOUBLE.optionalFieldOf("max", { it.max }, ConfigDefaults.MAX_DOUBLE),
                 Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("min_fallback", { it.min_fallback }, 0.0),
-                Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, 1_000_000.0),
-                Endec.STRING.xmap(
-                    { x -> if (x.uppercase() === "DIMINISHED") StackingFormula.Diminished else StackingFormula.Flat },
-                    { x -> x.name.uppercase() }
-                ).fieldOf("formula") { it.formula },
+                Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, ConfigDefaults.MAX_DOUBLE),
+                Endec.STRING.xmap(StackingFormula::of) { it.name }.fieldOf("formula") { it.formula },
                 OverridesConfigModel::AttributeOverride,
             )
         }

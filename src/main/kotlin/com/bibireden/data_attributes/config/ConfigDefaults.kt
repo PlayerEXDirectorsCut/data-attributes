@@ -14,6 +14,9 @@ import net.minecraft.util.Identifier
 private operator fun <T> Registry<T>.get(link: T) = this.getId(link)
 
 object ConfigDefaults {
+    /** The maximum value for every [Double] config value. */
+    const val MAX_DOUBLE = 1_000_000.0
+
     private val MAX_HEALTH_ID = Registries.ATTRIBUTE[EntityAttributes.GENERIC_MAX_HEALTH]!!
     private val GENERIC_ARMOR_ID = Registries.ATTRIBUTE[EntityAttributes.GENERIC_ARMOR]!!
 
@@ -22,7 +25,7 @@ object ConfigDefaults {
         MAX_HEALTH_ID to AttributeOverride(
             true,
             0.0,
-            1_000_000.0,
+            MAX_DOUBLE,
             0.0,
             1.0,
             1024.0
@@ -30,7 +33,7 @@ object ConfigDefaults {
         GENERIC_ARMOR_ID to AttributeOverride(
             true,
             0.0,
-            1_000_000.0,
+            MAX_DOUBLE,
             0.0,
             1.0,
             1024.0
@@ -38,7 +41,7 @@ object ConfigDefaults {
         Registries.ATTRIBUTE[EntityAttributes.GENERIC_ARMOR_TOUGHNESS]!! to AttributeOverride(
             true,
             0.0,
-            1_000_000.0,
+            MAX_DOUBLE,
             0.0,
             1.0,
             1024.0

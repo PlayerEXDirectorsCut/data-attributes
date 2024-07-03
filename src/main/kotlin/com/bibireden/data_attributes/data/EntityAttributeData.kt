@@ -34,7 +34,7 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
      * If there is none present, then no override will be done.
      */
     fun override(attribute: EntityAttribute) {
-        this.override?.override(attribute as MutableEntityAttribute)
+        this.override?.override(attribute)
     }
 
     /** Copies to a provided [EntityAttribute] by adding children to itself. */
