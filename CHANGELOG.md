@@ -1,3 +1,2 @@
-- Added more defaults to fit the original example(s).
-- Added more code docs
-- Updated dependencies
+## Changes ⚙️
+- Resolved issues with the implementation of the mod in terms of utilizing it in mods.

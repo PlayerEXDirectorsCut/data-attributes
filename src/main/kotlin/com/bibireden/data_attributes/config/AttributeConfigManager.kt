@@ -24,6 +24,9 @@ import net.minecraft.entity.passive.PassiveEntity
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
+/**
+ * Used to manage config data, and contains an [AttributeContainerHandler] to build related [EntityTypeData].
+ */
 class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler(), var updateFlag: Int = 0) {
     @JvmRecord
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
@@ -60,8 +63,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
     }
 
-    companion object
-    {
+    companion object {
         /**
          * Obtains an [EntityAttribute] from the [Registries.ATTRIBUTE] registry.
          * Will return `null` if the [Identifier] is not present.
@@ -81,10 +83,16 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     }
 
     /**
+     * Increments to the next flag, usually signaling an update from the manager.
+     * @return [Int] The update flag's current value.
+     */
+    fun nextUpdateFlag() = this.updateFlag++
+
+    /**
      * Updates the data with the latest from the provided config.
      * This applies the data immediately afterward.
      */
-    fun updateData() {
+    fun update() {
         this.data = Data(
             DataAttributes.OVERRIDES_CONFIG.overrides,
             DataAttributes.FUNCTIONS_CONFIG.functions.data,
@@ -101,12 +109,6 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         this.data = packet.data
         this.updateFlag = packet.updateFlag
     }
-
-    /**
-     * Increments to the next flag, usually signaling an update from the manager.
-     * @return [Int] The update flag's current value.
-     */
-    fun nextUpdateFlag() = this.updateFlag++
 
     /**
      * Gets an [AttributeContainer] based on the given [EntityType] and the provided [LivingEntity].

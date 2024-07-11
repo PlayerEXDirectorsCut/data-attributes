@@ -31,36 +31,38 @@ class DataAttributes : ModInitializer {
 
         @JvmField val LOGGER: Logger = LogManager.getLogger()
 
-        @JvmField val SERVER_MANAGER = AttributeConfigManager()
+        @JvmField val MANAGER = AttributeConfigManager()
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
         @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
-            builder.registerSerializer(AttributeFunctionConfig::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
+            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
                 val mapped = mutableMapOf<Identifier, List<AttributeFunction>>()
 
                 unmapped.forEach { (key, array) ->
-                    if (key !is String) return@forEach
-                    if (array !is JsonArray) return@forEach
-
-                    val listing = mutableListOf<AttributeFunction>()
-
-                    array.forEach { value -> listing.add(marshaller.marshall(AttributeFunction::class.java, value)) }
-
-                    mapped[Identifier(key)] = listing
+                    if (key !is String || array !is JsonArray) return@forEach
+                    val id = Identifier.tryParse(key)
+                    if (id != null) {
+                        mapped[id] = array.map { marshaller.marshall(AttributeFunction::class.java, it) }
+                    }
                 }
+
                 AttributeFunctionConfig(mapped)
             }
         }
         @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
             builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
-                EntityTypeData(des.map { (id, value) -> Identifier(id) to marshaller.marshall(Double::class.java, value) }.toMap().toMutableMap())
+                EntityTypeData(des.mapNotNull { (key, value) ->
+                    val id = Identifier.tryParse(key) ?: return@mapNotNull null
+                    id to marshaller.marshall(Double::class.java, value)
+                }.toMap())
             }
         }
 
+        /** Creates an [Identifier] associated with the [MOD_ID]. */
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
         /** Reload all the data-attributes configs at once. */
@@ -89,9 +91,9 @@ class DataAttributes : ModInitializer {
     override fun onInitialize() {
         ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
-        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) SERVER_MANAGER.updateData() }
+        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) MANAGER.update() }
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
-            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, SERVER_MANAGER.toPacket()))
+            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket()))
         }
 
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, current, _, _ ->
@@ -102,7 +104,7 @@ class DataAttributes : ModInitializer {
         EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
             if (entity?.world == null) return@register // no entity & no world, skip
 
-            if (entity.world.isClient == false) {
+            if (!entity.world.isClient) {
                 if (attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
                     entity.health = attribute.clamp(entity.health.toDouble()).toFloat()
                 }
