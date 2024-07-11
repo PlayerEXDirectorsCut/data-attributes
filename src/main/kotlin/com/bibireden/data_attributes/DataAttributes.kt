@@ -104,7 +104,7 @@ class DataAttributes : ModInitializer {
         EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
             if (entity?.world == null) return@register // no entity & no world, skip
 
-            if (entity.world.isClient == false) {
+            if (!entity.world.isClient) {
                 if (attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
                     entity.health = attribute.clamp(entity.health.toDouble()).toFloat()
                 }
