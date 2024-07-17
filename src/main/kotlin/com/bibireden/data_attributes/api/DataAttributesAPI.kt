@@ -5,14 +5,13 @@ import net.minecraft.entity.attribute.EntityAttribute
 import java.util.*
 
 object DataAttributesAPI {
+    @JvmStatic
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity].
      * Certain requirements must be met in order for the value to be present:
      *
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
-     *
-     * The returned [Optional] provides more versatility.
      */
     fun getValue(attribute: EntityAttribute, entity: LivingEntity): Optional<Double> {
         val container = entity.attributes
@@ -25,14 +24,13 @@ object DataAttributesAPI {
         }
     }
 
+    @JvmStatic
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity] based on a supplier implementation.
      * Certain requirements must be met in order for the value to be present:
      *
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
-     *
-     * The returned [Optional] provides more versatility.
      */
     fun getValue(supplier: () -> EntityAttribute?, entity: LivingEntity): Optional<Double> {
         val container = entity.attributes
