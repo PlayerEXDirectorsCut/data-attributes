@@ -26,7 +26,7 @@ object ConfigDefaults {
             true,
             0.0,
             MAX_DOUBLE,
-            0.0,
+            0.001,
             1.0,
             1024.0
         ),
@@ -34,7 +34,7 @@ object ConfigDefaults {
             true,
             0.0,
             MAX_DOUBLE,
-            0.0,
+            0.001,
             1.0,
             1024.0
         ),
@@ -42,7 +42,7 @@ object ConfigDefaults {
             true,
             0.0,
             MAX_DOUBLE,
-            0.0,
+            0.001,
             1.0,
             1024.0
         ),
@@ -50,7 +50,7 @@ object ConfigDefaults {
             true,
             0.0,
             1.0,
-            0.0,
+            0.001,
             0.0,
             1.0,
             StackingFormula.Diminished

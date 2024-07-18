@@ -35,7 +35,7 @@ class DataAttributes : ModInitializer {
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
-        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
+        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad( { builder ->
             builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
                 val unmapped = marshaller.marshall(Map::class.java, obj)
@@ -51,7 +51,7 @@ class DataAttributes : ModInitializer {
 
                 AttributeFunctionConfig(mapped)
             }
-        }
+        })
         @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
             builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
