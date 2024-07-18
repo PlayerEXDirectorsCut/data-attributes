@@ -8,5 +8,5 @@ package com.bibireden.data_attributes.api.attribute;
  */
 @FunctionalInterface
 public interface StackingFunction {
-	double result(final double k, final double k2, final double v, final double v2, final double i);
+	double result(final double k, final double k2, final double v, final double v2, final double s);
 }

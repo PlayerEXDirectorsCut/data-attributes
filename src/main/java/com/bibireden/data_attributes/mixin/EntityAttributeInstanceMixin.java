@@ -151,12 +151,6 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			});
 		}
 
-
-		if (formula == StackingFormula.Diminished) {
-			e.set(e.get() * (attribute.data_attributes$max() - attribute.data_attributes$min()));
-			e.set(e.get() + attribute.data_attributes$min());
-		}
-
         return ((EntityAttribute) attribute).clamp(e.get());
 	}
 

@@ -52,8 +52,8 @@ public enum StackingFormula {
 		return current + Math.abs(value);
 	}
 	
-	public double result(final double k, final double k2, final double v, final double v2, final double increment) {
-		return this.stack.result(k, k2, v, v2, increment);
+	public double result(final double k, final double k2, final double v, final double v2, final double smoothness) {
+		return this.stack.result(k, k2, v, v2, smoothness);
 	}
 	
 	@Override
