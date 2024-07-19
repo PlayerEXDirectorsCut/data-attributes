@@ -51,7 +51,7 @@ class OverridesConfigModel {
                 Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.01),
                 Endec.DOUBLE.optionalFieldOf("min_fallback", { it.min_fallback }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, ConfigDefaults.MAX_DOUBLE),
-                Endec.STRING.xmap(StackingFormula::of) { it.name }.fieldOf("formula") { it.formula },
+                StackingFormula.ENDEC.fieldOf("formula") { it.formula },
                 OverridesConfigModel::AttributeOverride,
             )
         }

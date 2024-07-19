@@ -129,6 +129,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			});
 		}
 
+
 		double d = attribute.data_attributes$sum(k.get(), k2, v.get(), v2);
 		AtomicReference<Double> e = new AtomicReference<>(d);
 

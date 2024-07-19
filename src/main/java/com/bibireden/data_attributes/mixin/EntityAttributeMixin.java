@@ -100,7 +100,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Override
     public double data_attributes$sum(final double k, final double k2, final double v, final double v2) {
-        return this.data_formula.result(k, k2, v, v2, this.data_smoothness);
+        return this.data_formula.result(k, k2, v, v2, this);
     }
 
     @Override
