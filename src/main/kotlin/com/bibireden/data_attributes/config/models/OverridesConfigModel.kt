@@ -29,7 +29,7 @@ class OverridesConfigModel {
         @JvmField
         var max: Double = 1000.0,
         @JvmField
-        var smoothness: Double = 0.0,
+        var smoothness: Double = 0.01,
         @JvmField
         var min_fallback: Double = 0.0,
         @JvmField
@@ -48,10 +48,10 @@ class OverridesConfigModel {
                 Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max", { it.max }, ConfigDefaults.MAX_DOUBLE),
-                Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.0),
+                Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.01),
                 Endec.DOUBLE.optionalFieldOf("min_fallback", { it.min_fallback }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, ConfigDefaults.MAX_DOUBLE),
-                Endec.STRING.xmap(StackingFormula::of) { it.name }.fieldOf("formula") { it.formula },
+                StackingFormula.ENDEC.fieldOf("formula") { it.formula },
                 OverridesConfigModel::AttributeOverride,
             )
         }

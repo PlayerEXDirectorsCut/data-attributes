@@ -21,16 +21,9 @@ abstract class LivingEntityMixin {
 	@Shadow
 	private AttributeContainer attributes;
 
-	@Shadow @Final private static TrackedData<Float> HEALTH;
-
-	@Shadow public abstract float getHealth();
-
-	@Shadow public abstract float getMaxHealth();
-
 	@Unique
 	private int data_updateFlag;
 
-	@SuppressWarnings("ALL") // todo: until intellij updates
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(EntityType<? extends LivingEntity> entityType, World world, CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object)this;
@@ -42,7 +35,6 @@ abstract class LivingEntityMixin {
 		livingEntity.setHealth(livingEntity.getMaxHealth());
 	}
 	
-	@SuppressWarnings("ALL") // todo: until intellij updates
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tickActiveItemStack()V"))
 	private void data_tick(CallbackInfo ci) {
 		LivingEntity livingEntity = (LivingEntity)(Object)this;

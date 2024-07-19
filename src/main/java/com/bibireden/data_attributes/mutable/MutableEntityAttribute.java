@@ -35,7 +35,10 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     /** Clears all properties and relationships of the entity attribute. */
     void data_attributes$clear();
 
-    /** Calculates the sum based on the {@link StackingFormula}. */
+    /** Calculates the sum based on the {@link StackingFormula}.
+     * By including a secondary pair of variables,
+     * it allows for the modeling of more complex scenarios, such as negative modifiers.
+     */
     double data_attributes$sum(final double k, final double k2, final double v, final double v2);
 
     /** Returns a mutable map of parent entity attributes with associated functions. */

@@ -126,8 +126,10 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         hf.child(
                             Components.discreteSlider(Sizing.fill(30), 0.01, 100.0).value(override.smoothness).also { slider ->
                                 slider.onChanged().subscribe {
+                                    var smoothness = slider.value().round(2)
+                                    if (smoothness <= 0.0) {smoothness = 0.01}
                                     this.backing.remove(id)
-                                    this.backing.put(id, override.copy(smoothness = slider.value().round(2)))
+                                    this.backing.put(id, override.copy(smoothness = smoothness))
                                 }
                             }
                                 .positioning(Positioning.relative(100, 0))

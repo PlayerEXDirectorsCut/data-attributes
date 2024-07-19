@@ -129,6 +129,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			});
 		}
 
+
 		double d = attribute.data_attributes$sum(k.get(), k2, v.get(), v2);
 		AtomicReference<Double> e = new AtomicReference<>(d);
 
@@ -149,12 +150,6 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 				e.set(e.get() * (1.0D + (parentInstance.getValue() * function.value())));
 			});
-		}
-
-
-		if (formula == StackingFormula.Diminished) {
-			e.set(e.get() * (attribute.data_attributes$max() - attribute.data_attributes$min()));
-			e.set(e.get() + attribute.data_attributes$min());
 		}
 
         return ((EntityAttribute) attribute).clamp(e.get());

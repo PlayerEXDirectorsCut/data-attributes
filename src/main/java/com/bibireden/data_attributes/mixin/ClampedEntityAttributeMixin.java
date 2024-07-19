@@ -56,6 +56,9 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	}
 
 	@Override
+	public double data_attributes$smoothness() { return this.data_smoothness; }
+
+	@Override
 	public double data_attributes$min_fallback() {
 		return this.minValue;
 	}
