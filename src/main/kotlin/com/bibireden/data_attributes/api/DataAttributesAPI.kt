@@ -3,6 +3,7 @@ package com.bibireden.data_attributes.api
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import java.util.*
+import java.util.function.Supplier
 
 object DataAttributesAPI {
     @JvmStatic
@@ -32,9 +33,9 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
-    fun getValue(supplier: () -> EntityAttribute?, entity: LivingEntity): Optional<Double> {
+    fun getValue(supplier: Supplier<EntityAttribute?>, entity: LivingEntity): Optional<Double> {
         val container = entity.attributes
-        val attribute = supplier()
+        val attribute = supplier.get()
 
         return if (attribute != null && container.hasAttribute(attribute)) {
             Optional.of(container.getValue(attribute))
