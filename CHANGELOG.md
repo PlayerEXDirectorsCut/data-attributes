@@ -1,4 +1,5 @@
 ## Additions 💫
-- Diminishing setting should be implemented. It works somewhat differently compared to the wiki, so it will require documentation which will be supplimented in the future.
-  - To use Diminishing behavior, click on the **Flat** button to toggle between Diminishing behavior for an attribute.
-    - Adjust the smoothness (previously increment value) to your liking.
+- Added the `DefaultAttributeFactory`, which can be used in mods to add extra defaults to the config.
+  - Currently, it is limited to hard-code, 
+- Added `EntityAttributeSupplier` to the mod again.
+  - Its purpose is just to be a wrapper on lazily evaluated `EntityAttribute` values.
