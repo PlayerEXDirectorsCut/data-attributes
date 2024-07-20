@@ -32,7 +32,10 @@ object DefaultAttributeFactory {
     /** Registers default [EntityTypeData]'s to the config if they are not present currently within the config. */
     fun registerEntityTypes(entityTypes: Map<Identifier, EntityTypeData>) {
         val current = DataAttributes.ENTITY_TYPES_CONFIG.entity_types.toMutableMap()
-        entityTypes.forEach { (id, types) -> current.computeIfAbsent(id) { types } }
+        entityTypes.forEach { (id, types) ->
+            current.computeIfAbsent(id) { types }
+            current[id]!!.data.toMutableMap().putAll(types.data)
+        }
         DataAttributes.ENTITY_TYPES_CONFIG.entity_types = current
         DataAttributes.ENTITY_TYPES_CONFIG.save()
     }
