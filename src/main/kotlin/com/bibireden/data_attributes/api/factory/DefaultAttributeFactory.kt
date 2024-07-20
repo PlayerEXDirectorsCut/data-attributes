@@ -24,7 +24,11 @@ object DefaultAttributeFactory {
     /** Registers default [AttributeFunction]'s to the config if they are not present currently within the config. */
     fun registerFunctions(functions: Map<Identifier, List<AttributeFunction>>) {
         val current = DataAttributes.FUNCTIONS_CONFIG.functions.data.toMutableMap()
-        functions.forEach { (id, af) -> current.computeIfAbsent(id) { af } }
+        for ((id, af) in functions) {
+            val currentFunctions = current.getOrPut(id) { listOf() }.toMutableList()
+            currentFunctions.addAll(af)
+            current[id] = currentFunctions
+        }
         DataAttributes.FUNCTIONS_CONFIG.functions.data = current
         DataAttributes.FUNCTIONS_CONFIG.save()
     }
@@ -32,9 +36,10 @@ object DefaultAttributeFactory {
     /** Registers default [EntityTypeData]'s to the config if they are not present currently within the config. */
     fun registerEntityTypes(entityTypes: Map<Identifier, EntityTypeData>) {
         val current = DataAttributes.ENTITY_TYPES_CONFIG.entity_types.toMutableMap()
-        entityTypes.forEach { (id, types) ->
-            current.computeIfAbsent(id) { types }
-            current[id]!!.data.toMutableMap().putAll(types.data)
+        for ((id, type) in entityTypes) {
+            val types = current.getOrPut(id) { EntityTypeData() }.data.toMutableMap()
+            types.putAll(type.data)
+            current[id] = EntityTypeData(types)
         }
         DataAttributes.ENTITY_TYPES_CONFIG.entity_types = current
         DataAttributes.ENTITY_TYPES_CONFIG.save()
