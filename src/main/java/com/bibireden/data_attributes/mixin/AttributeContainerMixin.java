@@ -49,8 +49,6 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Shadow
 	private void updateTrackedStatus(EntityAttributeInstance instance) {}
 
-	@Shadow @Final private Map<EntityAttribute, EntityAttributeInstance> custom;
-
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
 		Identifier identifier = ((MutableAttributeInstance) instance).data_attributes$get_id();
@@ -137,7 +135,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		ci.cancel();
 	}
 
-	@SuppressWarnings("all") // todo: temp until intellij update
+	@SuppressWarnings("UnreachableCode")
 	@Inject(method = "setFrom", at = @At("HEAD"), cancellable = true)
 	private void data_setFrom(AttributeContainer other, CallbackInfo ci) {
 		AttributeContainer container = (AttributeContainer) (Object) this;

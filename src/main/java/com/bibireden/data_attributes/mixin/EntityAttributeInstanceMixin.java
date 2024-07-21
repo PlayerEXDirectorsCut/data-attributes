@@ -66,6 +66,8 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 	@Shadow public abstract EntityAttribute getAttribute();
 
+	@Shadow public abstract void setBaseValue(double baseValue);
+
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
 		this.data_identifier = Registries.ATTRIBUTE.getId(type);

@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.api.attribute
 
 import io.wispforest.endec.Endec
+import net.minecraft.util.math.MathHelper
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -17,7 +18,7 @@ enum class StackingFormula(val function: (k: Double, k2: Double, v: Double, v2: 
         val v = v / 100
         val v2 = v2 / 100
 
-        val s = attribute.`data_attributes$smoothness`()
+        val s = MathHelper.clamp(attribute.`data_attributes$smoothness`(), 0.01, 1.0)
 
         val result1 = (1.0 - v2)
         val result2 = (1.0 - s).pow((v - v2) / s)

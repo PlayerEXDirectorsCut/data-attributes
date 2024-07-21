@@ -24,7 +24,6 @@ import io.wispforest.owo.ui.event.MouseDown
 import io.wispforest.owo.ui.event.MouseEnter
 import io.wispforest.owo.ui.event.MouseLeave
 import io.wispforest.owo.ui.util.UISounds
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.resource.language.I18n
