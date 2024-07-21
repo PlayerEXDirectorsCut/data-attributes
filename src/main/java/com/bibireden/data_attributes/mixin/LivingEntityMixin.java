@@ -26,8 +26,11 @@ abstract class LivingEntityMixin {
 	@Unique
 	private int data_attributes$update_flag;
 
+	@SuppressWarnings("UnreachableCode")
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(EntityType<? extends LivingEntity> entityType, World world, CallbackInfo ci) {
+		LivingEntity entity = (LivingEntity)(Object)this;
+		this.attributes = DataAttributes.MANAGER.getContainer(entityType, entity);
 		this.data_attributes$update_flag = DataAttributes.MANAGER.getUpdateFlag();
 	}
 
