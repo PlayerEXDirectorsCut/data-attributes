@@ -21,6 +21,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger

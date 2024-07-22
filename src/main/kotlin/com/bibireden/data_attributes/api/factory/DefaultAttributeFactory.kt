@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier
  * Ensure that it is not done through static initialization, the config is not guaranteed to exist at that time. Instead, register afterward, such as on **mod initialization**.
  */
 object DefaultAttributeFactory {
+    @JvmStatic
     /** Registers default [AttributeOverride]'s to the config if they are not present currently within the config. */
     fun registerOverrides(overrides: Map<Identifier, AttributeOverride>) {
         val current = DataAttributes.OVERRIDES_CONFIG.overrides.toMutableMap()
@@ -21,24 +22,34 @@ object DefaultAttributeFactory {
         DataAttributes.OVERRIDES_CONFIG.save()
     }
 
+    @JvmStatic
     /** Registers default [AttributeFunction]'s to the config if they are not present currently within the config. */
     fun registerFunctions(functions: Map<Identifier, List<AttributeFunction>>) {
-        val current = DataAttributes.FUNCTIONS_CONFIG.functions.data.toMutableMap()
+        val config = DataAttributes.FUNCTIONS_CONFIG
+        val current = config.functions.data.toMutableMap()
         for ((id, af) in functions) {
             val currentFunctions = current.getOrPut(id) { listOf() }.toMutableList()
-            currentFunctions.addAll(af)
+            // I made my own bed, now I have to sit in it for a bit...
+            af.forEach {
+                if (current[id]?.find { existing -> existing.id == it.id } == null) {
+                    currentFunctions.add(it)
+                }
+            }
             current[id] = currentFunctions
         }
         DataAttributes.FUNCTIONS_CONFIG.functions.data = current
         DataAttributes.FUNCTIONS_CONFIG.save()
     }
 
+    @JvmStatic
     /** Registers default [EntityTypeData]'s to the config if they are not present currently within the config. */
     fun registerEntityTypes(entityTypes: Map<Identifier, EntityTypeData>) {
         val current = DataAttributes.ENTITY_TYPES_CONFIG.entity_types.toMutableMap()
         for ((id, type) in entityTypes) {
             val types = current.getOrPut(id) { EntityTypeData() }.data.toMutableMap()
-            types.putAll(type.data)
+            type.data.forEach { (typeID, value) ->
+                if (!types.contains(typeID)) types[typeID] = value
+            }
             current[id] = EntityTypeData(types)
         }
         DataAttributes.ENTITY_TYPES_CONFIG.entity_types = current
