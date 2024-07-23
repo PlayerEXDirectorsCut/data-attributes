@@ -30,23 +30,23 @@ abstract class LivingEntityMixin {
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(EntityType<? extends LivingEntity> entityType, World world, CallbackInfo ci) {
 		LivingEntity entity = (LivingEntity)(Object)this;
-		this.attributes = DataAttributes.MANAGER.getContainer(entityType, entity);
-		this.data_attributes$update_flag = DataAttributes.MANAGER.getUpdateFlag();
+		this.attributes = DataAttributes.getManagerFromWorld(entity.getWorld()).getContainer(entityType, entity);
+		this.data_attributes$update_flag = DataAttributes.getManagerFromWorld(entity.getWorld()).getUpdateFlag();
 	}
 
 	@SuppressWarnings("UnreachableCode")
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;tickActiveItemStack()V"))
 	private void data_attributes$tick(CallbackInfo ci) {
-		AttributeConfigManager manager = DataAttributesClient.MANAGER;
+		LivingEntity entity = ((LivingEntity) (Object) this);
+		AttributeConfigManager manager = DataAttributes.getManagerFromWorld(entity.getWorld());
 		final int updateFlag = manager.getUpdateFlag();
 
 		if (this.data_attributes$update_flag != updateFlag) {
 			this.data_attributes$update_flag = updateFlag;
 
-			LivingEntity entity = ((LivingEntity) (Object) this);
-
 			@SuppressWarnings("unchecked")
-			AttributeContainer handledContainer = DataAttributes.MANAGER.getContainer((EntityType<? extends LivingEntity>) entity.getType(), entity);
+			AttributeContainer handledContainer = DataAttributes.getManagerFromWorld(entity.getWorld()).getContainer((EntityType<? extends LivingEntity>) entity.getType(), entity);
+
 			handledContainer.setFrom(this.getAttributes());
 			this.attributes = handledContainer;
 

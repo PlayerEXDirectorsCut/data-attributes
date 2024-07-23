@@ -23,6 +23,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
+import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -65,6 +66,10 @@ class DataAttributes : ModInitializer {
 
         /** Creates an [Identifier] associated with the [MOD_ID]. */
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
+
+        /** Acquires the proper manager based on the world. */
+        @JvmStatic
+        fun getManagerFromWorld(world: World) = if (world.isClient) DataAttributesClient.MANAGER else MANAGER
 
         /** Reload all the data-attributes configs at once. */
         @JvmStatic
