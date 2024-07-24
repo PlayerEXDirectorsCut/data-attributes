@@ -24,7 +24,7 @@ abstract class EntityTrackerEntryMixin {
 	private Entity entity;
 
 	@WrapOperation(method = "syncEntityData", at = @At(value = "INVOKE", target = "Ljava/util/Set;clear()V"))
-	private void data_syncEntityData(Set<EntityAttributeInstance> instances, Operation<Void> original) {
+	private void data_attributes$syncEntityData(Set<EntityAttributeInstance> instances, Operation<Void> original) {
 		MutableAttributeContainer container = (MutableAttributeContainer) ((LivingEntity) this.entity).getAttributes();
 		container.data_attributes$clearTracked();
 		original.call(instances);

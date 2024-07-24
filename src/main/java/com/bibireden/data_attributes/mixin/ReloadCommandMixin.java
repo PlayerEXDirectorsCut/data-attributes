@@ -23,9 +23,9 @@ import net.minecraft.server.command.ServerCommandSource;
 @Mixin(ReloadCommand.class)
 abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
-	private static void data_tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
+	private static void data_attributes$tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.reloadConfigs();
-		// process new manager data from config(s) on server.
+		
 		DataAttributes.MANAGER.update();
 		DataAttributes.MANAGER.nextUpdateFlag();
 

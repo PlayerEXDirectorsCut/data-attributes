@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,12 +36,11 @@ import net.minecraft.registry.Registries;
 
 @Mixin(EntityAttributeInstance.class)
 abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance, IEntityAttributeInstance {
+	@Unique
+	private AttributeContainer data_attributes$container;
 
 	@Unique
-	private AttributeContainer data_containerCallback;
-
-	@Unique
-	private Identifier data_identifier;
+	private Identifier data_attributes$id;
 
 	@Final
 	@Shadow
@@ -66,16 +66,18 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 	@Shadow public abstract EntityAttribute getAttribute();
 
-	@Shadow public abstract void setBaseValue(double baseValue);
+	@Shadow public abstract Set<EntityAttributeModifier> getModifiers(EntityAttributeModifier.Operation operation);
+
+	@Shadow @Nullable public abstract EntityAttributeModifier getModifier(UUID uuid);
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void data_init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
-		this.data_identifier = Registries.ATTRIBUTE.getId(type);
+	private void data_attributes$init(EntityAttribute type, Consumer<EntityAttributeInstance> updateCallback, CallbackInfo ci) {
+		this.data_attributes$id = Registries.ATTRIBUTE.getId(type);
 	}
 
 	@ModifyReturnValue(method = "getAttribute", at = @At("RETURN"))
-	private EntityAttribute data_getAttribute(EntityAttribute original) {
-		EntityAttribute attribute = Registries.ATTRIBUTE.get(this.data_identifier);
+	private EntityAttribute data_attributes$getAttribute(EntityAttribute original) {
+		EntityAttribute attribute = Registries.ATTRIBUTE.get(this.data_attributes$id);
 		return attribute != null ? attribute : original;
 	}
 
@@ -85,7 +87,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		StackingFormula formula = attribute.data_attributes$formula();
 
 		// If the formula is set to Flat and there is no associated container, provide original.
-		if (formula == StackingFormula.Flat && this.data_containerCallback == null) return original;
+		if (formula == StackingFormula.Flat && this.data_attributes$container == null) return original;
 
 		AtomicReference<Double> k = new AtomicReference<>(0.0D);
 		AtomicReference<Double> v = new AtomicReference<>(0.0D);
@@ -113,11 +115,11 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			}
 		}
 
-		if (this.data_containerCallback != null) {
+		if (this.data_attributes$container != null) {
 			attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
 				if (function.behavior() != StackingBehavior.Add) return;
 
-				EntityAttributeInstance parentInstance = this.data_containerCallback.getCustomInstance((EntityAttribute) parentAttribute);
+				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
 
 				double multiplier = function.value();
@@ -143,11 +145,11 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			e.set(e.get() * (1.0D + modifier.getValue()));
 		}
 
-		if (this.data_containerCallback != null) {
+		if (this.data_attributes$container != null) {
             attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
 				if (function.behavior() != StackingBehavior.Multiply) return;
 
-				EntityAttributeInstance parentInstance = this.data_containerCallback.getCustomInstance((EntityAttribute) parentAttribute);
+				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
 
 				e.set(e.get() * (1.0D + (parentInstance.getValue() * function.value())));
@@ -158,18 +160,20 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@Inject(method = "addModifier", at = @At("HEAD"), cancellable = true)
-	private void data_addModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
+	private void data_attributes$addModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
 		EntityAttributeInstance instance = (EntityAttributeInstance) (Object) this;
 		UUID key = modifier.getId();
-		EntityAttributeModifier entityAttributeModifier = (EntityAttributeModifier) this.idToModifiers.get(key);
+		EntityAttributeModifier entityAttributeModifier = this.idToModifiers.get(key);
 
 		if (entityAttributeModifier != null) {
 			throw new IllegalArgumentException("Modifier is already applied on this attribute!");
 		} else {
-			this.data_attributes$actionModifier(() -> {
-				this.idToModifiers.put(key, modifier);
-				instance.getModifiers(modifier.getOperation()).add(modifier);
-			}, instance, modifier, true);
+			this.data_attributes$actionModifier(
+				() -> {
+					this.idToModifiers.put(key, modifier);
+					instance.getModifiers(modifier.getOperation()).add(modifier);
+				}, instance, modifier, true
+			);
 		}
 
 		ci.cancel();
@@ -177,43 +181,40 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 	@Inject(method = "removeModifier(Lnet/minecraft/entity/attribute/EntityAttributeModifier;)V", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$removeModifier(EntityAttributeModifier modifier, CallbackInfo ci) {
-		EntityAttributeInstance instance = (EntityAttributeInstance) (Object) this;
-
-		this.data_attributes$actionModifier(() -> {
-			instance.getModifiers(modifier.getOperation()).remove(modifier);
-			this.idToModifiers.remove(modifier.getId());
-			this.persistentModifiers.remove(modifier);
-		}, instance, modifier, false);
+		this.data_attributes$actionModifier(
+			() -> {
+				this.getModifiers(modifier.getOperation()).remove(modifier);
+				this.idToModifiers.remove(modifier.getId());
+				this.persistentModifiers.remove(modifier);
+			},
+			(EntityAttributeInstance) (Object) this,
+			modifier,
+			false
+		);
 
 		ci.cancel();
 	}
 
 	@ModifyExpressionValue(method = "toNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;"))
 	private Identifier data_attributes$toNbt(Identifier id) {
-		if (this.data_identifier == null)
-			return Registries.ATTRIBUTE.getId(this.type);
-		return this.data_identifier;
+		return this.data_attributes$id == null ? Registries.ATTRIBUTE.getId(this.type) : this.data_attributes$id;
 	}
 
 	@Override
 	public Identifier data_attributes$get_id() {
-		return this.data_identifier;
+		return this.data_attributes$id;
 	}
 
 	@Override
 	public void data_attributes$actionModifier(final VoidConsumer consumerIn, final EntityAttributeInstance instanceIn, final EntityAttributeModifier modifierIn, final boolean isWasAdded) {
-		EntityAttribute entityAttribute = ((EntityAttributeInstance) (Object) this).getAttribute();
-		MutableEntityAttribute parent = (MutableEntityAttribute) entityAttribute;
+		if (this.data_attributes$container == null) return;
 
-		if (this.data_containerCallback == null)
-			return;
-		for (IEntityAttribute child : parent.data_attributes$childrenMutable().keySet()) {
-			EntityAttribute attribute = (EntityAttribute) child;
-			EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance(attribute);
+		EntityAttribute parentAttribute = this.getAttribute();
+		MutableEntityAttribute mutableParentAttribute = (MutableEntityAttribute) this.getAttribute();
 
-			if (instance != null) {
-				instance.getValue();
-			}
+		for (IEntityAttribute child : mutableParentAttribute.data_attributes$childrenMutable().keySet()) {
+			EntityAttributeInstance instance = this.data_attributes$container.getCustomInstance((EntityAttribute) child);
+			if (instance != null) instance.getValue();
 		}
 
 		final double value = instanceIn.getValue();
@@ -222,46 +223,36 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		this.onUpdate();
 
-		LivingEntity livingEntity = ((MutableAttributeContainer) this.data_containerCallback).data_attributes$getLivingEntity();
+		LivingEntity livingEntity = ((MutableAttributeContainer) this.data_attributes$container).data_attributes$getLivingEntity();
 
-		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(entityAttribute, livingEntity, modifierIn, value, isWasAdded);
+		EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(parentAttribute, livingEntity, modifierIn, value, isWasAdded);
 
-		for (IEntityAttribute child : parent.data_attributes$childrenMutable().keySet()) {
-			EntityAttribute attribute = (EntityAttribute) child;
-			EntityAttributeInstance instance = this.data_containerCallback.getCustomInstance(attribute);
-
+		for (IEntityAttribute child : mutableParentAttribute.data_attributes$childrenMutable().keySet()) {
+			EntityAttributeInstance instance = this.data_attributes$container.getCustomInstance((EntityAttribute) child);
 			if (instance != null) {
-				((MutableAttributeInstance) instance).data_attributes$actionModifier(() -> {
-				}, instance, modifierIn, isWasAdded);
+				((MutableAttributeInstance) instance).data_attributes$actionModifier(() -> {}, instance, modifierIn, isWasAdded);
 			}
 		}
 	}
 
 	@Override
 	public void data_attributes$setContainerCallback(final AttributeContainer containerIn) {
-		this.data_containerCallback = containerIn;
+		this.data_attributes$container = containerIn;
 	}
 
 	@Override
 	public void data_attributes$updateId(final Identifier identifierIn) {
-		this.data_identifier = identifierIn;
+		this.data_attributes$id = identifierIn;
 	}
 
 	@Override
 	public void updateModifier(final UUID uuid, final double value) {
-		EntityAttributeInstance instance = (EntityAttributeInstance) (Object) this;
-		EntityAttributeModifier modifier = instance.getModifier(uuid);
+		EntityAttributeModifier modifier = this.getModifier(uuid);
+		if (modifier == null) return;
 
-		if (modifier == null)
-			return;
-
-		this.data_attributes$actionModifier(() -> {
-			((MutableAttributeModifier) modifier).data_attributes$updateValue(value);
-		}, instance, modifier, false);
+		this.data_attributes$actionModifier(() -> ((MutableAttributeModifier) modifier).data_attributes$updateValue(value), (EntityAttributeInstance) (Object) this, modifier, false);
 	}
 
 	@Override
-	public void data_attributes$refresh() {
-		this.onUpdate();
-	}
+	public void data_attributes$refresh() { this.onUpdate(); }
 }

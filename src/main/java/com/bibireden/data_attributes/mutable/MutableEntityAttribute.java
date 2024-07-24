@@ -27,10 +27,10 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     void data_attributes$override(OverridesConfigModel.AttributeOverride override);
 
     /** Adds a parent attribute with a function. */
-    void data_attributes$addParent(MutableEntityAttribute attributeIn, final AttributeFunction function);
+    void data_attributes$addParent(MutableEntityAttribute attribute, final AttributeFunction function);
 
     /** Adds a child attribute with a function. */
-    void data_attributes$addChild(MutableEntityAttribute attributeIn, final AttributeFunction function);
+    void data_attributes$addChild(MutableEntityAttribute attribute, final AttributeFunction function);
 
     /** Clears all properties and relationships of the entity attribute. */
     void data_attributes$clear();

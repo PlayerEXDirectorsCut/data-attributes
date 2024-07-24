@@ -18,24 +18,24 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 @Mixin(EntityAttributeModifier.class)
 abstract class EntityAttributeModifierMixin implements MutableAttributeModifier {
     @Unique
-    private double data_value;
+    private double data_attributes$value;
 
     @Inject(method = "<init>(Ljava/util/UUID;Ljava/util/function/Supplier;DLnet/minecraft/entity/attribute/EntityAttributeModifier$Operation;)V", at = @At("TAIL"))
     private void init(UUID uuid, Supplier<String> nameGetter, double value, EntityAttributeModifier.Operation operation, CallbackInfo ci) {
-        this.data_value = value;
+        this.data_attributes$value = value;
     }
 
     @ModifyReturnValue(method = "getValue", at = @At("RETURN"))
-    private double data_attributes$getValue(double original) { return this.data_value; }
+    private double data_attributes$getValue(double original) { return this.data_attributes$value; }
 
     @ModifyExpressionValue(method = "toString", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D"))
-    private double data_attributes$toString(double original) { return this.data_value; }
+    private double data_attributes$toString(double original) { return this.data_attributes$value; }
 
     @ModifyExpressionValue(method = "toNbt", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/attribute/EntityAttributeModifier;value:D"))
-    private double data_attributes$toNbt(double original) { return this.data_value; }
+    private double data_attributes$toNbt(double original) { return this.data_attributes$value; }
 
     @Override
     public void data_attributes$updateValue(double value) {
-        this.data_value = value;
+        this.data_attributes$value = value;
     }
 }

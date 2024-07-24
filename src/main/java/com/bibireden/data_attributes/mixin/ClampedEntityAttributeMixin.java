@@ -26,37 +26,26 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
-		this.data_attributes$override(new OverridesConfigModel.AttributeOverride(false, minValue, maxValue, min, max, 0.0D, StackingFormula.Flat));
+		this.data_attributes$override(new OverridesConfigModel.AttributeOverride(false, minValue, maxValue, min, max, 0.0, StackingFormula.Flat));
 	}
 
 	@ModifyReturnValue(method = "getMinValue", at = @At("RETURN"))
 	private double data_attributes$getMin(double original) {
-		if (this.data_enabled) {
-			return this.data_attributes$min();
-		}
-
-		return original;
+		return this.data_attributes$enabled ? this.data_attributes$min() : original;
 	}
 
 	@ModifyReturnValue(method = "getMaxValue", at = @At("RETURN"))
 	private double data_attributes$getMax(double original) {
-		if (this.data_enabled) {
-			return this.data_attributes$max();
-		}
-
-		return original;
+		return this.data_attributes$enabled ? this.data_attributes$max() : original;
 	}
 
 	@ModifyReturnValue(method = "clamp", at = @At("RETURN"))
 	private double data_attributes$clamp(double original, @Local(argsOnly = true) double value) {
-		if (this.data_enabled) {
-			return this.data_attributes$clamped(value);
-		}
-		return original;
+		return this.data_attributes$enabled ? this.data_attributes$clamped(value) : original;
 	}
 
 	@Override
-	public double data_attributes$smoothness() { return this.data_smoothness; }
+	public double data_attributes$smoothness() { return this.data_attributes$smoothness; }
 
 	@Override
 	public double data_attributes$min_fallback() {
@@ -71,7 +60,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 	@Override
 	public void data_attributes$clear() {
 		super.data_attributes$clear();
-		this.data_min = this.minValue;
-		this.data_max = this.maxValue;
+		this.data_attributes$min = this.minValue;
+		this.data_attributes$max = this.maxValue;
 	}
 }
