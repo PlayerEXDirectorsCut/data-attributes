@@ -1,8 +1,10 @@
 package com.bibireden.data_attributes.networking
 
 import com.bibireden.data_attributes.DataAttributes
+import org.jetbrains.annotations.ApiStatus
 
-object Channels {
+@ApiStatus.Internal
+object NetworkingChannels {
     @JvmField
     val HANDSHAKE = DataAttributes.id("handshake")
     @JvmField

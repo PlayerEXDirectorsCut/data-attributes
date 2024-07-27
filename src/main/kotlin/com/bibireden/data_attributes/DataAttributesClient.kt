@@ -1,7 +1,7 @@
 package com.bibireden.data_attributes
 
 import com.bibireden.data_attributes.config.AttributeConfigManager
-import com.bibireden.data_attributes.networking.Channels
+import com.bibireden.data_attributes.networking.NetworkingChannels
 import com.bibireden.data_attributes.ui.DataAttributesConfigScreen
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
 import io.wispforest.owo.config.ui.ConfigScreen
@@ -32,11 +32,11 @@ class DataAttributesClient : ClientModInitializer {
     override fun onInitializeClient() {
         ConfigScreen.registerProvider(DataAttributes.MOD_ID) { DataAttributesConfigScreen(DataAttributes.OVERRIDES_CONFIG, DataAttributes.FUNCTIONS_CONFIG, DataAttributes.ENTITY_TYPES_CONFIG, it) }
 
-        ClientLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { client, _, buf, _ ->
+        ClientLoginNetworking.registerGlobalReceiver(NetworkingChannels.HANDSHAKE) { client, _, buf, _ ->
             onPacketReceived(client, buf)
             CompletableFuture.completedFuture(PacketByteBufs.empty())
         }
-        ClientPlayNetworking.registerGlobalReceiver(Channels.RELOAD) { client, _, buf, _ ->
+        ClientPlayNetworking.registerGlobalReceiver(NetworkingChannels.RELOAD) { client, _, buf, _ ->
             onPacketReceived(client, buf)
         }
     }

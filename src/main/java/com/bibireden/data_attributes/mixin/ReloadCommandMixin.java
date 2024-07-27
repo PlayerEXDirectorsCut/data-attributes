@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.config.AttributeConfigManager;
-import com.bibireden.data_attributes.networking.Channels;
+import com.bibireden.data_attributes.networking.NetworkingChannels;
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +33,7 @@ abstract class ReloadCommandMixin {
 		manager.nextUpdateFlag();
 
 		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), manager.toPacket());
-		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
+		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, NetworkingChannels.RELOAD, buf));
 
 		DataAttributes.LOGGER.info(
 			"Updated manager with {} override(s), {} function(s) and {} entity types :: update flag [#{}]",

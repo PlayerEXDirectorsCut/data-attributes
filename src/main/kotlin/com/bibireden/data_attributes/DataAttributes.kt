@@ -1,20 +1,15 @@
 package com.bibireden.data_attributes
 
-import blue.endless.jankson.JsonArray
-import blue.endless.jankson.JsonElement
-import blue.endless.jankson.JsonObject
-import blue.endless.jankson.JsonPrimitive
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.*
-import com.bibireden.data_attributes.config.functions.AttributeFunction
-import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
 import com.bibireden.data_attributes.config.models.EntityTypesConfig
 import com.bibireden.data_attributes.config.models.FunctionsConfig
 import com.bibireden.data_attributes.config.models.OverridesConfig
-import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ext.refreshAttributes
-import com.bibireden.data_attributes.networking.Channels
+import com.bibireden.data_attributes.networking.NetworkingChannels
+import com.bibireden.data_attributes.networking.ConfigPacketBufs
+import com.bibireden.data_attributes.serde.JanksonBuilders
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
@@ -36,27 +31,8 @@ class DataAttributes : ModInitializer {
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
-        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
-            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller ->
-                marshaller.serialize(cfg.data)
-            }
-            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
-                AttributeFunctionConfig(marshaller.marshall<Map<String, JsonArray>>(Map::class.java, obj).entries
-                    .associate { (id, array) ->
-                        Identifier.tryParse(id)!! to array.map { v -> marshaller.marshall(AttributeFunction::class.java, v) }
-                    }
-                )
-            }
-        }
-        @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad {
-            it.registerSerializer(EntityTypeData::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
-            it.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { json, marshaller ->
-                EntityTypeData(
-                    marshaller.marshall<Map<String, JsonPrimitive>>(Map::class.java, json)
-                        .entries.associate { (k, v) -> Identifier.tryParse(k)!! to marshaller.marshallCarefully(Double::class.java, v) }
-                )
-            }
-        }
+        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad(JanksonBuilders::applyFunctions)
+        @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad(JanksonBuilders::applyEntityTypes)
 
 
         val MANAGER = AttributeConfigManager()
@@ -91,11 +67,11 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
-        ServerLoginNetworking.registerGlobalReceiver(Channels.HANDSHAKE) { _, _, _, _, _, _ -> }
+        ServerLoginNetworking.registerGlobalReceiver(NetworkingChannels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
         ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) MANAGER.update() }
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
-            sender.sendPacket(Channels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket()))
+            sender.sendPacket(NetworkingChannels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket()))
         }
 
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register { _, current, _, _ ->
