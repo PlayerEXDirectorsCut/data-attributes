@@ -129,9 +129,9 @@ class DataAttributesConfigScreen(val overrides: OverridesConfig, val functions: 
             container?.child(result.baseComponent())
         }
 
-        overrides.forEachOption(::optFunc);
-        functions.forEachOption(::optFunc);
-        entity_types.forEachOption(::optFunc);
+        overrides.forEachOption(::optFunc)
+        functions.forEachOption(::optFunc)
+        entity_types.forEachOption(::optFunc)
 
         if (!sections.isEmpty()) {
             val panelContainer = rootComponent.childById(FlowLayout::class.java, "option-panel-container")

@@ -1,6 +1,5 @@
 package com.bibireden.data_attributes
 
-import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents
 import com.bibireden.data_attributes.config.*
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
 import com.bibireden.data_attributes.config.models.EntityTypesConfig
@@ -17,7 +16,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
@@ -78,15 +76,5 @@ class DataAttributes : ModInitializer {
             if (current is LivingEntity) current.refreshAttributes()
         }
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ -> player.refreshAttributes() }
-
-        EntityAttributeModifiedEvents.MODIFIED.register { attribute, entity, _, _, _ ->
-            if (entity?.world == null) return@register // no entity & no world, skip
-
-            if (!entity.world.isClient) {
-                if (attribute == EntityAttributes.GENERIC_MAX_HEALTH) {
-                    entity.health = attribute.clamp(entity.health.toDouble()).toFloat()
-                }
-            }
-        }
     }
 }

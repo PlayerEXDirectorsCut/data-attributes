@@ -6,7 +6,7 @@ import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
 import io.wispforest.owo.config.Option.SyncMode
-import io.wispforest.owo.config.annotation.*;
+import io.wispforest.owo.config.annotation.*
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
