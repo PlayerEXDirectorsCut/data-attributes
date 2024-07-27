@@ -38,17 +38,15 @@ class DataAttributes : ModInitializer {
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
         @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
-            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller ->
-                marshaller.serialize(cfg.data)
-            }
+            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
             builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
                 AttributeFunctionConfig(marshaller.marshall<Map<Identifier, List<AttributeFunction>>>(Map::class.java, obj))
             }
         }
         @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
-            builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
-            builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
-                EntityTypeData(marshaller.marshall<Map<Identifier, Double>>(Map::class.java, des))
+            builder.registerSerializer(EntityTypeData::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
+            builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { obj, marshaller ->
+                EntityTypeData(marshaller.marshall<Map<Identifier, Double>>(Map::class.java, obj))
             }
         }
 
