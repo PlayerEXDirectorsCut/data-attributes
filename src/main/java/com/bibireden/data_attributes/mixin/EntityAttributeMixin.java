@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.bibireden.data_attributes.api.attribute.IAttributeFunction;
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
@@ -131,12 +130,12 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public Map<IEntityAttribute, IAttributeFunction> data_attributes$parents() {
+    public Map<IEntityAttribute, AttributeFunction> data_attributes$parents() {
         return ImmutableMap.copyOf(this.data_attributes$parents);
     }
 
     @Override
-    public Map<IEntityAttribute, IAttributeFunction> data_attributes$children() {
+    public Map<IEntityAttribute, AttributeFunction> data_attributes$children() {
         return ImmutableMap.copyOf(this.data_attributes$children);
     }
 }

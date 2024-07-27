@@ -1,6 +1,5 @@
 package com.bibireden.data_attributes.config.functions
 
-import com.bibireden.data_attributes.api.attribute.IAttributeFunction
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.endec.Endecs
 import io.wispforest.endec.Endec
@@ -10,9 +9,9 @@ import net.minecraft.util.Identifier
 
 /**
  * A function that is composed of the target [EntityAttribute] by an [Identifier] it will be applied to,
- * the [StackingBehavior] of the function which will determine if the given [value] will be an additive or multiplicative one.
+ * the [StackingBehavior] of the function which will determine if the given [getValue] will be an additive or multiplicative one.
  * */
-data class AttributeFunction(var id: Identifier, var behavior: StackingBehavior, var value: Double) : IAttributeFunction {
+data class AttributeFunction(var id: Identifier, var behavior: StackingBehavior, var value: Double) {
     @Suppress("UNUSED")
     constructor() : this(Identifier("unknown"), StackingBehavior.Add, 0.0)
 
@@ -25,8 +24,4 @@ data class AttributeFunction(var id: Identifier, var behavior: StackingBehavior,
             ::AttributeFunction
         )
     }
-
-    override fun behavior(): StackingBehavior = this.behavior
-
-    override fun value(): Double = this.value
 }

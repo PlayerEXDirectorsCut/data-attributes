@@ -1,5 +1,7 @@
 package com.bibireden.data_attributes.api.attribute;
 
+import com.bibireden.data_attributes.config.functions.AttributeFunction;
+
 import java.util.Map;
 
 /**
@@ -38,11 +40,11 @@ public interface IEntityAttribute {
 	 * @return An immutable map of the function-parents attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, IAttributeFunction> data_attributes$parents();
+	Map<IEntityAttribute, AttributeFunction> data_attributes$parents();
 	
 	/**
 	 * @return An immutable map of the function-children attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, IAttributeFunction> data_attributes$children();
+	Map<IEntityAttribute, AttributeFunction> data_attributes$children();
 }

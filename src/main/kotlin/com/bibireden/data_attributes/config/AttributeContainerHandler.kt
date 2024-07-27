@@ -12,6 +12,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.DefaultAttributeRegistry
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
+import org.jetbrains.annotations.ApiStatus
 import kotlin.math.round
 
 typealias ImplicitContainers = Map<Int, Tuple<DefaultAttributeContainer>>
@@ -26,6 +27,7 @@ typealias ExplicitContainers = Map<EntityType<out LivingEntity>, DefaultAttribut
  * This is primarily useful to be an internal implementation to apply config
  * information to [LivingEntity]'s in the game.
  */
+@ApiStatus.Internal
 class AttributeContainerHandler(private var implicitContainers: ImplicitContainers = mapOf(), private var explicitContainers: ExplicitContainers = mapOf()) {
     /**
      * Obtains a [MutableAttributeContainer] based on the provided [EntityType] and [LivingEntity].

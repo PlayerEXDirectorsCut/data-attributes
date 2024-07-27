@@ -117,12 +117,12 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_attributes$container != null) {
 			attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
-				if (function.behavior() != StackingBehavior.Add) return;
+				if (function.getBehavior() != StackingBehavior.Add) return;
 
 				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
 
-				double multiplier = function.value();
+				double multiplier = function.getValue();
 				double value = multiplier * parentInstance.getValue();
 
 				if (value > 0.0D) {
@@ -147,12 +147,12 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_attributes$container != null) {
             attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
-				if (function.behavior() != StackingBehavior.Multiply) return;
+				if (function.getBehavior() != StackingBehavior.Multiply) return;
 
 				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
 
-				e.set(e.get() * (1.0D + (parentInstance.getValue() * function.value())));
+				e.set(e.get() * (1.0D + (parentInstance.getValue() * function.getValue())));
 			});
 		}
 

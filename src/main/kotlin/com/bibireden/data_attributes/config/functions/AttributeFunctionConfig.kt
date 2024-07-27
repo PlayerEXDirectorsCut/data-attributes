@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier
 data class AttributeFunctionConfig(var data: Map<Identifier, List<AttributeFunction>> = mapOf()) {
     companion object {
         @JvmField
-        val ENDEC = Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf())
-            .xmap(::AttributeFunctionConfig) { it.data }
+        val ENDEC = Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf()).xmap(::AttributeFunctionConfig) { it.data }
     }
 }

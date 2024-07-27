@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Collection;
 
+import com.bibireden.data_attributes.api.DataAttributesAPI;
 import com.bibireden.data_attributes.config.AttributeConfigManager;
 import com.bibireden.data_attributes.networking.Channels;
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
@@ -25,11 +26,13 @@ abstract class ReloadCommandMixin {
 	@Inject(method = "tryReloadDataPacks", at = @At("TAIL"))
 	private static void data_attributes$tryReloadDataPacks(Collection<String> dataPacks, ServerCommandSource source, CallbackInfo ci) {
 		DataAttributes.reloadConfigs();
-		
-		DataAttributes.MANAGER.update();
-		DataAttributes.MANAGER.nextUpdateFlag();
 
-		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), DataAttributes.MANAGER.toPacket());
+		AttributeConfigManager manager = DataAttributesAPI.getServerManager();
+		
+		manager.update();
+		manager.nextUpdateFlag();
+
+		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), manager.toPacket());
 		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, Channels.RELOAD, buf));
 
 		DataAttributes.LOGGER.info(
@@ -37,7 +40,7 @@ abstract class ReloadCommandMixin {
 			DataAttributes.OVERRIDES_CONFIG.getOverrides().size(),
 			DataAttributes.FUNCTIONS_CONFIG.getFunctions().getData().size(),
 			DataAttributes.ENTITY_TYPES_CONFIG.getEntity_types().size(),
-			DataAttributes.MANAGER.getUpdateFlag()
+			manager.getUpdateFlag()
 		);
 	}
 }
