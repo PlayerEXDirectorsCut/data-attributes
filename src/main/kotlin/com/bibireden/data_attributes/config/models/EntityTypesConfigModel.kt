@@ -1,7 +1,6 @@
 package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.config.ConfigDefaults
 import com.bibireden.data_attributes.data.EntityTypeData
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.Config
@@ -18,5 +17,5 @@ class EntityTypesConfigModel {
 
     @JvmField
     @Hook
-    var entity_types: Map<Identifier, EntityTypeData> = ConfigDefaults.ENTITY_TYPES
+    var entity_types: Map<Identifier, EntityTypeData> = mapOf()
 }

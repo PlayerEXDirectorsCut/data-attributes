@@ -2,7 +2,6 @@ package com.bibireden.data_attributes.config.models
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingFormula
-import com.bibireden.data_attributes.config.ConfigDefaults
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
@@ -19,7 +18,7 @@ class OverridesConfigModel {
 
     @JvmField
     @Hook
-    var overrides: Map<Identifier, AttributeOverride> = ConfigDefaults.OVERRIDES
+    var overrides: Map<Identifier, AttributeOverride> = mapOf()
 
     data class AttributeOverride(
         @JvmField
@@ -47,10 +46,10 @@ class OverridesConfigModel {
             val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
                 Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
-                Endec.DOUBLE.optionalFieldOf("max", { it.max }, ConfigDefaults.MAX_DOUBLE),
+                Endec.DOUBLE.optionalFieldOf("max", { it.max }, 1_000_000.0),
                 Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.01),
                 Endec.DOUBLE.optionalFieldOf("min_fallback", { it.min_fallback }, 0.0),
-                Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, ConfigDefaults.MAX_DOUBLE),
+                Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, 1_000_000.0),
                 StackingFormula.ENDEC.fieldOf("formula") { it.formula },
                 OverridesConfigModel::AttributeOverride,
             )

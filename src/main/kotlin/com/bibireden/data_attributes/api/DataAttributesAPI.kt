@@ -1,16 +1,37 @@
 package com.bibireden.data_attributes.api
 
 import com.bibireden.data_attributes.DataAttributes
-import com.bibireden.data_attributes.config.functions.AttributeFunction
-import com.bibireden.data_attributes.config.models.OverridesConfigModel
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.DataAttributesClient
+import com.bibireden.data_attributes.api.attribute.EntityAttributeSupplier
+import com.bibireden.data_attributes.config.AttributeConfigManager
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.registry.Registries
+import net.minecraft.world.World
 import java.util.*
 import java.util.function.Supplier
 
+/**
+ * The front-facing API for **DataAttributes**
+ * that contains functions for fetching the current value of an attribute via
+ * the direct [EntityAttribute] or the means of an [EntityAttributeSupplier] (or equivalent),
+ * and contains manager fields and functions.
+ * */
 object DataAttributesAPI {
+    /** The [AttributeConfigManager] that is managed on the client. */
+    @JvmStatic
+    val clientManager: AttributeConfigManager = DataAttributesClient.MANAGER
+
+    /** The [AttributeConfigManager] that is managed primarily by the server (dedicated or integrated). */
+    @JvmStatic
+    val serverManager: AttributeConfigManager = DataAttributes.MANAGER
+
+    /**
+     * Gets the [AttributeConfigManager] based on a provided world.
+     * Depending on the context of that world (client or server), it will provide the proper one.
+     */
+    @JvmStatic
+    fun getManager(world: World) = DataAttributes.getManagerFromWorld(world)
+
     @JvmStatic
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity].
@@ -38,30 +59,7 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
-    fun getValue(supplier: Supplier<EntityAttribute?>, entity: LivingEntity): Optional<Double> {
-        val container = entity.attributes
-        val attribute = supplier.get()
-
-        return if (attribute != null && container.hasAttribute(attribute)) {
-            Optional.of(container.getValue(attribute))
-        }
-        else {
-            Optional.empty()
-        }
-    }
-
-    @JvmStatic
-    fun getOverride(attribute: EntityAttribute): OverridesConfigModel.AttributeOverride? {
-        return DataAttributes.OVERRIDES_CONFIG.overrides[Registries.ATTRIBUTE.getId(attribute)]
-    }
-
-    @JvmStatic
-    fun getFunctions(attribute: EntityAttribute): List<AttributeFunction>? {
-        return DataAttributes.FUNCTIONS_CONFIG.functions.data[Registries.ATTRIBUTE.getId(attribute)]
-    }
-
-    @JvmStatic
-    fun getEntityTypes(attribute: EntityAttribute): EntityTypeData? {
-        return DataAttributes.ENTITY_TYPES_CONFIG.entity_types[Registries.ATTRIBUTE.getId(attribute)]
+    fun getValue(supplier: Supplier<Optional<EntityAttribute>>, entity: LivingEntity): Optional<Double> {
+        return supplier.get().filter(entity.attributes::hasAttribute).map(entity.attributes::getValue)
     }
 }

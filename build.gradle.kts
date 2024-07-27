@@ -37,7 +37,7 @@ dependencies {
     include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
 
     modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
 
     modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
         exclude("net.fabricmc.fabric-api")

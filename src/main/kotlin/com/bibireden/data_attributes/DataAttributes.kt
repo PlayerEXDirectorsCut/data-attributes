@@ -37,30 +37,18 @@ class DataAttributes : ModInitializer {
 
         @JvmField val CONFIG: DataAttributesConfig = DataAttributesConfig.createAndLoad()
         @JvmField val OVERRIDES_CONFIG: OverridesConfig = OverridesConfig.createAndLoad()
-        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad( { builder ->
-            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller -> marshaller.serialize(cfg.data) }
-            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
-                val unmapped = marshaller.marshall(Map::class.java, obj)
-                val mapped = mutableMapOf<Identifier, List<AttributeFunction>>()
-
-                unmapped.forEach { (key, array) ->
-                    if (key !is String || array !is JsonArray) return@forEach
-                    val id = Identifier.tryParse(key)
-                    if (id != null) {
-                        mapped[id] = array.map { marshaller.marshall(AttributeFunction::class.java, it) }
-                    }
-                }
-
-                AttributeFunctionConfig(mapped)
+        @JvmField val FUNCTIONS_CONFIG: FunctionsConfig = FunctionsConfig.createAndLoad { builder ->
+            builder.registerSerializer(AttributeFunctionConfig::class.java) { cfg, marshaller ->
+                marshaller.serialize(cfg.data)
             }
-        })
+            builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
+                AttributeFunctionConfig(marshaller.marshall<Map<Identifier, List<AttributeFunction>>>(Map::class.java, obj))
+            }
+        }
         @JvmField val ENTITY_TYPES_CONFIG: EntityTypesConfig = EntityTypesConfig.createAndLoad { builder ->
             builder.registerSerializer(EntityTypeData::class.java) { dat, marshaller -> marshaller.serialize(dat.data) }
             builder.registerDeserializer(JsonObject::class.java, EntityTypeData::class.java) { des, marshaller ->
-                EntityTypeData(des.mapNotNull { (key, value) ->
-                    val id = Identifier.tryParse(key) ?: return@mapNotNull null
-                    id to marshaller.marshall(Double::class.java, value)
-                }.toMap())
+                EntityTypeData(marshaller.marshall<Map<Identifier, Double>>(Map::class.java, des))
             }
         }
 
@@ -68,7 +56,6 @@ class DataAttributes : ModInitializer {
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
 
         /** Acquires the proper manager based on the world. */
-        @JvmStatic
         fun getManagerFromWorld(world: World) = if (world.isClient) DataAttributesClient.MANAGER else MANAGER
 
         /** Reload all the data-attributes configs at once. */
