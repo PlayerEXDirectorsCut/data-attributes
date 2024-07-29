@@ -1,39 +1,29 @@
 package com.bibireden.data_attributes.api.attribute;
 
 /**
+ * Used to factor into {@link com.bibireden.data_attributes.config.functions.AttributeFunction}'s
+ * to determine what operation to use when calculating how their modifier(s) are applied.
+ *	<p/>
  * @since 1.4.0
- * @author CleverNucleus
+ * @author Bare Minimum Studios (B.M.S), CleverNucleus
  */
 public enum StackingBehavior {
-	/** Addition of values as defined by the parent attribute. Equivalent of EntityAttributeModifier.Operation.ADDITION. */
-	Add((byte)0),
-	/** Multiplication of parent attribute. Equivalent of EntityAttributeModifier.Operation.MULTIPLY_TOTAL. */
-	Multiply((byte)1);
-	
-	private final byte id;
-	
-	StackingBehavior(final byte id) {
-		this.id = id;
-	}
-	
-	public static StackingBehavior of(final byte id) {
-		return switch(id) {
-			case 0 -> Add;
-			case 1 -> Multiply;
-			default -> Add;
-		};
-	}
+	/**
+	 * Addition of values as defined by the parent attribute.
+	 * <p/>
+	 * Equivalent to {@link net.minecraft.entity.attribute.EntityAttributeModifier.Operation#ADDITION}.
+	 */
+	Add,
+	/**
+	 * Multiplication of parent attribute.
+	 * <p>
+	 * Equivalent to {@link net.minecraft.entity.attribute.EntityAttributeModifier.Operation#MULTIPLY_TOTAL}.
+	 */
+	Multiply;
 
 	public static StackingBehavior of(final String id) {
 		return id.equalsIgnoreCase("multiply") ? Multiply : Add;
 	}
-	
-	public byte id() {
-		return this.id;
-	}
-	
-	@Override
-	public String toString() {
-		return String.valueOf(this.id);
-	}
+
+	public String getTranslationKey() { return "text.data_attributes.stackingBehavior." + this.name().toLowerCase(); }
 }

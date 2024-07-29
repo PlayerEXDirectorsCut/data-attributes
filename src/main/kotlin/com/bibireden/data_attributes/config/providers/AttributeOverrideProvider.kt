@@ -42,7 +42,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
             Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true)
                 .also { topContainer ->
                     if (isOverrideInvalid) {
-                        topContainer.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                        topContainer.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                     }
 
                     topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15)).also { hf ->

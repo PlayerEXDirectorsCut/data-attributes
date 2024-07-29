@@ -24,9 +24,9 @@ class OverridesConfigModel {
         @JvmField
         var enabled: Boolean = true,
         @JvmField
-        var min: Double = 0.0,
+        var min: Double = Double.NaN,
         @JvmField
-        var max: Double = 1000.0,
+        var max: Double = Double.NaN,
         @JvmField
         var smoothness: Double = 0.01,
         @JvmField

@@ -29,7 +29,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
             CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
                 ct.gap(15)
                 if (isFunctionParentUnregistered) {
-                    ct.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                    ct.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                 }
                 functions.forEachIndexed { index,  function ->
                     val isFunctionChildUnregistered = isAttributeUnregistered(function.id)
@@ -37,7 +37,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
                     Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(function.id), true).also {
                         it.gap(8)
                         if (isFunctionChildUnregistered) {
-                            it.tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+                            it.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
                         }
                         else {
                             val attribute = Registries.ATTRIBUTE[function.id]

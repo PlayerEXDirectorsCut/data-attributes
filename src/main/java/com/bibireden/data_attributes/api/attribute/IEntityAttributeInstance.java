@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * 
  * Access to an entity attribute instance.
- * @author CleverNucleus
+ * @author Bare Minimum Studios (B.M.S), CleverNucleus
  *
  */
 public interface IEntityAttributeInstance {

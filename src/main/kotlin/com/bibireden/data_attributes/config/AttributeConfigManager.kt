@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
+import com.bibireden.data_attributes.api.attribute.IEntityAttribute
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.config.functions.AttributeFunction
@@ -27,7 +28,9 @@ import net.minecraft.util.Identifier
 /**
  * Used to manage config data, and contains an [AttributeContainerHandler] to build related [EntityTypeData].
  */
-class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler(), var updateFlag: Int = 0) {
+class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler()) {
+    var updateFlag: Int = 0
+
     @JvmRecord
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
 
@@ -82,6 +85,18 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         )
     }
 
+    /** Currently applied [AttributeOverride]'s mapped with an [EntityAttribute]'s [Identifier]. */
+    val overrides: Map<Identifier, AttributeOverride>
+        get() = this.data.overrides
+
+    /** Currently applied [AttributeFunction]'s tied to the parent [EntityAttribute]'s [Identifier]. */
+    val functions: Map<Identifier, List<AttributeFunction>>
+        get() = this.data.functions
+
+    /** Currently applied [EntityTypeData] tied to an [EntityType]'s [Identifier]. */
+    val entityTypes: Map<Identifier, EntityTypeData>
+        get() = this.data.entity_types
+
     /**
      * Increments to the next flag, usually signaling an update from the manager.
      * @return [Int] The update flag's current value.
@@ -120,15 +135,22 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     fun onDataUpdate() {
         val entityAttributeData = mutableMapOf<Identifier, EntityAttributeData>()
 
-        for ((id, value) in this.data.overrides) {
+        for ((id, value) in this.overrides) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("Attribute [$id] that was targeted for override is not registered. This has been skipped.")
                 continue
             }
+            val attribute = Registries.ATTRIBUTE[id]!! as IEntityAttribute
+            if (value.max.isNaN()) {
+                value.max = attribute.`data_attributes$max_fallback`()
+            }
+            if (value.min.isNaN()) {
+                value.min = attribute.`data_attributes$min_fallback`()
+            }
             entityAttributeData[id] = EntityAttributeData(value)
         }
 
-        for ((id, configs) in this.data.functions) {
+        for ((id, configs) in this.functions) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")
             }
@@ -145,11 +167,11 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
             data.override(getAttribute(id)!!) // was already asserted to exist in L: 124
         }
 
-        for ((identifier, attributeData) in entityAttributeData) {
-            attributeData.copy(Registries.ATTRIBUTE[identifier]!!) // was already asserted to exist in L: 124
+        for ((identifier, data) in entityAttributeData) {
+            data.copy(Registries.ATTRIBUTE[identifier]!!) // was already asserted to exist in L: 124
         }
 
-        this.handler.buildContainers(this.data.entity_types)
+        this.handler.buildContainers(this.entityTypes)
 
         AttributesReloadedEvent.EVENT.invoker().onReloadCompleted()
     }

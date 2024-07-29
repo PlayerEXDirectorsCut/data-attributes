@@ -104,6 +104,12 @@
     {"text":  "when ready.", "italic": true, "color": "gray"}
   ],
 
-  "ui.data_attributes.collapsiblefoldablecontainer.collapse_all": "Collapse",
-  "ui.data_attributes.collapsiblefoldablecontainer.uncollapse_all": "Uncollapse"
+  "ui.data_attributes.cfc.collapse_all": "Collapse",
+  "ui.data_attributes.cfc.uncollapse_all": "Uncollapse",
+
+  "text.data_attributes.stackingFormula.flat": "Flat",
+  "text.data_attributes.stackingFormula.diminished": "Diminished",
+
+  "text.data_attributes.stackingBehavior.add": "Add",
+  "text.data_attributes.stackingBehavior.multiply": "Multiply"
 }

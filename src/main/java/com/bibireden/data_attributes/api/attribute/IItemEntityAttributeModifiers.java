@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 /**
  * Implement this in your Item class.
  * 
- * @author CleverNucleus
+ * @author Bare Minimum Studios (B.M.S), CleverNucleus
  *
  */
 public interface IItemEntityAttributeModifiers {

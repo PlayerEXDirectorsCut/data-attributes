@@ -50,7 +50,7 @@ class DataAttributesConfigScreen(val overrides: OverridesConfig, val functions: 
 
         val optionPanel = rootComponent.childById(FlowLayout::class.java, "option-panel")
 
-        if (this.client?.world != null) rootComponent.surface(Surface.blur(.55F, 2F))
+        if (this.client?.world != null) rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
 
         val sections = LinkedHashMap<Component, Text>()
 

@@ -8,7 +8,7 @@ import java.util.Map;
  * 
  * EntityAttribute's implement this through a mixin, and can be cast to this interface to get additional data added by Data Attributes.
  * 
- * @author CleverNucleus
+ * @author Bare Minimum Studios (B.M.S), CleverNucleus
  *
  */
 public interface IEntityAttribute {

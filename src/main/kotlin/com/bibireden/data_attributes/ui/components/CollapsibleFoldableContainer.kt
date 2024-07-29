@@ -13,10 +13,10 @@ class CollapsibleFoldableContainer(horizontalSizing: Sizing, verticalSizing: Siz
 
     fun getFoldableText(): MutableText {
         return if (isFoldered) {
-            Text.translatable("ui.data_attributes.collapsiblefoldablecontainer.uncollapse_all")
+            Text.translatable("ui.data_attributes.cfc.uncollapse_all")
         }
         else {
-            Text.translatable("ui.data_attributes.collapsiblefoldablecontainer.collapse_all")
+            Text.translatable("ui.data_attributes.cfc.collapse_all")
         }
     }
 
