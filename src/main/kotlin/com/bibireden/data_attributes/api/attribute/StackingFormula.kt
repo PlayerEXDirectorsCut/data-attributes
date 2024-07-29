@@ -1,15 +1,16 @@
 package com.bibireden.data_attributes.api.attribute
 
 import io.wispforest.endec.Endec
+import net.minecraft.entity.attribute.EntityAttributeInstance
 import kotlin.math.abs
 
 // CN: ((1.0 - v2) * (1.0 - m).pow((v - v2) / m)) - ((1.0 - k2) * (1.0 - m).pow((k - k2) / m))
 
-enum class StackingFormula(val function: (k: Double, k2: Double, v: Double, v2: Double, attribute: IEntityAttribute) -> Double) {
+enum class StackingFormula(val function: (k: Double, k2: Double, v: Double, v2: Double, instance: EntityAttributeInstance) -> Double) {
     Flat({ k, _, v, _, _ -> k - v }),
-    Diminished({ k, k2, v, v2, attribute ->
-        val base = (attribute as net.minecraft.entity.attribute.EntityAttribute).defaultValue
-        val smoothness = attribute.`data_attributes$smoothness`()
+    Diminished({ k, k2, v, v2, instance ->
+        val base = instance.baseValue
+        val smoothness = (instance.attribute as IEntityAttribute).`data_attributes$smoothness`()
         val result = base + (((k - base) - v) * smoothness)
         result
     });
@@ -27,7 +28,7 @@ enum class StackingFormula(val function: (k: Double, k2: Double, v: Double, v2: 
 
     fun stack(current: Double, input: Double): Double = current + abs(input)
 
-    fun result(k: Double, k2: Double, v: Double, v2: Double, attribute: IEntityAttribute): Double = this.function(k, k2, v, v2, attribute)
+    fun result(k: Double, k2: Double, v: Double, v2: Double, instance: EntityAttributeInstance): Double = this.function(k, k2, v, v2, instance)
 }
 
 

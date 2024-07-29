@@ -81,6 +81,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 		return attribute != null ? attribute : original;
 	}
 
+	@SuppressWarnings("UnreachableCode")
 	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"))
 	private double data_attributes$computeValue(double original) {
 		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
@@ -133,8 +134,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 			});
 		}
 
-
-		double d = attribute.data_attributes$sum(k.get(), k2, v.get(), v2);
+		double d = attribute.data_attributes$sum(k.get(), k2, v.get(), v2, (EntityAttributeInstance) (Object) this);
 		AtomicReference<Double> e = new AtomicReference<>(d);
 
 		for (EntityAttributeModifier modifier : this.getModifiersByOperation(EntityAttributeModifier.Operation.MULTIPLY_BASE)) {

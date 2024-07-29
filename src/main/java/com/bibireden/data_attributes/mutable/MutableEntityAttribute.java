@@ -6,6 +6,7 @@ import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 
 /**
  * Extends the {@link net.minecraft.entity.attribute.EntityAttribute} class
@@ -39,7 +40,7 @@ public interface MutableEntityAttribute extends IEntityAttribute {
      * By including a secondary pair of variables,
      * it allows for the modeling of more complex scenarios, such as negative modifiers.
      */
-    double data_attributes$sum(final double k, final double k2, final double v, final double v2);
+    double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance);
 
     /** Returns a mutable map of parent entity attributes with associated functions. */
     Map<IEntityAttribute, AttributeFunction> data_attributes$parentsMutable();

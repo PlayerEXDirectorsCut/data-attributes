@@ -5,6 +5,7 @@ import java.util.Map;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -94,8 +95,8 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public double data_attributes$sum(final double k, final double k2, final double v, final double v2) {
-        return this.data_attributes$formula.result(k, k2, v, v2, this);
+    public double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) {
+        return this.data_attributes$formula.result(k, k2, v, v2, instance);
     }
 
     @Override
