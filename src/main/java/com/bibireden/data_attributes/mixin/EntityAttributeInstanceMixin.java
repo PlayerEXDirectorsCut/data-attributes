@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -82,13 +84,13 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 	}
 
 	@SuppressWarnings("UnreachableCode")
-	@ModifyReturnValue(method = "computeValue", at = @At("RETURN"))
-	private double data_attributes$computeValue(double original) {
+	@WrapMethod(method = "computeValue")
+	private double data_attributes$computeValue(Operation<Double> original) {
 		MutableEntityAttribute attribute = (MutableEntityAttribute) this.getAttribute();
 		StackingFormula formula = attribute.data_attributes$formula();
 
 		// If the formula is set to Flat and there is no associated container, provide original.
-		if (formula == StackingFormula.Flat && this.data_attributes$container == null) return original;
+		if (formula == StackingFormula.Flat && this.data_attributes$container == null) return original.call();
 
 		AtomicReference<Double> k = new AtomicReference<>(0.0D);
 		AtomicReference<Double> v = new AtomicReference<>(0.0D);
