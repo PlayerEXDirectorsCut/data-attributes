@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "data_attributes",
+  "version": "${version}",
+  "name": "Data Attributes",
+  "description": "Allows the ability to cache player data to the server based on cached keys.",
+  "authors": [
+    "Bare Minimum Studios",
+    "CleverNucleus (former author)"
+  ],
+  "contact": {
+    "homepage": "https://bareminimumstudios.github.io/Bare-Minimum-Docs/",
+    "sources": "https://github.com/BareMinimumStudios/data-attributes"
+  },
+  "license": "MIT",
+  "icon": "assets/data_attributes/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.bibireden.data_attributes.fabric.DataAttributesFabric"
+    ]
+  },
+  "mixins": [
+    "data_attributes.mixins.json",
+    "data_attributes-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": "~1.20.1",
+    "fabric-api": "*",
+    "fabric-language-kotlin": ">=1.10.19+kotlin.1.9.23"
+  }
+}

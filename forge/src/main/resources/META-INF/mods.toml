@@ -1,0 +1,27 @@
+modLoader = "kotlinforforge"
+loaderVersion = "[4.9,)"
+issueTrackerURL = "https://github.com/BareMinimumStudios/data-attributes/issues"
+license = "MIT"
+
+[[mods]]
+modId = "data_attributes"
+version = "${version}"
+displayName = "Data Attributes"
+authors = "Bare Minimum Studios"
+description = '''TBD'''
+logoFile = "data_attributes_icon.png"
+displayURL = "https://github.com/BareMinimumStudios/data-attributes"
+
+[[dependencies.data_attributes]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.data_attributes]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1]"
+ordering = "NONE"
+side = "BOTH"
