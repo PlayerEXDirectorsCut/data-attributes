@@ -12,6 +12,7 @@ sourceSets.main.get().resources.srcDir("src/main/generated/resources")
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
+    modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_api_version"]}+${minecraftVersion}")
     modImplementation("net.fabricmc:fabric-loader:${project.properties["fabric_loader_version"]}")
 }
 

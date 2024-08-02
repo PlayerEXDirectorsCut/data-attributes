@@ -41,6 +41,8 @@ dependencies {
     forge("net.minecraftforge:forge:$minecraftVersion-${project.properties["forge_version"]}")
     implementation("thedarkcolour:kotlinforforge:${project.properties["kotlin_forge_version"]}")
 
+    modImplementation("dev.su5ed.sinytra.fabric-api:fabric-api:${project.properties["forgified_fabric_api_version"]}")
+
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionForge")) { isTransitive = false }
 }

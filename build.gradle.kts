@@ -1,3 +1,4 @@
+import com.gradle.scan.agent.serialization.scan.serializer.kryo.fg
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
 plugins {
@@ -28,6 +29,7 @@ subprojects {
         maven("https://maven.terraformersmc.com")
         maven("https://maven.wispforest.io/releases")
         maven("https://maven.kosmx.dev/")
+        maven("https://maven.su5ed.dev/releases")
     }
 
     @Suppress("UnstableApiUsage")
