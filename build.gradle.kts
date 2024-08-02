@@ -42,6 +42,8 @@ subprojects {
             parchment("org.parchmentmc.data:parchment-$minecraftVersion:${project.properties["parchment"]}@zip")
         })
 
+        annotationProcessor("io.github.llamalad7:mixinextras-common:${project.properties["mixinextras_version"]}")
+
         compileOnly("org.jetbrains:annotations:24.1.0")
     }
 }

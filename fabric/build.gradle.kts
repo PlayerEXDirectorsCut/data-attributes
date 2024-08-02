@@ -32,9 +32,6 @@ dependencies {
 
     include("io.wispforest:owo-sentinel:${project.properties["owo_version"]}")
 
-    modImplementation("io.wispforest:endec:${project.properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${project.properties["endec_netty_version"]}")!!.let(::include)
-
     modImplementation("com.terraformersmc:modmenu:${project.properties["modmenu_version"]}") {
         exclude("net.fabricmc.fabric-api")
     }
@@ -45,6 +42,9 @@ dependencies {
     }
 
     modImplementation("io.wispforest:owo-lib:${project.properties["owo_version"]}")
+
+    modImplementation("io.wispforest:endec:${project.properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${project.properties["endec_netty_version"]}")!!.let(::include)
 
     implementation("com.google.devtools.ksp:symbol-processing-api:${project.properties["ksp_version"]}")
     implementation("com.squareup:kotlinpoet-ksp:${project.properties["kotlinpoet_version"]}")

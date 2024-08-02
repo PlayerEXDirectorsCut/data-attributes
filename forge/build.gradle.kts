@@ -43,6 +43,12 @@ dependencies {
 
     modImplementation("dev.su5ed.sinytra.fabric-api:fabric-api:${project.properties["forgified_fabric_api_version"]}")
 
+    modImplementation("io.wispforest:endec:${project.properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${project.properties["endec_netty_version"]}")!!.let(::include)
+
+    compileOnly("io.github.llamalad7:mixinextras-common:${project.properties["mixinextras_version"]}")!!.let(::annotationProcessor)
+    implementation("io.github.llamalad7:mixinextras-forge:${project.properties["mixinextras_version"]}")!!.let(::include)
+
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionForge")) { isTransitive = false }
 }
