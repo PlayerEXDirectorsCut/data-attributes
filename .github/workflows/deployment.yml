@@ -8,7 +8,7 @@ on:
       - dev
 
 jobs:
-  build-and-deploy:
+  deployment:
     env:
       BRANCH_PREFIX: $(cat gradle.properties | grep mod_version | cut -d'+' -f2)
     strategy:
@@ -77,8 +77,8 @@ jobs:
             fabric/build/libs/!(*-@(dev|sources|javadoc|shadow)).jar
             fabric/build/libs/*-@(dev|sources|javadoc|shadow).jar
 
-          modrinth-id: oLPaySSb
-          curseforge-id: 1019391
+          modrinth-id: KCGxOJsE
+          curseforge-id: 955929
 
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
@@ -114,7 +114,7 @@ jobs:
             forge/build/libs/!(*-@(dev|sources|javadoc|shadow)).jar
             forge/build/libs/*-@(dev|sources|javadoc|shadow).jar
 
-          modrinth-id: oLPaySSb
+          modrinth-id: KCGxOJsE
           curseforge-id: 1019391
 
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
