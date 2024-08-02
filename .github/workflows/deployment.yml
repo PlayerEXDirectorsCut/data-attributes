@@ -1,9 +1,10 @@
 name: Deployment (J17)
 on:
   push:
-    branches:
-      - '*/*'
-      - '!dev'
+    branches-ignore:
+      - '**/dev-**'
+      - '**/dev**'
+      - 'dev'
 
 jobs:
   deployment:
