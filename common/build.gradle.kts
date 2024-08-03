@@ -15,8 +15,6 @@ dependencies {
     modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_api_version"]}+${minecraftVersion}")
     modImplementation("net.fabricmc:fabric-loader:${project.properties["fabric_loader_version"]}")
 
-    
-
     modCompileOnly("io.wispforest:endec:${project.properties["endec_version"]}")!!.let(::include)
     modCompileOnly("io.wispforest.endec:netty:${project.properties["endec_netty_version"]}")!!.let(::include)
 }

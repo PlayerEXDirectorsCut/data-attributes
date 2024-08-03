@@ -30,6 +30,8 @@ subprojects {
         maven("https://maven.wispforest.io/releases")
         maven("https://maven.kosmx.dev/")
         maven("https://maven.su5ed.dev/releases")
+        maven("https://repo.spongepowered.org/repository/maven-public/")
+        maven("https://api.modrinth.com/maven")
     }
 
     @Suppress("UnstableApiUsage")

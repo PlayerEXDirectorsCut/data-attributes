@@ -30,17 +30,12 @@ dependencies {
     modApi("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_api_version"]}+$minecraftVersion")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.properties["fabric_language_kotlin_version"]}")
 
-    include("io.wispforest:owo-sentinel:${project.properties["owo_version"]}")
-
-    modImplementation("com.terraformersmc:modmenu:${project.properties["modmenu_version"]}") {
-        exclude("net.fabricmc.fabric-api")
-    }
-
     annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.properties["mixinextras_version"]}")?.let {
         implementation(it)
         include(it)
     }
 
+    include("io.wispforest:owo-sentinel:${project.properties["owo_version"]}")
     modImplementation("io.wispforest:owo-lib:${project.properties["owo_version"]}")
 
     modImplementation("io.wispforest:endec:${project.properties["endec_version"]}")!!.let(::include)
@@ -50,6 +45,10 @@ dependencies {
     implementation("com.squareup:kotlinpoet-ksp:${project.properties["kotlinpoet_version"]}")
 
     ksp("dev.kosmx.kowoconfig:ksp-owo-config:${project.properties["ksp_owo_config_version"]}")
+
+    modImplementation("com.terraformersmc:modmenu:${project.properties["modmenu_version"]}") {
+        exclude("net.fabricmc.fabric-api")
+    }
 
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionFabric")) { isTransitive = false }

@@ -1,3 +1,5 @@
+import java.util.Objects
+
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
@@ -49,6 +51,11 @@ dependencies {
     compileOnly("io.github.llamalad7:mixinextras-common:${project.properties["mixinextras_version"]}")!!.let(::annotationProcessor)
     implementation("io.github.llamalad7:mixinextras-forge:${project.properties["mixinextras_version"]}")!!.let(::include)
 
+    minecraftLibraries("org.sinytra:Connector:${project.properties["connector_version"]}")
+    runtimeOnly("maven.modrinth:forgified-fabric-api:${project.properties["forgified_fabric_api_version"]}")
+
+//    classpath('org.spongepowered:mixingradle:0.7-SNAPSHOT')
+
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionForge")) { isTransitive = false }
 }
@@ -82,6 +89,13 @@ tasks {
         from(commonSources.get().archiveFile.map { zipTree(it) })
     }
 }
+
+// afterEvaluate {
+//     val cleanArtifactJar =  requireNotNull(net.minecraftforge.gradle.common.util.MavenArtifactDownloader.generate(project, "net.minecraft:joined:${project.properties["mcp_version"]}:srg", true))
+//     minecraft.runs.configureEach {
+//         property("connector.clean.path", cleanArtifactJar);
+//     }
+// }
 
 components {
     java.run {
