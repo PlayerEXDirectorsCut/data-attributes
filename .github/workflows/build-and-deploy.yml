@@ -3,7 +3,10 @@ on:
   push:
     branches-ignore:
       - master
-
+      - "**-dev"
+      - "**-dev**"
+      - dev
+      
 jobs:
   build-and-deploy:
     env:
