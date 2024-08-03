@@ -1,5 +1,7 @@
 package com.bibireden.data_attributes.api.attribute;
 
+import net.minecraft.util.Identifier;
+
 import java.util.UUID;
 
 /**
@@ -12,8 +14,8 @@ public interface IEntityAttributeInstance {
 	
 	/**
 	 * Changes the value of the input modifier (if it exists) and updates the instance and all children.
-	 * @param uuid The uuid of the modifier.
+	 * @param id The id of the modifier.
 	 * @param value The value to change the modifier to.
 	 */
-	void updateModifier(final UUID uuid, final double value);
+	void updateModifier(final Identifier id, final double value);
 }

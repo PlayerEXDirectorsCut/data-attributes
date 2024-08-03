@@ -18,7 +18,7 @@ abstract class PlayerEntityMixin {
 	@Final
 	private PlayerAbilities abilities;
 
-	@Inject(method = "readCustomDataFromNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getAttributeInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;"))
+	@Inject(method = "readCustomDataFromNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getAttributeInstance(Lnet/minecraft/registry/entry/RegistryEntry;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;"))
 	private void data_attributes$readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
 		this.abilities.setWalkSpeed((float) ((PlayerEntity) (Object) this).getAttributeBaseValue(EntityAttributes.GENERIC_MOVEMENT_SPEED));
 	}

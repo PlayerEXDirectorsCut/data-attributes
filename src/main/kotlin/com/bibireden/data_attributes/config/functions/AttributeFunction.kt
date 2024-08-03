@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier
  * */
 data class AttributeFunction(var id: Identifier, var behavior: StackingBehavior, var value: Double) {
     @Suppress("UNUSED")
-    constructor() : this(Identifier("unknown"), StackingBehavior.Add, 0.0)
+    constructor() : this(Identifier.of("unknown"), StackingBehavior.Add, 0.0)
 
     companion object {
         @JvmField

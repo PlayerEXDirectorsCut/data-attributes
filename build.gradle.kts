@@ -6,8 +6,8 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.0-1.0.21"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 group = "${properties["maven_group"]}"
 version = "${properties["mod_version"]}-${properties["loader"]}"
@@ -23,6 +23,8 @@ repositories {
     maven("https://maven.terraformersmc.com")
     maven("https://api.modrinth.com/maven")
     maven("https://maven.kosmx.dev/")
+    maven("https://maven.parchmentmc.org")
+    maven("https://maven.quiltmc.org/repository/release/")
 }
 
 dependencies {
@@ -30,14 +32,17 @@ dependencies {
 
     mappings("net.fabricmc:yarn:${properties["yarn_mappings"]}:v2")
 
+//    "mappings"(loom.layered {
+//        mappings("org.quiltmc:quilt-mappings:${properties["minecraft_version"]}+build.${project.properties["quilt_mappings_version"]}:intermediary-v2")
+//        officialMojangMappings()
+//        parchment("org.parchmentmc.data:parchment-${properties["minecraft_version"]}:${project.properties["parchment"]}@zip")
+//    })
+
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
 
     include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
-
-    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
 
     modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
         exclude("net.fabricmc.fabric-api")
@@ -49,6 +54,11 @@ dependencies {
     }
 
     modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")
+
+    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:gson:${properties["endec_gson_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:jankson:${properties["endec_jankson_version"]}")!!.let(::include)
 
     implementation("com.google.devtools.ksp:symbol-processing-api:${properties["ksp_version"]}")
     implementation("com.squareup:kotlinpoet-ksp:${properties["kotlinpoet_version"]}")

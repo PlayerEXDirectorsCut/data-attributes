@@ -32,8 +32,7 @@ abstract class ReloadCommandMixin {
 		manager.update();
 		manager.nextUpdateFlag();
 
-		PacketByteBuf buf = AttributeConfigManager.Packet.ENDEC.encodeFully(() -> ByteBufSerializer.of(PacketByteBufs.create()), manager.toPacket());
-		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, NetworkingChannels.RELOAD, buf));
+		PlayerLookup.all(source.getServer()).forEach(player -> ServerPlayNetworking.send(player, manager.toPacket()));
 
 		DataAttributes.LOGGER.info(
 			"Updated manager with {} override(s), {} function(s) and {} entity types :: update flag [#{}]",

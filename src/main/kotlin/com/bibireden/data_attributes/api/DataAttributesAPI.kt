@@ -6,6 +6,7 @@ import com.bibireden.data_attributes.api.attribute.EntityAttributeSupplier
 import com.bibireden.data_attributes.config.AttributeConfigManager
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.world.World
 import java.util.*
 import java.util.function.Supplier
@@ -40,7 +41,7 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
-    fun getValue(attribute: EntityAttribute, entity: LivingEntity): Optional<Double> {
+    fun getValue(attribute: RegistryEntry<EntityAttribute>, entity: LivingEntity): Optional<Double> {
         val container = entity.attributes
 
         return if (container.hasAttribute(attribute)) {
@@ -59,7 +60,7 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
-    fun getValue(supplier: Supplier<Optional<EntityAttribute>>, entity: LivingEntity): Optional<Double> {
+    fun getValue(supplier: Supplier<Optional<RegistryEntry<EntityAttribute>>>, entity: LivingEntity): Optional<Double> {
         return supplier.get().filter(entity.attributes::hasAttribute).map(entity.attributes::getValue)
     }
 }

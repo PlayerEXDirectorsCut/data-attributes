@@ -15,6 +15,6 @@ abstract class ItemMixin implements ItemHelper {
 
     @Override
     public SoundEvent getEquipSound(final ItemStack itemStack) {
-        return !(this instanceof Equipment) ? SoundEvents.ITEM_ARMOR_EQUIP_GENERIC : ((Equipment) this).getEquipSound();
+        return !(this instanceof Equipment) ? SoundEvents.ITEM_ARMOR_EQUIP_GENERIC.value() : ((Equipment) this).getEquipSound().value();
     }
 }

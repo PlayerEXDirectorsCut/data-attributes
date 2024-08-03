@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Deployment (J21)
 on:
   push:
     branches-ignore:
@@ -14,7 +14,7 @@ jobs:
       BRANCH_PREFIX: $(cat gradle.properties | grep mod_version | cut -d'+' -f2)
     strategy:
       matrix:
-        java: [17]
+        java: [21]
     runs-on: ubuntu-latest
     steps:
       - name: check environment variables
@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew build
       - name: capture build artifacts
         if: |
-          ${{ matrix.java == '17' }}
+          ${{ matrix.java == '21' }}
           github.ref == 'refs/heads/${{ env.BRANCH_PREFIX }}'
         uses: actions/upload-artifact@v3
         with:
@@ -47,13 +47,14 @@ jobs:
         run: |
           loader_val=$(grep "loader" gradle.properties | cut -d'=' -f2 | tr -d '\n')
           mod_version_val=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d '\n')
+          commitish_val=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d '\n')
           echo "mod_version=$mod_version_val-$loader_val" >> $GITHUB_OUTPUT
-          echo "commitish=$mod_version_val/$loader_val" >> $GITHUB_OUTPUT
+          echo "commitish=$commitish_val/main" >> $GITHUB_OUTPUT
       - name: get minecraft version
         if: github.ref == 'refs/heads/${{ env.BRANCH_PREFIX }}'
         id: minecraft_version
         run: |
-          minecraft_version_val=$(grep "mod_version" gradle.properties | cut -d'+' -f2 | tr -d '\n')
+          minecraft_version_val=$(grep "minecraft_version" gradle.properties | cut -d'=' -f2 | tr -d '\n')
           echo "minecraft_version=$minecraft_version_val" >> $GITHUB_OUTPUT
       - name: deploy with mc-publish
         if: github.ref == 'refs/heads/${{ env.BRANCH_PREFIX }}'

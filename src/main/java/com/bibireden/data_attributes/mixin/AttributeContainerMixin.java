@@ -8,6 +8,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,7 +50,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Shadow
 	private void updateTrackedStatus(EntityAttributeInstance instance) {}
 
-	@Shadow @Nullable public abstract EntityAttributeInstance getCustomInstance(EntityAttribute attribute);
+	@Shadow @Nullable public abstract EntityAttributeInstance getCustomInstance(RegistryEntry<EntityAttribute> attribute);
 
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
@@ -69,12 +70,12 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	private Map<?, ?> data_attributes$getAttributesToSend(Map<?, ?> instances) { return this.data_attributes$custom; }
 
 	@Nullable
-	@ModifyReturnValue(method = "getCustomInstance(Lnet/minecraft/entity/attribute/EntityAttribute;)Lnet/minecraft/entity/attribute/EntityAttributeInstance;", at = @At("RETURN"))
-	private EntityAttributeInstance data_attributes$getCustomInstance(EntityAttributeInstance original, EntityAttribute attribute2) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
+	@ModifyReturnValue(method = "getCustomInstance", at = @At("RETURN"))
+	private EntityAttributeInstance data_attributes$getCustomInstance(EntityAttributeInstance original, RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		if (identifier == null) return original;
 
-		EntityAttributeInstance entityAttributeInstance = this.data_attributes$custom.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
+		EntityAttributeInstance entityAttributeInstance = this.data_attributes$custom.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, entry));
 		if (entityAttributeInstance != null) {
 			MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
 			mutable.data_attributes$setContainerCallback((AttributeContainer) (Object) this);
@@ -86,37 +87,37 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		return entityAttributeInstance;
 	}
 
-	@ModifyReturnValue(method = "hasAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;)Z", at = @At("RETURN"))
-	private boolean data_attributes$hasAttribute(boolean original, EntityAttribute attribute) {
-		var identifier = Registries.ATTRIBUTE.getId(attribute);
+	@ModifyReturnValue(method = "hasAttribute", at = @At("RETURN"))
+	private boolean data_attributes$hasAttribute(boolean original, RegistryEntry<EntityAttribute> entry) {
+		var identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$custom.get(identifier) != null || original;
 	}
 
 	@WrapOperation(
-		method = "hasModifierForAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;Ljava/util/UUID;)Z",
+		method = "hasModifierForAttribute",
 		at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
 	)
-	private <V> Object data_attributes$hasModifierForAttribute(Map<?, ?> instances, Object attribute, Operation<V> original) {
-		Identifier identifier = Registries.ATTRIBUTE.getId((EntityAttribute) attribute);
+	private <V> Object data_attributes$hasModifierForAttribute(Map<?, ?> instances, Object entry, Operation<V> original) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(((RegistryEntry<EntityAttribute>) entry).value());
 		var value = this.data_attributes$custom.get(identifier);
-		return value != null ? value : original.call(instances, attribute);
+		return value != null ? value : original.call(instances, entry);
 	}
 
 	@ModifyExpressionValue(method = "getValue", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$getValue(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
+	private Object data_attributes$getValue(Object original, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$custom.get(identifier);
 	}
 
 	@ModifyExpressionValue(method = "getBaseValue", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$getBaseValue(Object attribute, @Local(argsOnly = true) EntityAttribute param) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(param);
+	private Object data_attributes$getBaseValue(Object attribute, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$custom.get(identifier);
 	}
 
-	@ModifyExpressionValue(method = "getModifierValue(Lnet/minecraft/entity/attribute/EntityAttribute;Ljava/util/UUID;)D", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$getModifierValue(Object attribute, @Local(argsOnly = true) EntityAttribute param) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(param);
+	@ModifyExpressionValue(method = "getModifierValue", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+	private Object data_attributes$getModifierValue(Object attribute, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$custom.get(identifier);
 	}
 
@@ -137,13 +138,13 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 	@Inject(method = "setFrom", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$setFrom(AttributeContainer other, CallbackInfo ci) {
 		((MutableAttributeContainer) other).data_attributes$custom().values().forEach(attributeInstance -> {
-			EntityAttribute entityAttribute = attributeInstance.getAttribute();
-			EntityAttributeInstance entityAttributeInstance = this.getCustomInstance(entityAttribute);
+			RegistryEntry<EntityAttribute> entry = attributeInstance.getAttribute();
+			EntityAttributeInstance entityAttributeInstance = this.getCustomInstance(entry);
 
 			if (entityAttributeInstance != null) {
 				entityAttributeInstance.setFrom(attributeInstance);
 				EntityAttributeModifiedEvents.MODIFIED.invoker().onModified(
-					entityAttribute,
+					entry,
 					this.data_attributes$livingEntity,
 					null,
 					entityAttributeInstance.getValue(),

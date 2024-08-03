@@ -11,8 +11,10 @@ import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.ext.keyOf
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
+import com.bibireden.data_attributes.networking.NetworkingChannels
 import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
+import io.wispforest.owo.serialization.CodecUtils
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.AttributeContainer
@@ -22,6 +24,8 @@ import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.PathAwareEntity
 import net.minecraft.entity.passive.AnimalEntity
 import net.minecraft.entity.passive.PassiveEntity
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.packet.CustomPayload
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 
@@ -35,7 +39,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
 
     @JvmRecord
-    data class Packet(val data: Data, val updateFlag: Int) {
+    data class Packet(val data: Data, val updateFlag: Int) : CustomPayload{
         companion object {
             @JvmField
             val ENDEC = StructEndecBuilder.of(
@@ -43,7 +47,12 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
                 Endec.INT.fieldOf("updateFlag") { it.updateFlag },
                 ::Packet
             )
+
+            val PACKET_ID = CustomPayload.Id<Packet>(NetworkingChannels.RELOAD)
+            val PACKET_CODEC = CodecUtils.toPacketCodec<PacketByteBuf, Packet>(ENDEC)
         }
+
+        override fun getId(): CustomPayload.Id<out CustomPayload> = PACKET_ID
     }
 
     /**

@@ -35,8 +35,8 @@
   "depends": {
     "fabricloader": ">=0.15.11",
     "fabric-api": ">=0.92.2",
-    "minecraft": "~1.20.1",
-    "java": ">=17",
+    "minecraft": "~1.21",
+    "java": ">=21",
     "fabric-language-kotlin": ">=1.9.5+kotlin.1.8.22",
     "owo-lib": ">=0.11.2+1.20"
   },
@@ -49,9 +49,9 @@
       "curseforge": 955929,
       "loaders": ["fabric", "quilt"],
       "dependencies": [
-        "fabric-api@0.92.2+1.20.1(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
+        "fabric-api@0.100.8+1.21(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
         "fabric-language-kotlin@1.9.5+kotlin.1.8.22(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
-        "owo-lib@0.11.2(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)"
+        "owo-lib@0.12.11+1.21(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)"
       ]
     }
   }

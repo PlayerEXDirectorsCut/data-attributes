@@ -6,6 +6,8 @@ import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,6 +32,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Unique protected StackingFormula data_attributes$formula;
     @Unique protected boolean data_attributes$enabled;
     @Unique protected double data_attributes$min, data_attributes$max, data_attributes$smoothness;
+//    @Unique protected RegistryEntry<EntityAttribute> data_attributes$cached_entry;
 
     @Final
     @Shadow
@@ -57,8 +60,13 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Unique
     protected double data_attributes$clamped(double valueIn) {
-        double value = EntityAttributeModifiedEvents.CLAMPED.invoker().onClamped((EntityAttribute) (Object) this, valueIn);
+        double value = EntityAttributeModifiedEvents.CLAMPED.invoker().onClamped(this.data_attributes$entry(), valueIn);
         return MathHelper.clamp(value, this.data_attributes$min(), this.data_attributes$max());
+    }
+
+    @Override
+    public RegistryEntry<EntityAttribute> data_attributes$entry() {
+        return Registries.ATTRIBUTE.getEntry((EntityAttribute) (Object) this);
     }
 
     @Override

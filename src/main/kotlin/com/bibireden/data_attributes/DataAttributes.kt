@@ -13,6 +13,7 @@ import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
 import net.minecraft.entity.LivingEntity
@@ -65,6 +66,8 @@ class DataAttributes : ModInitializer {
     }
 
     override fun onInitialize() {
+        PayloadTypeRegistry.playS2C().register(AttributeConfigManager.Packet.PACKET_ID, AttributeConfigManager.Packet.PACKET_CODEC)
+
         ServerLoginNetworking.registerGlobalReceiver(NetworkingChannels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
         ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) MANAGER.update() }

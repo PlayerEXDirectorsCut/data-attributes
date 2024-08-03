@@ -1,6 +1,8 @@
 package com.bibireden.data_attributes.api.attribute;
 
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.registry.entry.RegistryEntry;
 
 import java.util.Map;
 
@@ -12,6 +14,9 @@ import java.util.Map;
  *
  */
 public interface IEntityAttribute {
+	/** Gets the {@link RegistryEntry} that is associated with this attribute. */
+	RegistryEntry<EntityAttribute> data_attributes$entry();
+
 	/**
 	 * @return The minimum value of the attribute.
 	 */
@@ -26,9 +31,9 @@ public interface IEntityAttribute {
 	double data_attributes$min_fallback();
 
 	/** Returns the intended maximum fallback of this attribute. */
-	double data_attributes$max_fallback();	/** Returns the intended maximum fallback of this attribute. */
+	double data_attributes$max_fallback();
 
-	/** Returns the smoothness of this attribute. */
+    /** Returns the smoothness of this attribute. */
 	double data_attributes$smoothness();
 	
 	/**

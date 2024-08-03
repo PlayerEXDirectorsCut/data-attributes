@@ -5,5 +5,5 @@ import net.minecraft.util.Identifier
 
 object Endecs {
     @JvmField
-    val IDENTIFIER: Endec<Identifier> = Endec.STRING.xmap(::Identifier, Identifier::toString)
+    val IDENTIFIER: Endec<Identifier> = Endec.STRING.xmap({ Identifier.tryParse(it)!! }, Identifier::toString)
 }

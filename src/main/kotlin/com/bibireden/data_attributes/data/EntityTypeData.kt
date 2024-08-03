@@ -25,8 +25,9 @@ data class EntityTypeData(val data: Map<Identifier, Double> = mapOf()) {
     fun build(builder: DefaultAttributeContainer.Builder, container: DefaultAttributeContainer?) {
         (container as MutableDefaultAttributeContainer).`data_attributes$copy`(builder)
         for ((key, value) in this.data) {
-            val attribute = Registries.ATTRIBUTE[key] ?: continue
-            builder.add(attribute, attribute.clamp(value))
+            Registries.ATTRIBUTE.getEntry(key).ifPresent { entry ->
+                builder.add(entry, entry.value().clamp(value))
+            }
         }
     }
 }

@@ -7,8 +7,8 @@ import net.minecraft.item.SwordItem;
 
 @Mixin(SwordItem.class)
 abstract class SwordItemMixin extends ItemMixin {
-    @Override
-    public Float getAttackDamage(final ItemStack itemStack) {
-        return ((SwordItem) (Object) this).getAttackDamage();
-    }
+//    @Override
+//    public Float getAttackDamage(final ItemStack itemStack) {
+//        return ((SwordItem) (Object) this).getAttackDamage();
+//    }
 }

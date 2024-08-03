@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,13 +32,13 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 
 	@Final
 	@Shadow
-	private Map<EntityAttribute, EntityAttributeInstance> instances;
+	private Map<RegistryEntry<EntityAttribute>, EntityAttributeInstance> instances;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void data_attributes$init(Map<EntityAttribute, EntityAttributeInstance> instances, CallbackInfo ci) {
+	private void data_attributes$init(Map<RegistryEntry<EntityAttribute>, EntityAttributeInstance> instances, CallbackInfo ci) {
 		this.data_attributes$instances = new HashMap<>();
-		instances.forEach((attribute, instance) -> {
-			Identifier key = Registries.ATTRIBUTE.getId(attribute);
+		instances.forEach((entry, instance) -> {
+			Identifier key = Registries.ATTRIBUTE.getId(entry.value());
 			if (key != null) {
 				this.data_attributes$instances.put(key, instance);
 			}
@@ -45,32 +46,32 @@ abstract class DefaultAttributeContainerMixin implements MutableDefaultAttribute
 	}
 
 	@ModifyExpressionValue(method = "require", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$require(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
+	private Object data_attributes$require(Object original, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$instances.getOrDefault(identifier, (EntityAttributeInstance) original);
 	}
 
 	@ModifyExpressionValue(method = "createOverride", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-	private Object data_attributes$createOverride(Object original, @Local(argsOnly = true) EntityAttribute attribute) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(attribute);
+	private Object data_attributes$createOverride(Object original, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$instances.getOrDefault(identifier, (EntityAttributeInstance) original);
 	}
 
 	@ModifyReturnValue(method = "has", at = @At("RETURN"))
-	private boolean data_attributes$has(boolean original, @Local(argsOnly = true) EntityAttribute type) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(type);
+	private boolean data_attributes$has(boolean original, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		return this.data_attributes$instances.containsKey(identifier) || original;
 	}
 
 	@ModifyReturnValue(method = "hasModifier", at = @At("RETURN"))
-	private boolean data_attributes$hasModifier(boolean original, @Local(argsOnly = true) EntityAttribute type, @Local(argsOnly = true) UUID uuid) {
-		Identifier identifier = Registries.ATTRIBUTE.getId(type);
+	private boolean data_attributes$hasModifier(boolean original, @Local(argsOnly = true) RegistryEntry<EntityAttribute> entry, @Local(argsOnly = true) Identifier id) {
+		Identifier identifier = Registries.ATTRIBUTE.getId(entry.value());
 		var instance = this.data_attributes$instances.get(identifier);
-		return (instance != null && instance.getModifier(uuid) != null) || original;
+		return (instance != null && instance.getModifier(id) != null) || original;
 	}
 
 	@Override
 	public void data_attributes$copy(DefaultAttributeContainer.Builder builder) {
-		this.instances.forEach((entityAttribute, instance) -> builder.add(entityAttribute, instance.getBaseValue()));
+		this.instances.forEach((entry, instance) -> builder.add(entry, instance.getBaseValue()));
 	}
 }
