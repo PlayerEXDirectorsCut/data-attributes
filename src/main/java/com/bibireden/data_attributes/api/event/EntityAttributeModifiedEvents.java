@@ -29,7 +29,7 @@ public final class EntityAttributeModifiedEvents {
 	
 	/**
 	 * Fired after the attribute instance value was calculated, but before it was output. This offers one last chance to alter the 
-	 * value in some way (for example round a decimal to an integer).
+	 * value in some way (for example, rounding a decimal to an integer).
 	 */
 	public static final Event<Clamped> CLAMPED = EventFactory.createArrayBacked(Clamped.class, callbacks -> (attribute, value) -> {
 		double cache = value;

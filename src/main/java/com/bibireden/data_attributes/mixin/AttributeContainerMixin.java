@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.bibireden.data_attributes.api.event.EntityAttributeModifiedEvents;
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer;
-import com.bibireden.data_attributes.mutable.MutableAttributeInstance;
 import com.google.common.collect.Multimap;
 
 import net.minecraft.entity.LivingEntity;
@@ -53,7 +52,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
 	@Inject(method = "updateTrackedStatus", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$updateTrackedStatus(EntityAttributeInstance instance, CallbackInfo ci) {
-		Identifier identifier = ((MutableAttributeInstance) instance).data_attributes$get_id();
+		Identifier identifier = instance.data_attributes$get_id();
 		if (identifier != null) {
 			this.data_attributes$tracked.put(identifier, instance);
 		}
@@ -74,16 +73,15 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 		Identifier identifier = Registries.ATTRIBUTE.getId(attribute2);
 		if (identifier == null) return original;
 
-		EntityAttributeInstance entityAttributeInstance = this.data_attributes$custom.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
-		if (entityAttributeInstance != null) {
-			MutableAttributeInstance mutable = (MutableAttributeInstance) entityAttributeInstance;
-			mutable.data_attributes$setContainerCallback((AttributeContainer) (Object) this);
-			if (mutable.data_attributes$get_id() == null) {
-				mutable.data_attributes$updateId(identifier);
+		EntityAttributeInstance instance = this.data_attributes$custom.computeIfAbsent(identifier, id -> this.fallback.createOverride(this::updateTrackedStatus, attribute2));
+		if (instance != null) {
+			instance.data_attributes$setContainerCallback((AttributeContainer) (Object) this);
+			if (instance.data_attributes$get_id() == null) {
+				instance.data_attributes$updateId(identifier);
 			}
 		}
 
-		return entityAttributeInstance;
+		return instance;
 	}
 
 	@ModifyReturnValue(method = "hasAttribute(Lnet/minecraft/entity/attribute/EntityAttribute;)Z", at = @At("RETURN"))
@@ -136,7 +134,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
 	@Inject(method = "setFrom", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$setFrom(AttributeContainer other, CallbackInfo ci) {
-		((MutableAttributeContainer) other).data_attributes$custom().values().forEach(attributeInstance -> {
+		other.data_attributes$custom().values().forEach(attributeInstance -> {
 			EntityAttribute entityAttribute = attributeInstance.getAttribute();
 			EntityAttributeInstance entityAttributeInstance = this.getCustomInstance(entityAttribute);
 
@@ -177,9 +175,7 @@ abstract class AttributeContainerMixin implements MutableAttributeContainer {
 
 	@Override
 	public void data_attributes$refresh() {
-		for (EntityAttributeInstance instance : this.data_attributes$custom.values()) {
-			((MutableAttributeInstance) instance).data_attributes$refresh();
-		}
+		this.data_attributes$custom.values().forEach(EntityAttributeInstance::data_attributes$refresh);
 	}
 
 	@Override

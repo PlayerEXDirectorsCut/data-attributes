@@ -15,5 +15,5 @@ public interface IEntityAttributeInstance {
 	 * @param uuid The uuid of the modifier.
 	 * @param value The value to change the modifier to.
 	 */
-	void updateModifier(final UUID uuid, final double value);
+	default void data_attributes$updateModifier(final UUID uuid, final double value) {}
 }

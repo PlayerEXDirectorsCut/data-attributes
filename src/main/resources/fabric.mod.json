@@ -53,6 +53,21 @@
         "fabric-language-kotlin@1.9.5+kotlin.1.8.22(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
         "owo-lib@0.11.2(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)"
       ]
+    },
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1320": ["com/bibireden/data_attributes/api/attribute/IEntityAttribute", "com/bibireden/data_attributes/mutable/MutableEntityAttribute"],
+      "net/minecraft/class_1324": ["com/bibireden/data_attributes/api/attribute/IEntityAttributeInstance", "com/bibireden/data_attributes/mutable/MutableAttributeInstance"],
+      "net/minecraft/class_5131": ["com/bibireden/data_attributes/mutable/MutableAttributeContainer"],
+      "net/minecraft/class_5132": ["com/bibireden/data_attributes/mutable/MutableDefaultAttributeContainer"],
+      "net/minecraft/class_1322": ["com/bibireden/data_attributes/mutable/MutableAttributeModifier"]
+    },
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/pcRw79hwey",
+        "modmenu.wiki": "https://bareminimumstudios.github.io/Bare-Minimum-Docs/",
+        "modmenu.kofi": "https://ko-fi.com/bibiredens",
+        "modmenu.modrinth": "https://modrinth.com/mod/data-attributes-directors-cut"
+      }
     }
   }
 }
