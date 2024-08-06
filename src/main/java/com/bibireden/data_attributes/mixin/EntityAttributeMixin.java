@@ -95,7 +95,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) {
+    public Double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) {
         return this.data_attributes$formula.result(k, k2, v, v2, instance);
     }
 
@@ -110,18 +110,18 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public double data_attributes$min() { return this.data_attributes$min; }
+    public Double data_attributes$min() { return this.data_attributes$min; }
 
     @Override
-    public double data_attributes$max() { return this.data_attributes$max; }
+    public Double data_attributes$max() { return this.data_attributes$max; }
 
     @Override
-    public double data_attributes$min_fallback() {
+    public Double data_attributes$min_fallback() {
         return Double.MIN_VALUE;
     }
 
     @Override
-    public double data_attributes$max_fallback() {
+    public Double data_attributes$max_fallback() {
         return Double.MAX_VALUE;
     }
 

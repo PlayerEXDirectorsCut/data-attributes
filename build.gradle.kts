@@ -23,12 +23,22 @@ repositories {
     maven("https://maven.terraformersmc.com")
     maven("https://api.modrinth.com/maven")
     maven("https://maven.kosmx.dev/")
+    maven("https://maven.parchmentmc.org")
+    maven("https://maven.quiltmc.org/repository/release/")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
 
     mappings("net.fabricmc:yarn:${properties["yarn_mappings"]}:v2")
+
+//    mappings {
+//        loom.layered {
+//            mappings("org.quiltmc:quilt-mappings:${properties["minecraft_version"]}+build.${properties["quilt_mappings_version"]}:intermediary-v2")
+//            officialMojangMappings()
+//            parchment("org.parchmentmc.data:parchment-${properties["parchment_version"]}@zip")
+//        }
+//    }
 
     modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")

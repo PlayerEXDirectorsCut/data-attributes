@@ -4,6 +4,6 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 
 public interface MutableDefaultAttributeContainer {
 
-    // Copies attribute configurations from a DefaultAttributeContainer.Builder
-    void data_attributes$copy(DefaultAttributeContainer.Builder builder);
+    /** Copies attribute configurations from a {@link DefaultAttributeContainer.Builder}. */
+    default void data_attributes$copy(DefaultAttributeContainer.Builder builder) {};
 }
