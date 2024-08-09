@@ -1,0 +1,146 @@
+{
+	"entries": {
+		"playerex:luckiness": [
+			{
+				"id": "playerex:melee_crit_chance",
+				"behavior": "Add",
+				"value": 0.02
+			},
+			{
+				"id": "playerex:ranged_crit_chance",
+				"behavior": "Add",
+				"value": 0.02
+			},
+			{
+				"id": "minecraft:generic.luck",
+				"behavior": "Add",
+				"value": 0.05
+			},
+			{
+				"id": "playerex:evasion",
+				"behavior": "Add",
+				"value": 0.01
+			},
+			{
+				"id": "spell_power:critical_chance",
+				"behavior": "Add",
+				"value": 0.02
+			}
+		],
+		"playerex:dexterity": [
+			{
+				"id": "minecraft:generic.attack_speed",
+				"behavior": "Multiply",
+				"value": 0.01
+			},
+			{
+				"id": "playerex:ranged_crit_damage",
+				"behavior": "Add",
+				"value": 0.005
+			},
+			{
+				"id": "ranged_weapon:haste",
+				"behavior": "Multiply",
+				"value": 0.02
+			},
+			{
+				"id": "ranged_weapon:damage",
+				"behavior": "Multiply",
+				"value": 0.02
+			}
+		],
+		"playerex:constitution": [
+			{
+				"id": "minecraft:generic.max_health",
+				"behavior": "Add",
+				"value": 0.5
+			},
+			{
+				"id": "minecraft:generic.armor",
+				"behavior": "Add",
+				"value": 0.25
+			},
+			{
+				"id": "additionalentityattributes:generic.magic_protection",
+				"behavior": "Add",
+				"value": 0.25
+			},
+			{
+				"id": "additionalentityattributes:generic.lung_capacity",
+				"behavior": "Add",
+				"value": 0.01
+			},
+			{
+				"id": "playerex:poison_resistance",
+				"behavior": "Add",
+				"value": 0.01
+			}
+		],
+		"playerex:intelligence": [
+			{
+				"id": "additionalentityattributes:player.dropped_experience",
+				"behavior": "Multiply",
+				"value": 0.01
+			},
+			{
+				"id": "playerex:wither_resistance",
+				"behavior": "Add",
+				"value": 0.01
+			},
+			{
+				"id": "spell_power:haste",
+				"behavior": "Add",
+				"value": 0.002
+			}
+		],
+		"playerex:focus": [
+			{
+				"id": "playerex:health_regeneration",
+				"behavior": "Add",
+				"value": 0.0015
+			},
+			{
+				"id": "playerex:heal_amplification",
+				"behavior": "Add",
+				"value": 2.0E-4
+			},
+			{
+				"id": "playerex:freeze_resistance",
+				"behavior": "Add",
+				"value": 0.01
+			},
+			{
+				"id": "playerex:lightning_resistance",
+				"behavior": "Add",
+				"value": 0.01
+			},
+			{
+				"id": "playerex:fire_resistance",
+				"behavior": "Add",
+				"value": 0.01
+			}
+		],
+		"playerex:strength": [
+			{
+				"id": "minecraft:generic.attack_damage",
+				"behavior": "Multiply",
+				"value": 0.02
+			},
+			{
+				"id": "minecraft:generic.knockback_resistance",
+				"behavior": "Add",
+				"value": 0.1
+			},
+			{
+				"id": "playerex:melee_crit_damage",
+				"behavior": "Add",
+				"value": 0.005
+			},
+			{
+				"id": "playerex:breaking_speed",
+				"behavior": "Add",
+				"value": 1.0
+			}
+		]
+	}
+}

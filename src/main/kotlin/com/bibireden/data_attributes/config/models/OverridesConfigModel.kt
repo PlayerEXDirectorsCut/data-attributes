@@ -7,6 +7,7 @@ import io.wispforest.endec.Endec
 import io.wispforest.endec.impl.StructEndecBuilder
 import io.wispforest.owo.config.Option.SyncMode
 import io.wispforest.owo.config.annotation.*
+import kotlinx.serialization.Serializable
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
@@ -20,6 +21,7 @@ class OverridesConfigModel {
     @Hook
     var overrides: Map<Identifier, AttributeOverride> = mapOf()
 
+    @Serializable
     data class AttributeOverride(
         @JvmField
         var enabled: Boolean = true,
@@ -51,7 +53,7 @@ class OverridesConfigModel {
                 Endec.DOUBLE.optionalFieldOf("min_fallback", { it.min_fallback }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max_fallback", { it.max_fallback }, 1_000_000.0),
                 StackingFormula.ENDEC.fieldOf("formula") { it.formula },
-                OverridesConfigModel::AttributeOverride,
+                ::AttributeOverride,
             )
         }
     }
