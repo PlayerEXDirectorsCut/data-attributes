@@ -8,7 +8,6 @@ import kotlinx.serialization.UseSerializers
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
-import com.bibireden.data_attributes.data.EntityTypeData
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -116,7 +115,16 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
         manager.findResources(path, ::isPathJson).forEach { (id, res) ->
             try {
                 Json.decodeFromStream<EntityTypes>(res.inputStream).entries.forEach { (id, entry) ->
-                    cache.types.entries.computeIfAbsent(id) { entry }
+                    val presentEntry = cache.types.entries[id]
+                    if (presentEntry == null) {
+                        cache.types.entries[id] = entry
+                    }
+                    else {
+                        for ((secondaryId, secondaryValue) in entry) {
+                            presentEntry.computeIfAbsent(secondaryId) { secondaryValue }
+                        }
+                        cache.types.entries[id] = presentEntry
+                    }
                 }
             }
             catch (why: Exception) {
