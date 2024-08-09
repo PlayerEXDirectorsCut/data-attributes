@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes.config.functions
 
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
+import com.bibireden.data_attributes.api.attribute.AttributeFormat
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.serde.IdentifierSerializer
 import io.wispforest.endec.Endec

@@ -31,6 +31,15 @@
     {"text": "Multiply", "color": "white"}
   ],
 
+  "text.config.data_attributes.enum.format.whole": [
+    {"text":  "ℝ ", "color":  "#ffffff"},
+    {"text": "Whole", "color":  "white"}
+  ],
+  "text.config.data_attributes.enum.format.percentage": [
+    {"text":  "% ", "color":  "#ffffff"},
+    {"text": "Percentage", "color":  "white"}
+  ],
+
   "text.config.data_attributes.category.overrides": "Overrides",
   "text.config.data_attributes.category.functions": "Functions",
 
@@ -62,6 +71,10 @@
   "text.config.data_attributes.data_entry.overrides.formula": [
     {"text": "\uD83E\uDDEA ", "color": "#83DEB7"},
     {"text": "Stacking Formula", "color": "white"}
+  ],
+  "text.config.data_attributes.data_entry.overrides.format" : [
+    {"text": "\uD835\uDC53 ", "color": "#83DEB7"},
+    {"text":  "Format", "color":  "white"}
   ],
   "text.config.data_attributes.data_entry.functions.behavior": [
     {"text": "\uD835\uDC53 ", "color": "#83DEB7"},

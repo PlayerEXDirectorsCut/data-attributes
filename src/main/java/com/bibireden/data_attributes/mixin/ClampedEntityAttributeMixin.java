@@ -1,5 +1,7 @@
 package com.bibireden.data_attributes.mixin;
 
+import com.bibireden.data_attributes.api.attribute.AttributeFormat;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -26,7 +28,7 @@ abstract class ClampedEntityAttributeMixin extends EntityAttributeMixin {
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void data_attributes$init(String translationKey, double fallback, double min, double max, CallbackInfo ci) {
-		this.data_attributes$override(new AttributeOverride(false, minValue, maxValue, min, max, 0.0, StackingFormula.Flat));
+		this.data_attributes$override(new AttributeOverride(false, minValue, maxValue, min, max, 0.0, StackingFormula.Flat, AttributeFormat.Whole));
 	}
 
 	@ModifyReturnValue(method = "getMinValue", at = @At("RETURN"))
