@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier
  * Instead, register afterward, such as on **mod initialization**.
  */
 object DefaultAttributeFactory {
-    @Deprecated("Use the new system to register default entries.", level = DeprecationLevel.WARNING)
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [AttributeOverride]'s to the config if they are not present currently within the config. */
     fun registerOverrides(overrides: Map<Identifier, AttributeOverride>) {
@@ -26,7 +26,7 @@ object DefaultAttributeFactory {
         DataAttributes.OVERRIDES_CONFIG.save()
     }
 
-    @Deprecated("Use the new system to register default entries.", level = DeprecationLevel.WARNING)
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [AttributeFunction]'s to the config if they are not present currently within the config. */
     fun registerFunctions(functions: Map<Identifier, List<AttributeFunction>>) {
@@ -46,7 +46,7 @@ object DefaultAttributeFactory {
         DataAttributes.FUNCTIONS_CONFIG.save()
     }
 
-    @Deprecated("Use the new system to register default entries.", level = DeprecationLevel.WARNING)
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [EntityTypeData]'s to the config if they are not present currently within the config. */
     fun registerEntityTypes(entityTypes: Map<Identifier, EntityTypeData>) {
