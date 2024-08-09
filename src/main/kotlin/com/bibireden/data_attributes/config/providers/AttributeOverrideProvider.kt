@@ -1,10 +1,12 @@
 package com.bibireden.data_attributes.config.providers
 
+import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
+import com.bibireden.data_attributes.config.entry.ConfigMerger
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
@@ -21,12 +23,13 @@ import io.wispforest.owo.ui.core.VerticalAlignment
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import kotlin.math.max
 
 class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverride>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     val backing = option.value().toMutableMap()
 
     init {
-        backing.forEach { (id, config) ->
+        ConfigMerger.mergeOverrides(DataAttributesAPI.serverManager.defaults.overrides.entries).forEach { (id, config) ->
             var override = config
             // extract min & max fallbacks.
             val attribute = Registries.ATTRIBUTE[id] as MutableEntityAttribute?
@@ -79,7 +82,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
-                                this.backing.replace(id, override.copy(min = v))
+                                this.backing[id] = override.copy(min = v)
                             }
                         },
                         "inputs.min"
@@ -93,7 +96,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
-                                this.backing.replace(id, override.copy(max = v))
+                                this.backing[id] = override.copy(max = v)
                             }
                         },
                         "inputs.max"
@@ -126,10 +129,8 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         hf.child(
                             Components.discreteSlider(Sizing.fill(30), 0.01, 100.0).value(override.smoothness).also { slider ->
                                 slider.onChanged().subscribe {
-                                    var smoothness = slider.value().round(2)
-                                    if (smoothness <= 0.0) {smoothness = 0.01}
                                     this.backing.remove(id)
-                                    this.backing.put(id, override.copy(smoothness = smoothness))
+                                    this.backing[id] = override.copy(smoothness = max(slider.value().round(2), 0.01))
                                 }
                             }
                                 .positioning(Positioning.relative(100, 0))
@@ -150,7 +151,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                     StackingFormula.Diminished -> StackingFormula.Flat
                                 }
                                 it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
-                                this.backing.replace(id, override.copy(formula = override.formula))
+                                this.backing[id] = override.copy(formula = override.formula)
                             })
                                 .renderer(ButtonRenderers.STANDARD)
                                 .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
