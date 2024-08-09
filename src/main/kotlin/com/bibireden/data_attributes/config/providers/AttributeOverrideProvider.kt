@@ -38,7 +38,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                     min_fallback = attribute.`data_attributes$min_fallback`(),
                     max_fallback = attribute.`data_attributes$max_fallback`()
                 )
-                this.backing[id] = override
+                this.backing.replace(id, override)
             }
 
             val isOverrideInvalid = isAttributeUnregistered(id)

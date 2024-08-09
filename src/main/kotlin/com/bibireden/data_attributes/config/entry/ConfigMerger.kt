@@ -18,14 +18,15 @@ object ConfigMerger {
     fun mergeFunctions(values: Map<Identifier, List<AttributeFunction>>): Map<Identifier, List<AttributeFunction>> {
         val entries = values.toMutableMap()
         for ((primaryId, primaryFunctions) in DataAttributes.FUNCTIONS_CONFIG.functions.data) {
-            val secondaryEntry = entries[primaryId]?.toMutableList()
-            if (secondaryEntry == null) {
+            val entriesMap = entries[primaryId]
+            if (entriesMap == null) {
                 entries[primaryId] = primaryFunctions
             }
             else {
+                val secondaryEntry = entriesMap.toMutableList()
                 primaryFunctions.forEach { primaryFunction ->
                     var replaced = false
-                    secondaryEntry.forEachIndexed { index, entry ->
+                    entriesMap.forEachIndexed { index, entry ->
                         if (entry.id == primaryFunction.id) {
                             secondaryEntry.removeAt(index)
                             secondaryEntry.add(index, primaryFunction)

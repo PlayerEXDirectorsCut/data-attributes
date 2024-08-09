@@ -30,7 +30,7 @@ import net.minecraft.util.Identifier
 /**
  * Used to manage config data, and contains an [AttributeContainerHandler] to build related [EntityTypeData].
  */
-class AttributeConfigManager(private var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler()) {
+class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler()) {
     var updateFlag: Int = 0
 
     var defaults: DefaultAttributesReloadListener.Cache = DefaultAttributesReloadListener.Cache()
@@ -163,10 +163,10 @@ class AttributeConfigManager(private var data: Data = Data(), val handler: Attri
     }
 
     private fun insertOverrides(overrides: Map<Identifier, AttributeOverride>, entityAttributeData: MutableMap<Identifier, EntityAttributeData>) {
-        overrides.forEach { (id, override) ->
+        for ((id, override) in overrides) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("Attribute [$id] that was targeted for override is not registered. This has been skipped.")
-                return@forEach
+                continue
             }
             val attribute = Registries.ATTRIBUTE[id]!! as IEntityAttribute
             if (override.max.isNaN()) {
@@ -180,11 +180,10 @@ class AttributeConfigManager(private var data: Data = Data(), val handler: Attri
     }
 
     private fun insertFunctions(store: Map<Identifier, List<AttributeFunction>>, data: MutableMap<Identifier, EntityAttributeData>) {
-        store.forEach { (id, functions) ->
+        for ((id, functions) in store) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")
-            }
-            else {
+            } else {
                 val dat = data[id] ?: EntityAttributeData()
                 dat.putFunctions(functions)
                 data[id] = dat

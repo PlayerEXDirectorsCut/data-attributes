@@ -61,7 +61,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
                             onChange = {
                                 it.toDoubleOrNull()?.let { v ->
                                     val popped = this.backing.remove(topID)?.toMutableList() ?: mutableListOf()
-                                    if (popped.isEmpty()) {
+                                    if (popped.size - 1 < index) {
                                         popped.add(function.copy(value = v))
                                     }
                                     else {

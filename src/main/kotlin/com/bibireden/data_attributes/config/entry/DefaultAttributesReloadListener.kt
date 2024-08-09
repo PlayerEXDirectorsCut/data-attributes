@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
+import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
@@ -29,11 +30,11 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
     var data: Cache = Cache()
 
     @Serializable
-    data class Overrides(val entries: LinkedHashMap<Identifier, AttributeOverride> = LinkedHashMap())
+    data class Overrides(var entries: LinkedHashMap<Identifier, AttributeOverride> = LinkedHashMap())
     @Serializable
-    data class Functions(val entries: LinkedHashMap<Identifier, List<AttributeFunction>> = LinkedHashMap())
+    data class Functions(var entries: LinkedHashMap<Identifier, List<AttributeFunction>> = LinkedHashMap())
     @Serializable
-    data class EntityTypes(val entries: LinkedHashMap<Identifier, LinkedHashMap<Identifier, Double>> = LinkedHashMap())
+    data class EntityTypes(var entries: LinkedHashMap<Identifier, LinkedHashMap<Identifier, Double>> = LinkedHashMap())
 
     @Serializable
     data class Cache(val overrides: Overrides = Overrides(), val functions: Functions = Functions(), val types: EntityTypes = EntityTypes())
@@ -53,6 +54,23 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
             readOverrides(manager, cache)
             readFunctions(manager, cache)
             readEntityTypes(manager, cache)
+
+            // Filtering before applying the cache.
+            cache.overrides.entries = LinkedHashMap(cache.overrides.entries.filter { (id, _) -> Registries.ATTRIBUTE.containsId(id) })
+            cache.functions.entries.forEach { (id, functions) ->
+                if (!Registries.ATTRIBUTE.containsId(id)) {
+                    cache.functions.entries.remove(id)
+                    return@forEach
+                }
+                cache.functions.entries[id] = functions.filter { f -> Registries.ATTRIBUTE.containsId(f.id) }
+            }
+            cache.types.entries.forEach { (id, data) ->
+                if (!Registries.ENTITY_TYPE.containsId(id)) {
+                    cache.types.entries.remove(id)
+                    return@forEach
+                }
+                cache.types.entries[id] = LinkedHashMap(data.filter { (id2) -> Registries.ATTRIBUTE.containsId(id2) })
+            }
 
             cache
         }
