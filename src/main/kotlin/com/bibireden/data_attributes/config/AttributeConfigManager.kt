@@ -185,7 +185,9 @@ class AttributeConfigManager(private var data: Data = Data(), val handler: Attri
                 DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")
             }
             else {
-                data.getOrPut(id, ::EntityAttributeData).putFunctions(functions)
+                val dat = data[id] ?: EntityAttributeData()
+                dat.putFunctions(functions)
+                data[id] = dat
             }
         }
     }

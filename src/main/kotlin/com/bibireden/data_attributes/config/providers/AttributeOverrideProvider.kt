@@ -38,7 +38,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                     min_fallback = attribute.`data_attributes$min_fallback`(),
                     max_fallback = attribute.`data_attributes$max_fallback`()
                 )
-                this.backing.replace(id, override)
+                this.backing[id] = override
             }
 
             val isOverrideInvalid = isAttributeUnregistered(id)
@@ -82,7 +82,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
-                                this.backing.replace(id, override.copy(min = v))
+                                this.backing[id] = override.copy(min = v)
                             }
                         },
                         "inputs.min"
@@ -96,7 +96,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         Validators::isNumeric,
                         onChange = {
                             it.toDoubleOrNull()?.let { v ->
-                                this.backing.replace(id, override.copy(max = v))
+                                this.backing[id] = override.copy(max = v)
                             }
                         },
                         "inputs.max"
@@ -151,7 +151,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                     StackingFormula.Diminished -> StackingFormula.Flat
                                 }
                                 it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
-                                this.backing.replace(id, override.copy(formula = override.formula))
+                                this.backing[id] = override.copy(formula = override.formula)
                             })
                                 .renderer(ButtonRenderers.STANDARD)
                                 .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))

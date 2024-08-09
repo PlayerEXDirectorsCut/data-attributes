@@ -28,7 +28,7 @@ object ConfigMerger {
                     secondaryEntry.forEachIndexed { index, entry ->
                         if (entry.id == primaryFunction.id) {
                             secondaryEntry.removeAt(index)
-                            secondaryEntry.add(index, entry)
+                            secondaryEntry.add(index, primaryFunction)
                             replaced = true
                         }
                     }
