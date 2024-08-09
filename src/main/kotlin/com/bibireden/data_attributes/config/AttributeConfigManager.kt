@@ -4,6 +4,7 @@ import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.EntityInstances
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute
 import com.bibireden.data_attributes.api.event.AttributesReloadedEvent
+import com.bibireden.data_attributes.config.entry.ConfigMerger
 import com.bibireden.data_attributes.config.entry.DefaultAttributesReloadListener
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
@@ -110,11 +111,9 @@ class AttributeConfigManager(private var data: Data = Data(), val handler: Attri
      * This applies the data immediately afterward.
      */
     fun update() {
-        this.data.overrides = defaults.overrides.entries.also { it.putAll(DataAttributes.OVERRIDES_CONFIG.overrides) }
-        this.data.functions = defaults.functions.entries.also { it.putAll(DataAttributes.FUNCTIONS_CONFIG.functions.data) }
-        this.data.entity_types = defaults.types.entries.entries.associate { (a, v) -> a to EntityTypeData(v) }
-            .toMutableMap()
-            .also { it.putAll(DataAttributes.ENTITY_TYPES_CONFIG.entity_types) }
+        this.data.overrides = ConfigMerger.mergeOverrides(defaults.overrides.entries)
+        this.data.functions = ConfigMerger.mergeFunctions(defaults.functions.entries)
+        this.data.entity_types = ConfigMerger.mergeEntityTypes(defaults.types.entries)
 
         this.onDataUpdate()
     }
