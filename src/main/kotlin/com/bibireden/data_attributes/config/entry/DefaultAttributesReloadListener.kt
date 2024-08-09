@@ -100,7 +100,18 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
         manager.findResources(path, ::isPathJson).forEach { (id, res) ->
             try {
                 Json.decodeFromStream<Functions>(res.inputStream).entries.forEach { (id, entry) ->
-                    cache.functions.entries.computeIfAbsent(id) { entry }
+                    val presentEntry = cache.functions.entries[id]
+                    if (presentEntry == null) {
+                        cache.functions.entries[id] = entry
+                    }
+                    else {
+                        val mutablePresentEntry = presentEntry.toMutableList()
+                        for (func in entry) {
+                            if (presentEntry.find { it.id == func.id } != null) continue
+                            mutablePresentEntry.add(func)
+                        }
+                        cache.functions.entries[id] = mutablePresentEntry
+                    }
                 }
             }
             catch (why: Exception) {
