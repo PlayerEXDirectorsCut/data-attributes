@@ -1,0 +1,148 @@
+{
+	"entries": {
+		"playerex:lightning_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"spell_power:haste": {
+			"enabled": true,
+			"min": 100.0,
+			"max": 1000.0,
+			"smoothness": 1.0,
+			"min_fallback": 100.0,
+			"max_fallback": 1000.0,
+			"formula": "Diminished"
+		},
+		"playerex:ranged_crit_damage": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1000000.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1000000.0,
+			"formula": "Diminished"
+		},
+		"minecraft:generic.knockback_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"minecraft:generic.luck": {
+			"enabled": true,
+			"min": -1024.0,
+			"max": 1024.0,
+			"smoothness": 1.0,
+			"min_fallback": -1024.0,
+			"max_fallback": 1024.0,
+			"formula": "Diminished"
+		},
+		"playerex:poison_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:melee_crit_damage": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:wither_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:freeze_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:health_regeneration": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 100.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 100.0,
+			"formula": "Diminished"
+		},
+		"playerex:heal_amplification": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 100.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 100.0,
+			"formula": "Diminished"
+		},
+		"playerex:ranged_crit_chance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:evasion": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 100.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 100.0,
+			"formula": "Diminished"
+		},
+		"playerex:melee_crit_chance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"playerex:fire_resistance": {
+			"enabled": true,
+			"min": 0.0,
+			"max": 1.0,
+			"smoothness": 1.0,
+			"min_fallback": 0.0,
+			"max_fallback": 1.0,
+			"formula": "Diminished"
+		},
+		"spell_power:critical_chance": {
+			"enabled": true,
+			"min": 100.0,
+			"max": 1000.0,
+			"smoothness": 1.0,
+			"min_fallback": 100.0,
+			"max_fallback": 1000.0,
+			"formula": "Diminished"
+		}
+	}
+}
