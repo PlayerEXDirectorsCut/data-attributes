@@ -1,7 +1,9 @@
 package com.bibireden.data_attributes.api.attribute;
 
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
+import org.apache.commons.lang3.NotImplementedException;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,36 +17,36 @@ public interface IEntityAttribute {
 	/**
 	 * @return The minimum value of the attribute.
 	 */
-	double data_attributes$min();
+	default Double data_attributes$min() { return null; }
 	
 	/**
 	 * @return The maximum value of the attribute.
 	 */
-	double data_attributes$max();
+	default Double data_attributes$max() { return null; }
 
 	/** Returns the intended minimum fallback of this attribute. */
-	double data_attributes$min_fallback();
+	default Double data_attributes$min_fallback() { return null; }
 
 	/** Returns the intended maximum fallback of this attribute. */
-	double data_attributes$max_fallback();	/** Returns the intended maximum fallback of this attribute. */
+	default Double data_attributes$max_fallback() { return null; }
 
 	/** Returns the smoothness of this attribute. */
-	double data_attributes$smoothness();
+	default Double data_attributes$smoothness() { return null; }
 	
 	/**
 	 * @return The attribute's {@link StackingFormula}.
 	 */
-	StackingFormula data_attributes$formula();
+	default StackingFormula data_attributes$formula() { return null; }
 	
 	/**
 	 * @return An immutable map of the function-parents attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, AttributeFunction> data_attributes$parents();
+	default Map<IEntityAttribute, AttributeFunction> data_attributes$parents() { return null; }
 	
 	/**
 	 * @return An immutable map of the function-children attached to this attribute.
 	 * @since 1.4.0
 	 */
-	Map<IEntityAttribute, AttributeFunction> data_attributes$children();
+	default Map<IEntityAttribute, AttributeFunction> data_attributes$children() { return null; }
 }

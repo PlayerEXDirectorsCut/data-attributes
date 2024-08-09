@@ -7,8 +7,4 @@ import io.wispforest.owo.config.annotation.Sync
 
 @Suppress("UNUSED")
 @Config(name = DataAttributes.MOD_ID, wrapperName = "DataAttributesConfig")
-class ConfigModel {
-    @JvmField
-    @Sync(SyncMode.OVERRIDE_CLIENT)
-    var applyOnWorldStart: Boolean = true
-}
+class ConfigModel

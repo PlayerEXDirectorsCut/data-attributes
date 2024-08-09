@@ -1,10 +1,14 @@
+@file:UseSerializers(IdentifierSerializer::class)
+
 package com.bibireden.data_attributes.data
 
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.ext.keyOf
-import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer
+import com.bibireden.data_attributes.serde.IdentifierSerializer
 import io.wispforest.endec.Endec
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
@@ -12,6 +16,7 @@ import net.minecraft.util.Identifier
 /**
  * Container for data that modifies the specific [Registries.ENTITY_TYPE] entry with an associated base value.
  */
+@Serializable
 data class EntityTypeData(val data: Map<Identifier, Double> = mapOf()) {
     companion object {
         @JvmField

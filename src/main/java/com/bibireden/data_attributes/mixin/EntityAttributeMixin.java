@@ -2,7 +2,7 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Map;
 
-import com.bibireden.data_attributes.config.models.OverridesConfigModel;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -62,7 +62,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public void data_attributes$override(OverridesConfigModel.AttributeOverride override) {
+    public void data_attributes$override(AttributeOverride override) {
         this.data_attributes$enabled = override.enabled;
         this.data_attributes$min = override.min;
         this.data_attributes$max = override.max;
@@ -90,12 +90,12 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Override
     public void data_attributes$clear() {
-        this.data_attributes$override(new OverridesConfigModel.AttributeOverride(this.data_attributes$enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
+        this.data_attributes$override(new AttributeOverride(this.data_attributes$enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
         this.data_attributes$clearDescendants();
     }
 
     @Override
-    public double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) {
+    public Double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) {
         return this.data_attributes$formula.result(k, k2, v, v2, instance);
     }
 
@@ -110,18 +110,18 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     }
 
     @Override
-    public double data_attributes$min() { return this.data_attributes$min; }
+    public Double data_attributes$min() { return this.data_attributes$min; }
 
     @Override
-    public double data_attributes$max() { return this.data_attributes$max; }
+    public Double data_attributes$max() { return this.data_attributes$max; }
 
     @Override
-    public double data_attributes$min_fallback() {
+    public Double data_attributes$min_fallback() {
         return Double.MIN_VALUE;
     }
 
     @Override
-    public double data_attributes$max_fallback() {
+    public Double data_attributes$max_fallback() {
         return Double.MAX_VALUE;
     }
 

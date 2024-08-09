@@ -1,10 +1,12 @@
 package com.bibireden.data_attributes.config.providers
 
+import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
+import com.bibireden.data_attributes.config.entry.ConfigMerger
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
@@ -24,7 +26,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
     val backing = option.value().data.toMutableMap()
 
     init {
-        backing.forEach { (topID, functions) ->
+        ConfigMerger.mergeFunctions(DataAttributesAPI.serverManager.defaults.functions.entries).forEach { (topID, functions) ->
             val isFunctionParentUnregistered = isAttributeUnregistered(topID)
             CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
                 ct.gap(15)
@@ -58,7 +60,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
                             Validators::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { v ->
-                                    val popped = this.backing.remove(topID)?.toMutableList() ?: return@textBoxComponent
+                                    val popped = this.backing.remove(topID)?.toMutableList() ?: mutableListOf()
                                     popped[index] = function.copy(value = v)
                                     this.backing.put(topID, popped)
                                 }
@@ -78,7 +80,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
                                         StackingBehavior.Multiply -> StackingBehavior.Add
                                     }
                                     it.message = Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}")
-                                    val popped = this.backing.remove(topID)?.toMutableList() ?: return@button
+                                    val popped = this.backing.remove(topID)?.toMutableList() ?: mutableListOf()
                                     popped[index] = function.copy(behavior = function.behavior)
                                     this.backing.put(topID, popped)
                                 })

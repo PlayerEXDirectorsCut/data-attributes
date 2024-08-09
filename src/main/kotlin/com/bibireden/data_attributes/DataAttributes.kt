@@ -1,21 +1,25 @@
 package com.bibireden.data_attributes
 
-import com.bibireden.data_attributes.config.*
+import com.bibireden.data_attributes.api.DataAttributesAPI.serverManager
+import com.bibireden.data_attributes.config.AttributeConfigManager
+import com.bibireden.data_attributes.config.entry.DefaultAttributesReloadListener
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
 import com.bibireden.data_attributes.config.models.EntityTypesConfig
 import com.bibireden.data_attributes.config.models.FunctionsConfig
 import com.bibireden.data_attributes.config.models.OverridesConfig
 import com.bibireden.data_attributes.ext.refreshAttributes
-import com.bibireden.data_attributes.networking.NetworkingChannels
 import com.bibireden.data_attributes.networking.ConfigPacketBufs
+import com.bibireden.data_attributes.networking.NetworkingChannels
 import com.bibireden.data_attributes.serde.JanksonBuilders
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
-import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents
-import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.networking.v1.*
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.entity.LivingEntity
+import net.minecraft.resource.ResourceType
+import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
 import org.apache.logging.log4j.LogManager
@@ -34,6 +38,7 @@ class DataAttributes : ModInitializer {
 
 
         val MANAGER = AttributeConfigManager()
+        val RELOAD_LISTENER = DefaultAttributesReloadListener()
 
         /** Creates an [Identifier] associated with the [MOD_ID]. */
         fun id(str: String) = Identifier.of(MOD_ID, str)!!
@@ -59,15 +64,36 @@ class DataAttributes : ModInitializer {
             CONFIG.save()
         }
 
+        /**
+         * Initiates a reload of config and default data for the server's [AttributeConfigManager].
+         * Changes are then networked to the client.
+         * */
+        @JvmStatic
+        fun reload(server: MinecraftServer) {
+            reloadConfigs()
+
+            val manager = serverManager
+
+            manager.update()
+            manager.nextUpdateFlag()
+
+            val buf = AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, manager.toPacket())
+            PlayerLookup.all(server).forEach { player -> ServerPlayNetworking.send(player, NetworkingChannels.RELOAD, buf) }
+        }
+
         init {
             ConfigPacketBufs.registerPacketSerializers()
         }
     }
 
     override fun onInitialize() {
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RELOAD_LISTENER)
+
         ServerLoginNetworking.registerGlobalReceiver(NetworkingChannels.HANDSHAKE) { _, _, _, _, _, _ -> }
 
-        ServerLoginConnectionEvents.INIT.register { _, _ -> if (CONFIG.applyOnWorldStart) MANAGER.update() }
+        ServerLifecycleEvents.SERVER_STARTED.register(::reload)
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, _ -> reload(server) }
+
         ServerLoginConnectionEvents.QUERY_START.register { _, _, sender, _ ->
             sender.sendPacket(NetworkingChannels.HANDSHAKE, AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket()))
         }
