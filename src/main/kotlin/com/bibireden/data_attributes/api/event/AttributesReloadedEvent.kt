@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.event.EventFactory
 object AttributesReloadedEvent {
     /**
      * Triggered on the **server** upon these conditions:
-     * - World Startup
+     * - World Startup (if the config is enabled for it)
      * - Reload through `/reload` brigadier command.
      *
      * Triggered on the **client** upon these conditions:

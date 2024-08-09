@@ -32,7 +32,6 @@ object DataAttributesAPI {
     @JvmStatic
     fun getManager(world: World) = DataAttributes.getManagerFromWorld(world)
 
-    @JvmStatic
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity].
      * Certain requirements must be met in order for the value to be present:
@@ -40,6 +39,7 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
+    @JvmStatic
     fun getValue(attribute: EntityAttribute, entity: LivingEntity): Optional<Double> {
         val container = entity.attributes
 
@@ -51,7 +51,6 @@ object DataAttributesAPI {
         }
     }
 
-    @JvmStatic
     /**
      * Tries to obtain a [EntityAttribute] value off a [LivingEntity] based on a supplier implementation.
      * Certain requirements must be met in order for the value to be present:
@@ -59,6 +58,7 @@ object DataAttributesAPI {
      * - The attribute is registered to the game
      * - The attribute is **present** on the given [LivingEntity].
      */
+    @JvmStatic
     fun getValue(supplier: Supplier<Optional<EntityAttribute>>, entity: LivingEntity): Optional<Double> {
         return supplier.get().filter(entity.attributes::hasAttribute).map(entity.attributes::getValue)
     }

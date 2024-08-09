@@ -1,10 +1,11 @@
 package com.bibireden.data_attributes.config.providers
 
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders
+import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.entityTypeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
+import com.bibireden.data_attributes.config.entry.ConfigMerger
 import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import io.wispforest.owo.config.Option
@@ -15,16 +16,17 @@ import io.wispforest.owo.ui.core.Sizing
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     val backing = HashMap(option.value())
 
     init {
-        backing.forEach { (topID, types) ->
+        ConfigMerger.mergeEntityTypes(DataAttributesAPI.serverManager.defaults.types.entries).forEach { (topID, types) ->
             CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(topID), true).also { ct ->
                 ct.gap(15)
-                types.data.forEach { id,  value ->
+                types.data.forEach { (id, value) ->
                     Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true).also {
                         it.gap(8)
 
@@ -34,7 +36,7 @@ class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityType
                             Validators::isNumeric,
                             onChange = {
                                 it.toDoubleOrNull()?.let { value ->
-                                    val data = this.backing.remove(topID)?: return@let
+                                    val data = this.backing.remove(topID) ?: EntityTypeData()
                                     val mapping = data.data.toMutableMap()
                                     mapping[id] = value
                                     this.backing.put(topID, data.copy(data = mapping))

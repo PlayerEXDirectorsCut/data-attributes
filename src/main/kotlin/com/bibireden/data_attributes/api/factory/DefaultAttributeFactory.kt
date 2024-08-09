@@ -1,18 +1,22 @@
 package com.bibireden.data_attributes.api.factory
 
 import com.bibireden.data_attributes.DataAttributes
+import com.bibireden.data_attributes.config.AttributeConfigManager
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.data.EntityTypeData
 import net.minecraft.util.Identifier
 
 /**
- * Meant to register attributes into the DataAttributes config primarily after it is initialized.
+ * Meant to register attributes into the game's [AttributeConfigManager] directly.
  *
  * This is useful for mods that wish to implement their own defaults, so they can be applied to the world.
- * Ensure that it is not done through static initialization, the config is not guaranteed to exist at that time. Instead, register afterward, such as on **mod initialization**.
+ * Ensure that it is not done through static initialization, the config is not guaranteed to exist at that time.
+ *
+ * Instead, register afterward, such as on **mod initialization**.
  */
 object DefaultAttributeFactory {
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [AttributeOverride]'s to the config if they are not present currently within the config. */
     fun registerOverrides(overrides: Map<Identifier, AttributeOverride>) {
@@ -22,6 +26,7 @@ object DefaultAttributeFactory {
         DataAttributes.OVERRIDES_CONFIG.save()
     }
 
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [AttributeFunction]'s to the config if they are not present currently within the config. */
     fun registerFunctions(functions: Map<Identifier, List<AttributeFunction>>) {
@@ -41,6 +46,7 @@ object DefaultAttributeFactory {
         DataAttributes.FUNCTIONS_CONFIG.save()
     }
 
+    @Deprecated("Use the new data-pack based system to register default entries.", level = DeprecationLevel.WARNING)
     @JvmStatic
     /** Registers default [EntityTypeData]'s to the config if they are not present currently within the config. */
     fun registerEntityTypes(entityTypes: Map<Identifier, EntityTypeData>) {

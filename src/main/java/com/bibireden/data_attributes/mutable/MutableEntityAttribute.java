@@ -1,10 +1,11 @@
 package com.bibireden.data_attributes.mutable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.bibireden.data_attributes.api.attribute.IEntityAttribute;
 import com.bibireden.data_attributes.api.attribute.StackingFormula;
-import com.bibireden.data_attributes.config.models.OverridesConfigModel;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 
@@ -25,26 +26,26 @@ public interface MutableEntityAttribute extends IEntityAttribute {
     }
 
     /** Overrides entity attribute properties. */
-    void data_attributes$override(OverridesConfigModel.AttributeOverride override);
+    default void data_attributes$override(AttributeOverride override) {}
 
     /** Adds a parent attribute with a function. */
-    void data_attributes$addParent(MutableEntityAttribute attribute, final AttributeFunction function);
+    default void data_attributes$addParent(MutableEntityAttribute attribute, final AttributeFunction function) {}
 
     /** Adds a child attribute with a function. */
-    void data_attributes$addChild(MutableEntityAttribute attribute, final AttributeFunction function);
+    default void data_attributes$addChild(MutableEntityAttribute attribute, final AttributeFunction function) {}
 
     /** Clears all properties and relationships of the entity attribute. */
-    void data_attributes$clear();
+    default void data_attributes$clear() {}
 
     /** Calculates the sum based on the {@link StackingFormula}.
      * By including a secondary pair of variables,
      * it allows for the modeling of more complex scenarios, such as negative modifiers.
      */
-    double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance);
+    default Double data_attributes$sum(final double k, final double k2, final double v, final double v2, EntityAttributeInstance instance) { return null; }
 
     /** Returns a mutable map of parent entity attributes with associated functions. */
-    Map<IEntityAttribute, AttributeFunction> data_attributes$parentsMutable();
+    default Map<IEntityAttribute, AttributeFunction> data_attributes$parentsMutable() { return new HashMap<>(); }
 
     /** Returns a mutable map of child entity attributes with associated functions. */
-    Map<IEntityAttribute, AttributeFunction> data_attributes$childrenMutable();
+    default Map<IEntityAttribute, AttributeFunction> data_attributes$childrenMutable() { return new HashMap<>(); }
 }

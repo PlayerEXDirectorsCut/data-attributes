@@ -62,7 +62,7 @@ object DataAttributesConfigProviders {
                     tb.setUneditableColor(ColorCodes.BEE_BLACK)
                     tb.setEditable(!isUnchangeable)
                     if (isUnchangeable) {
-                        tb.active = false
+                        tb.setTextPredicate { false }
                         tb.cursorStyle(CursorStyle.POINTER)
                         tb.setSuggestion(obj.toString())
                         tb.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
@@ -72,11 +72,8 @@ object DataAttributesConfigProviders {
                         tb.text = obj.toString()
                     }
                     if (onChange != null) {
-                        tb.onChanged().subscribe { v ->
-                            if (predicate == null || predicate.apply(v)) {
-                                onChange.invoke(v)
-                            }
-                        }
+                        tb.setTextPredicate { predicate == null || predicate.apply(it) }
+                        tb.onChanged().subscribe(onChange::invoke)
                     }
                 }.positioning(Positioning.relative(100, 50)).id(textBoxID)
             )
