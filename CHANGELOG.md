@@ -1,2 +1,2 @@
-## Additions 🍎
-- Added a condensed way to format attribute values into the API through `getFormattedValue`.
+## Fixes 🍋
+- Adjusted formatting of `Whole` formats to not go past two decimals.
