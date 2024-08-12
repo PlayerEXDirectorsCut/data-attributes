@@ -1,2 +1,2 @@
-## Changes 🌽
-- Resolved an issue with entity-types/functions not applying properly if a mod/data-pack got to the entity-type id first.
+## Additions 🍎
+- Added a condensed way to format attribute values into the API through `getFormattedValue`.

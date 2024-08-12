@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config.providers
 
+import com.bibireden.data_attributes.api.attribute.AttributeFormat
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
@@ -157,6 +158,48 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                 .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                         )
                     })
+
+                    topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).also { hf ->
+                        hf.verticalAlignment(VerticalAlignment.CENTER)
+                        hf.gap(8)
+                        hf.child(
+                            Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.format"))
+                                .sizing(Sizing.content(), Sizing.fixed(20))
+                        )
+                        hf.child(
+                            Components.button(Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}"), {
+                                override.format = when (override.format) {
+                                    AttributeFormat.Percentage -> AttributeFormat.Whole
+                                    AttributeFormat.Whole -> AttributeFormat.Percentage
+                                }
+                                it.message = Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")
+                                this.backing.replace(id, override.copy(formula = override.formula))
+                            })
+                                .renderer(ButtonRenderers.STANDARD)
+                                .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
+                        )
+                    })
+/*
+                    topContainer.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20))).also { hf ->
+                        hf.verticalAlignment(VerticalAlignment.CENTER)
+                        hf.gap(8)
+                        hf.child(
+                            Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.format"))
+                                .sizing(Sizing.content(), Sizing.fixed(20))
+                        )
+                        hf.child(
+                            Components.button(Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}"), {
+                                override.format = when (override.format) {
+                                    AttributeFormat.Whole -> AttributeFormat.Percentage
+                                    AttributeFormat.Percentage -> AttributeFormat.Whole
+                                }
+                                it.message = Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")
+                                this.backing.replace(id, override.copy(format = override.format))
+                            })
+                                .renderer(ButtonRenderers.STANDARD)
+                                .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
+                        )
+                    }*/
                 }
                 .also(this::child)
         }

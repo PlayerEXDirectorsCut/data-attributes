@@ -2,6 +2,8 @@ package com.bibireden.data_attributes.mixin;
 
 import java.util.Map;
 
+import com.bibireden.data_attributes.api.attribute.AttributeFormat;
+import com.bibireden.data_attributes.config.models.OverridesConfigModel;
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride;
 import com.bibireden.data_attributes.config.functions.AttributeFunction;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
@@ -28,6 +30,7 @@ import net.minecraft.util.math.MathHelper;
 abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Unique private Map<IEntityAttribute, AttributeFunction> data_attributes$parents, data_attributes$children;
     @Unique protected StackingFormula data_attributes$formula;
+    @Unique protected AttributeFormat data_attributes$format;
     @Unique protected boolean data_attributes$enabled;
     @Unique protected double data_attributes$min, data_attributes$max, data_attributes$smoothness;
 
@@ -41,6 +44,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
         this.data_attributes$min = Double.MIN_VALUE;
         this.data_attributes$max = Double.MAX_VALUE;
         this.data_attributes$formula = StackingFormula.Flat;
+        this.data_attributes$format = AttributeFormat.Whole;
         this.data_attributes$parents = new Object2ObjectArrayMap<>();
         this.data_attributes$children = new Object2ObjectArrayMap<>();
     }
@@ -68,6 +72,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
         this.data_attributes$max = override.max;
         this.data_attributes$smoothness = override.smoothness;
         this.data_attributes$formula = override.formula;
+        this.data_attributes$format = override.format;
     }
 
     @Override
@@ -90,7 +95,7 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
 
     @Override
     public void data_attributes$clear() {
-        this.data_attributes$override(new AttributeOverride(this.data_attributes$enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat));
+        this.data_attributes$override(new AttributeOverride(this.data_attributes$enabled, this.fallback, this.fallback, this.fallback, this.fallback, 0.0D, StackingFormula.Flat, AttributeFormat.Whole));
         this.data_attributes$clearDescendants();
     }
 
@@ -128,6 +133,11 @@ abstract class EntityAttributeMixin implements MutableEntityAttribute {
     @Override
     public StackingFormula data_attributes$formula() {
         return this.data_attributes$formula;
+    }
+
+    @Override
+    public AttributeFormat data_attributes$format() {
+        return this.data_attributes$format;
     }
 
     @Override

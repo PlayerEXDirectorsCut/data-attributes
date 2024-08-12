@@ -37,7 +37,8 @@ public interface IEntityAttribute {
 	 * @return The attribute's {@link StackingFormula}.
 	 */
 	default StackingFormula data_attributes$formula() { return null; }
-	
+
+	default AttributeFormat data_attributes$format() { return null; }
 	/**
 	 * @return An immutable map of the function-parents attached to this attribute.
 	 * @since 1.4.0
