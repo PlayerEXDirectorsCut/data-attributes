@@ -5,8 +5,38 @@
   "name": "Data Attributes: Directors Cut",
   "description": "This mod serves to overhaul the Entity Attribute system to be a lot more dynamic.",
   "authors": [
-    "Bare Minimum Studios",
-    "CleverNucleus (former author)"
+    {
+      "name": "bibireden",
+      "contact": {
+        "homepage": "https://github.com/bibi-reden"
+      }
+    },
+    {
+      "name": "OverlordsIII",
+      "contact": {
+        "homepage": "https://github.com/OverlordsIII"
+      }
+    },
+    {
+      "name": "DataEncoded",
+      "contact": {
+        "homepage": "https://github.com/DataEncoded"
+      }
+    }
+  ],
+  "contributors": [
+    {
+      "name": "pokesmells",
+      "contact": {
+        "homepage": "https://github.com/pokesmells"
+      }
+    },
+    {
+      "name": "CleverNucleus [former author]",
+      "contact": {
+        "homepage": "https://github.com/CleverNucleus"
+      }
+    }
   ],
   "contact": {
     "homepage": "https://github.com/BareMinimumStudios/data-attributes",
@@ -49,8 +79,8 @@
       "curseforge": 955929,
       "loaders": ["fabric", "quilt"],
       "dependencies": [
-        "fabric-api@0.92.2+1.20.1(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
-        "fabric-language-kotlin@1.12.0+kotlin.2.0.10(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
+        "fabric-api@>=0.92.2+1.20.1(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
+        "fabric-language-kotlin@>=1.12.0+kotlin.2.0.10(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
         "owo-lib@0.11.2(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)"
       ]
     },
