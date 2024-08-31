@@ -31,7 +31,7 @@ class OverridesConfigModel {
         @JvmField
         var max: Double = Double.NaN,
         @JvmField
-        var smoothness: Double = 0.01,
+        var smoothness: Double = 1.0,
         @JvmField
         var min_fallback: Double = 0.0,
         @JvmField

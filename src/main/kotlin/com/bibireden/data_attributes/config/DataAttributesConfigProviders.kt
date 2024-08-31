@@ -4,6 +4,7 @@ import com.bibireden.data_attributes.config.providers.AttributeEntityTypesProvid
 import com.bibireden.data_attributes.config.providers.AttributeFunctionsProvider
 import com.bibireden.data_attributes.config.providers.AttributeOverrideProvider
 import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProviderV2
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.ui.component.Components
@@ -24,11 +25,11 @@ object DataAttributesConfigProviders {
             append(Text.literal("($id)").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_BLACK)))
         }
     }
-    fun attributeIdentifierToText(id: Identifier): MutableText {
+    fun attributeIdToText(id: Identifier, default: Boolean = false): MutableText {
         val attribute = Registries.ATTRIBUTE[id]
         return Text.empty().apply {
             if (attribute != null) {
-                append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(0xE7C14B))
+                append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B))
             }
             append(Text.literal("($id)").also { t ->
                 t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
@@ -38,7 +39,7 @@ object DataAttributesConfigProviders {
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeOverrideProviderV2(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->

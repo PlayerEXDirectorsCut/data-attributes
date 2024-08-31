@@ -3,7 +3,7 @@ package com.bibireden.data_attributes.config.providers
 import com.bibireden.data_attributes.api.attribute.AttributeFormat
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingFormula
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
@@ -33,7 +33,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
         ConfigMerger.mergeOverrides(DataAttributesAPI.serverManager.defaults.overrides.entries).forEach { (id, config) ->
             var override = config
             // extract min & max fallbacks.
-            val attribute = Registries.ATTRIBUTE[id] as MutableEntityAttribute?
+            val attribute = Registries.ATTRIBUTE[id] as? MutableEntityAttribute
             if (attribute != null) {
                 override = override.copy(
                     min_fallback = attribute.`data_attributes$min_fallback`(),
@@ -43,7 +43,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
             }
 
             val isOverrideInvalid = isAttributeUnregistered(id)
-            Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true)
+            Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(id), true)
                 .also { topContainer ->
                     if (isOverrideInvalid) {
                         topContainer.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))

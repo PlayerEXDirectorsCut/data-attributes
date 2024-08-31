@@ -1,7 +1,7 @@
 package com.bibireden.data_attributes.config.providers
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.entityTypeIdentifierToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
@@ -16,7 +16,6 @@ import io.wispforest.owo.ui.core.Sizing
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
@@ -27,7 +26,7 @@ class AttributeEntityTypesProvider(val option: Option<Map<Identifier, EntityType
             CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(topID), true).also { ct ->
                 ct.gap(15)
                 types.data.forEach { (id, value) ->
-                    Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(id), true).also {
+                    Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(id), true).also {
                         it.gap(8)
 
                         it.child(textBoxComponent(

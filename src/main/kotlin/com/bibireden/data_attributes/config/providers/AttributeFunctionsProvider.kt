@@ -2,7 +2,7 @@ package com.bibireden.data_attributes.config.providers
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdentifierToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.isAttributeUnregistered
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
@@ -28,7 +28,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
     init {
         ConfigMerger.mergeFunctions(DataAttributesAPI.serverManager.defaults.functions.entries).forEach { (topID, functions) ->
             val isFunctionParentUnregistered = isAttributeUnregistered(topID)
-            CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdentifierToText(topID), true).also { ct ->
+            CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdToText(topID), true).also { ct ->
                 ct.gap(15)
                 if (isFunctionParentUnregistered) {
                     ct.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
@@ -36,7 +36,7 @@ class AttributeFunctionsProvider(val option: Option<AttributeFunctionConfig>) : 
                 functions.forEachIndexed { index,  function ->
                     val isFunctionChildUnregistered = isAttributeUnregistered(function.id)
 
-                    Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdentifierToText(function.id), true).also {
+                    Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(function.id), true).also {
                         it.gap(8)
                         if (isFunctionChildUnregistered) {
                             it.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
