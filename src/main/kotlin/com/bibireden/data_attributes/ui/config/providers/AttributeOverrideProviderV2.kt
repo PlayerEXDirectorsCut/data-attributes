@@ -53,6 +53,9 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
             if (!isRegistered) {
                 container.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
             }
+            else if (isDefault) {
+                container.titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
+            }
 
             container.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
                 .also { content ->
@@ -61,7 +64,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
 
                     content.child(ConfigToggleButton().also { button ->
                         button.enabled(override.enabled)
-                        button.onPress { backing[id] = override.copy(enabled = !override.enabled) }
+                        button.onPress { replaceEntry(id, override.copy(enabled = !override.enabled)) }
                         button.renderer(ButtonRenderers.STANDARD)
                     })
 
@@ -78,6 +81,16 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                         }
                         .renderer(ButtonRenderers.STANDARD)
                     )
+
+                    if (!isDefault) {
+                        content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.remove"))
+                        {
+                            this.backing.remove(id)
+                            refreshAndDisplayAttributes()
+                        }
+                            .renderer(ButtonRenderers.STANDARD)
+                        )
+                    }
                 }
             )
 
@@ -87,7 +100,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 Validators::isNumeric,
                 onChange = {
                     it.toDoubleOrNull()?.let { v ->
-                        this.backing[id] = override.copy(min = v)
+                        replaceEntry(id, override.copy(min = v))
                     }
                 },
                 "inputs.min"
@@ -100,7 +113,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                     Validators::isNumeric,
                     onChange = {
                         it.toDoubleOrNull()?.let { v ->
-                            this.backing[id] = override.copy(max = v)
+                            replaceEntry(id, override.copy(max = v))
                         }
                     },
                     "inputs.max"
