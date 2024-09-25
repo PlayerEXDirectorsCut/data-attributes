@@ -27,14 +27,14 @@ object DataAttributesConfigProviders {
     }
     fun attributeIdToText(id: Identifier, default: Boolean = false): MutableText {
         val attribute = Registries.ATTRIBUTE[id]
-        return Text.empty().apply {
-            if (attribute != null) {
-                append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B))
-            }
-            append(Text.literal("($id)").also { t ->
-                t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
-            })
+        val text = Text.empty()
+        if (attribute != null) {
+            text.append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B))
         }
+        text.append(Text.literal("($id)").also { t ->
+            t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
+        })
+        return text
     }
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
 

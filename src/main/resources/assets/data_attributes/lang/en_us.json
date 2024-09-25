@@ -48,9 +48,26 @@
     {"text": "Reset", "color": "white"}
   ],
 
+  "text.config.data_attributes.data_entry.edit": [
+    {"text": "✎ ", "color": "#efb13f"},
+    {"text": "Edit ID", "color": "white"}
+  ],
+
   "text.config.data_attributes.data_entry.remove": [
     {"text": "\uD83D\uDDD1 ", "color": "#EB1D36"},
     {"text": "Remove", "color": "white"}
+  ],
+
+  "text.config.data_attributes.data_entry.yes": [
+    {"text": "[", "color": "white"},
+    {"text": "✔", "color": "#84de56"},
+    {"text": "]"}
+  ],
+
+  "text.config.data_attributes.data_entry.no": [
+    {"text": "[", "color": "white"},
+    {"text": "X", "color": "#EB1D36"},
+    {"text": "]"}
   ],
 
   "text.config.data_attributes.data_entry.overrides.min_fallback": [
@@ -126,6 +143,13 @@
     {"text": "✱ ", "color": "#84de56"},
     {"text": "Default Entry\n\n", "color": "white"},
     {"text": "This entry is from another mod or datapack, and can be overrided by editing it.", "color": "white"}
+  ],
+
+  "text.config.data_attributes.buttons.add": [
+    {"text": "(", "color": "white"},
+    {"text": "+", "color": "#84de56"},
+    {"text": ")"},
+    {"text": " Add New Entry"}
   ],
 
   "ui.data_attributes.cfc.collapse_all": "Collapse",

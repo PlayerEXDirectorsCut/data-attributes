@@ -13,13 +13,12 @@ import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
+import io.wispforest.owo.config.ui.component.SearchAnchorComponent
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.CollapsibleContainer
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
-import io.wispforest.owo.ui.core.Positioning
-import io.wispforest.owo.ui.core.Sizing
-import io.wispforest.owo.ui.core.VerticalAlignment
+import io.wispforest.owo.ui.core.*
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
@@ -50,6 +49,8 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
         }
 
         Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(id, isDefault), true).also { container ->
+            container.child(SearchAnchorComponent(container.titleLayout(), Option.Key.ROOT, { id.toString() }, { Text.translatable(id.toTranslationKey()).toString() }))
+
             if (!isRegistered) {
                 container.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
             }
@@ -68,7 +69,8 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                         button.renderer(ButtonRenderers.STANDARD)
                     })
 
-                    content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
+                    if (!isDefault) {
+                        content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
                         {
                             this.backing[id] = override.copy(
                                 min = attribute?.`data_attributes$min_fallback`() ?: override.min_fallback,
@@ -79,10 +81,64 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                             )
                             refreshAndDisplayAttributes()
                         }
-                        .renderer(ButtonRenderers.STANDARD)
-                    )
+                            .renderer(ButtonRenderers.STANDARD)
+                        )
 
-                    if (!isDefault) {
+                        content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit"))
+                        {
+                            if (container.childById(FlowLayout::class.java, "edit-field") == null) {
+                                val field = Containers.horizontalFlow(Sizing.fill(70), Sizing.fill(5))
+                                    .apply {
+                                        verticalAlignment(VerticalAlignment.CENTER)
+                                        id("edit-field")
+                                    }
+                                val textBox = Components.textBox(Sizing.fill(60))
+                                    .apply {
+                                        setEditableColor(0xf2e1c0)
+                                        setTextPredicate { str ->
+                                            val id = Identifier.tryParse(str) ?: return@setTextPredicate true
+                                            if (backing.containsKey(id)) {
+                                                setEditableColor(0xe54d48)
+                                            }
+                                            else if (Registries.ATTRIBUTE[id] == null) {
+                                                setEditableColor(0xf2e1c0)
+                                            }
+                                            else {
+                                                setEditableColor(0x69d699)
+                                            }
+                                            true
+                                        }
+                                        verticalSizing(Sizing.fixed(12))
+                                    }
+                                field.child(textBox)
+                                field.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.yes")) {
+                                    val newId = Identifier.tryParse(textBox.text.toString()) ?: return@button
+                                    val newAttribute = (Registries.ATTRIBUTE[newId] ?: return@button) as MutableEntityAttribute
+                                    if (backing.containsKey(newId)) return@button
+                                    // ensured that this exists and is possible to swap
+                                    this.backing.remove(id)
+                                    this.backing[newId] = override.copy(
+                                        min = newAttribute.`data_attributes$min_fallback`() ?: override.min_fallback,
+                                        max = newAttribute.`data_attributes$max_fallback`() ?: override.max_fallback,
+                                        smoothness = 1.0,
+                                        formula = StackingFormula.Flat,
+                                        format = AttributeFormat.Whole
+                                    )
+                                    field.remove()
+                                    refreshAndDisplayAttributes()
+                                    // todo: figure out a way to focus on the proper component || focusHandler()!!.focus(target?, sComponent.FocusSource.MOUSE_CLICK)
+                                }
+                                    .renderer(ButtonRenderers.STANDARD)
+                                )
+                                field.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.no")) { field.remove() }
+                                    .renderer(ButtonRenderers.STANDARD)
+                                )
+                                container.child(0, field)
+                            }
+                        }
+                            .renderer(ButtonRenderers.STANDARD)
+                        )
+
                         content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.remove"))
                         {
                             this.backing.remove(id)
@@ -198,10 +254,27 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
     }
 
     init {
+        child(
+            Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
+                backing[Identifier.of("unresolved", "id")!!] = AttributeOverride()
+                refreshAndDisplayAttributes()
+            }
+                .renderer(ButtonRenderers.STANDARD)
+                .horizontalSizing(Sizing.content())
+                .verticalSizing(Sizing.fixed(20))
+        )
+
+        child(0,
+            Components.box(Sizing.fixed(60), Sizing.fixed(45))
+                .zIndex(100)
+                .positioning(Positioning.relative(50, 50))
+        )
+
         refreshAndDisplayAttributes()
     }
 
-    fun refreshAndDisplayAttributes() {
+    /** Initiates a deletion of all config components and replaces them with fresh ones provided from the map. */
+    private fun refreshAndDisplayAttributes() {
         for (child in children) {
             if (child is CollapsibleContainer) child.remove()
         }
