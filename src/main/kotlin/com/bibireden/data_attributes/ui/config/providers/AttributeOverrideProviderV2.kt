@@ -96,11 +96,11 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                                     .apply {
                                         setEditableColor(0xf2e1c0)
                                         setTextPredicate { str ->
-                                            val id = Identifier.tryParse(str) ?: return@setTextPredicate true
-                                            if (backing.containsKey(id)) {
+                                            val predId = Identifier.tryParse(str) ?: return@setTextPredicate true
+                                            if (backing.containsKey(predId)) {
                                                 setEditableColor(0xe54d48)
                                             }
-                                            else if (Registries.ATTRIBUTE[id] == null) {
+                                            else if (!Registries.ATTRIBUTE.containsId(predId)) {
                                                 setEditableColor(0xf2e1c0)
                                             }
                                             else {
@@ -118,8 +118,8 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                                     // ensured that this exists and is possible to swap
                                     this.backing.remove(id)
                                     this.backing[newId] = override.copy(
-                                        min = newAttribute.`data_attributes$min_fallback`() ?: override.min_fallback,
-                                        max = newAttribute.`data_attributes$max_fallback`() ?: override.max_fallback,
+                                        min = newAttribute.`data_attributes$min_fallback`(),
+                                        max = newAttribute.`data_attributes$max_fallback`(),
                                         smoothness = 1.0,
                                         formula = StackingFormula.Flat,
                                         format = AttributeFormat.Whole
@@ -218,10 +218,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 )
                 hf.child(
                     Components.button(Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")) {
-                        override.formula = when (override.formula) {
-                            StackingFormula.Flat -> StackingFormula.Diminished
-                            StackingFormula.Diminished -> StackingFormula.Flat
-                        }
+                        override.formula = StackingFormula.entries[override.formula.ordinal xor 1]
                         it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
                         replaceEntry(id, override.copy(formula = override.formula))
                     }

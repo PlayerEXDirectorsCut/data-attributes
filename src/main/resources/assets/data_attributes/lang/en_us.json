@@ -50,7 +50,7 @@
 
   "text.config.data_attributes.data_entry.edit": [
     {"text": "✎ ", "color": "#efb13f"},
-    {"text": "Edit ID", "color": "white"}
+    {"text": "Edit", "color": "white"}
   ],
 
   "text.config.data_attributes.data_entry.remove": [
