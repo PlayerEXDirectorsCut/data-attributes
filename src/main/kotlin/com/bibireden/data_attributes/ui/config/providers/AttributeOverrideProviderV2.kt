@@ -126,7 +126,6 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                                     )
                                     field.remove()
                                     refreshAndDisplayAttributes()
-                                    // todo: figure out a way to focus on the proper component || focusHandler()!!.focus(target?, sComponent.FocusSource.MOUSE_CLICK)
                                 }
                                     .renderer(ButtonRenderers.STANDARD)
                                 )
@@ -197,8 +196,8 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 hf.gap(8)
                 hf.child(
                     Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.smoothness"))
-                        .sizing(Sizing.content(), Sizing.fixed(20)))
-
+                        .sizing(Sizing.content(), Sizing.fixed(20))
+                )
                 hf.child(
                     Components.discreteSlider(Sizing.fill(30), 0.01, 100.0).value(override.smoothness).also { slider ->
                         slider.onChanged().subscribe {
@@ -236,10 +235,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 )
                 hf.child(
                     Components.button(Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")) {
-                        override.format = when (override.format) {
-                            AttributeFormat.Percentage -> AttributeFormat.Whole
-                            AttributeFormat.Whole -> AttributeFormat.Percentage
-                        }
+                        override.format = AttributeFormat.entries[override.format.ordinal xor 1]
                         it.message = Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")
                         replaceEntry(id, override.copy(formula = override.formula))
                     }
@@ -247,6 +243,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                         .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
                 )
             })
+            container.id(id.toString())
         }.also(::child)
     }
 
@@ -259,12 +256,6 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 .renderer(ButtonRenderers.STANDARD)
                 .horizontalSizing(Sizing.content())
                 .verticalSizing(Sizing.fixed(20))
-        )
-
-        child(0,
-            Components.box(Sizing.fixed(60), Sizing.fixed(45))
-                .zIndex(100)
-                .positioning(Positioning.relative(50, 50))
         )
 
         refreshAndDisplayAttributes()

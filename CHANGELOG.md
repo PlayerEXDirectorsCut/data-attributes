@@ -5,4 +5,6 @@
 - You can now actually use the search bar to look up the specific entries you wish to find.
   - Translations should be compatible in the language you choose as well as the attribute id.
     - e.g., looking up `playerex:luck`, or `Luck` should work.
-## Changes 🍋
+## Changes 🌽
+- Made some changes to certain logic internally and micro-optimizations.
+- 

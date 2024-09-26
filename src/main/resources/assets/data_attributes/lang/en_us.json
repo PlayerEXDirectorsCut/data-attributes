@@ -149,7 +149,7 @@
     {"text": "(", "color": "white"},
     {"text": "+", "color": "#84de56"},
     {"text": ")"},
-    {"text": " Add New Entry"}
+    {"text": " Add"}
   ],
 
   "ui.data_attributes.cfc.collapse_all": "Collapse",
