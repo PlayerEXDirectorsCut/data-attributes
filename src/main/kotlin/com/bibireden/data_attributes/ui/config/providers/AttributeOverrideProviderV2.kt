@@ -9,6 +9,7 @@ import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
+import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
@@ -26,6 +27,8 @@ import kotlin.math.max
 
 class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOverride>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     private val backing = option.value().toMutableMap()
+
+    private val trackedContainers: MutableMap<Identifier, CollapsibleContainer> = mutableMapOf()
 
     private fun replaceEntry(id: Identifier, override: AttributeOverride) {
         val noEntry = id !in backing
@@ -84,53 +87,39 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                             .renderer(ButtonRenderers.STANDARD)
                         )
 
-                        content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit"))
-                        {
+                        content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (container.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = Containers.horizontalFlow(Sizing.fill(70), Sizing.fill(5))
-                                    .apply {
-                                        verticalAlignment(VerticalAlignment.CENTER)
-                                        id("edit-field")
-                                    }
-                                val textBox = Components.textBox(Sizing.fill(60))
-                                    .apply {
-                                        setEditableColor(0xf2e1c0)
-                                        setTextPredicate { str ->
-                                            val predId = Identifier.tryParse(str) ?: return@setTextPredicate true
-                                            if (backing.containsKey(predId)) {
-                                                setEditableColor(0xe54d48)
-                                            }
-                                            else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                                setEditableColor(0xf2e1c0)
-                                            }
-                                            else {
-                                                setEditableColor(0x69d699)
-                                            }
-                                            true
+                                val field = EditFieldComponent(
+                                    { field, str ->
+                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
+                                        if (backing.containsKey(predId)) {
+                                            field.textBox.setEditableColor(0xe54d48)
                                         }
-                                        verticalSizing(Sizing.fixed(12))
-                                    }
-                                field.child(textBox)
-                                field.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.yes")) {
-                                    val newId = Identifier.tryParse(textBox.text.toString()) ?: return@button
-                                    val newAttribute = (Registries.ATTRIBUTE[newId] ?: return@button) as MutableEntityAttribute
-                                    if (backing.containsKey(newId)) return@button
-                                    // ensured that this exists and is possible to swap
-                                    this.backing.remove(id)
-                                    this.backing[newId] = override.copy(
-                                        min = newAttribute.`data_attributes$min_fallback`(),
-                                        max = newAttribute.`data_attributes$max_fallback`(),
-                                        smoothness = 1.0,
-                                        formula = StackingFormula.Flat,
-                                        format = AttributeFormat.Whole
-                                    )
-                                    field.remove()
-                                    refreshAndDisplayAttributes()
-                                }
-                                    .renderer(ButtonRenderers.STANDARD)
-                                )
-                                field.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.no")) { field.remove() }
-                                    .renderer(ButtonRenderers.STANDARD)
+                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
+                                            field.textBox.setEditableColor(0xf2e1c0)
+                                        }
+                                        else {
+                                            field.textBox.setEditableColor(0x69d699)
+                                        }
+                                        true
+                                    },
+                                    {
+                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
+                                        val newAttribute = (Registries.ATTRIBUTE[newId] ?: return@EditFieldComponent) as MutableEntityAttribute
+                                        if (backing.containsKey(newId)) return@EditFieldComponent
+                                        // ensured that this exists and is possible to swap
+                                        this.backing.remove(id)
+                                        this.backing[newId] = override.copy(
+                                            min = newAttribute.`data_attributes$min_fallback`(),
+                                            max = newAttribute.`data_attributes$max_fallback`(),
+                                            smoothness = 1.0,
+                                            formula = StackingFormula.Flat,
+                                            format = AttributeFormat.Whole
+                                        )
+                                        it.remove()
+                                        refreshAndDisplayAttributes()
+                                    },
+                                    EditFieldComponent::remove
                                 )
                                 container.child(0, field)
                             }
@@ -244,7 +233,9 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
                 )
             })
             container.id(id.toString())
-        }.also(::child)
+        }
+            .also(::child)
+            .also { trackedContainers[id] = it }
     }
 
     init {
@@ -263,9 +254,7 @@ class AttributeOverrideProviderV2(val option: Option<Map<Identifier, AttributeOv
 
     /** Initiates a deletion of all config components and replaces them with fresh ones provided from the map. */
     private fun refreshAndDisplayAttributes() {
-        for (child in children) {
-            if (child is CollapsibleContainer) child.remove()
-        }
+        trackedContainers.values.forEach(CollapsibleContainer::remove)
 
         val manager = DataAttributesAPI.serverManager
 

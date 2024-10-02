@@ -4,6 +4,7 @@ import com.bibireden.data_attributes.config.providers.AttributeEntityTypesProvid
 import com.bibireden.data_attributes.config.providers.AttributeFunctionsProvider
 import com.bibireden.data_attributes.config.providers.AttributeOverrideProvider
 import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProviderV2
 import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProviderV2
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.ui.OptionComponentFactory
@@ -43,7 +44,7 @@ object DataAttributesConfigProviders {
     }
 
     val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeFunctionsProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeFunctionProviderV2(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->
@@ -76,6 +77,7 @@ object DataAttributesConfigProviders {
                         tb.setTextPredicate { predicate == null || predicate.apply(it) }
                         tb.onChanged().subscribe(onChange::invoke)
                     }
+                    tb.id("text")
                 }.positioning(Positioning.relative(100, 50)).id(textBoxID)
             )
         }
