@@ -27,10 +27,10 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-    val backing = HashMap(option.value())
+    private val backing = HashMap(option.value())
 
-    val headerComponents: MutableMap<Identifier, Component> = mutableMapOf()
-    val entryComponents: MutableMap<Identifier, Component> = mutableMapOf()
+    private val headerComponents: MutableMap<Identifier, Component> = mutableMapOf()
+    private val entryComponents: MutableMap<Identifier, Component> = mutableMapOf()
 
     private fun createEntries(id: Identifier, types: Map<Identifier, Double>, isDefault: Boolean = false): CollapsibleFoldableContainer {
         val container = childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(id, isDefault), true).also { ct ->
