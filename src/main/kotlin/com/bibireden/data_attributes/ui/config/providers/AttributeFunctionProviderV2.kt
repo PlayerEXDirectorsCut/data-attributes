@@ -47,6 +47,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                     .apply {
                         verticalAlignment(VerticalAlignment.CENTER)
                         gap(10)
+                        id("dock")
                     }
                     .also { fl ->
                         fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayAttributes() }
@@ -82,6 +83,18 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                         }
                             .renderer(ButtonRenderers.STANDARD)
                         )
+
+                        fl.child(
+                            Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
+                                backing[id]?.let {
+                                    val list = it.toMutableList()
+                                    list.add(AttributeFunction())
+                                    backing[id] = list
+                                }
+                                refreshAndDisplayAttributes()
+                            }
+                                .renderer(ButtonRenderers.STANDARD)
+                        )
                     }
                 )
             }
@@ -95,7 +108,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
         if (located != null) return located
 
         val container = Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(function.id, isDefault), true).apply {
-            gap(8)
+            gap(4)
             id("${function.id}#child-fn")
 
             val attribute = Registries.ATTRIBUTE[function.id]
@@ -124,7 +137,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                                 val field = EditFieldComponent(
                                     { field, str ->
                                         val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing.containsKey(predId)) {
+                                        if (backing[parentId]?.find { it.id == predId } != null) {
                                             field.textBox.setEditableColor(0xe54d48)
                                         }
                                         else if (!Registries.ATTRIBUTE.containsId(predId)) {
@@ -202,6 +215,12 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
         if (index != null) parent.child(index, container) else parent.child(container)
         trackedEntryComponents[parentId]!![function.id] = container
 
+        // force a rearrangement to bring the dock up top~
+        parent.childById(FlowLayout::class.java, "dock")?.let {
+            parent.removeChild(it)
+            parent.child(0, it)
+        }
+
         return container
     }
 
@@ -213,12 +232,18 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
     }
 
     private fun refreshAndDisplayAttributes() {
-        for (map in trackedEntryComponents.values) {
+        for ((key, map) in trackedEntryComponents) {
             for (container in map.values) {
                 container.id("null")
                 container.remove()
             }
             map.clear()
+
+            // ensure cleanup of dead keys
+            if (key !in backing) childById(CollapsibleContainer::class.java, key.toString())?.also {
+                it.id("null")
+                it.remove()
+            }
         }
 
         for ((id, functions) in backing) {
@@ -233,7 +258,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
     init {
         child(
             Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                backing[Identifier.of("unresolved", "id")!!] = listOf()
+                backing[Identifier("unknown")] = listOf()
                 refreshAndDisplayAttributes()
             }
                 .renderer(ButtonRenderers.STANDARD)
