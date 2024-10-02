@@ -26,12 +26,12 @@ import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
+class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
     private val backing = option.value().data.toMutableMap()
 
     private val trackedEntryComponents: MutableMap<Identifier, MutableMap<Identifier, CollapsibleContainer>> = mutableMapOf()
 
-    private fun insertFunctionEntry(entryId: Identifier, insertingFunction: AttributeFunction, functions: MutableList<AttributeFunction>, at: Int? = null) {
+    private fun insertEntry(entryId: Identifier, insertingFunction: AttributeFunction, functions: MutableList<AttributeFunction>, at: Int? = null) {
         if (at == null || at >= functions.size) functions.add(insertingFunction)
         else functions[at] = insertingFunction
         backing[entryId] = functions
@@ -71,7 +71,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                                     },
                                     {
                                         val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        if (backing.containsKey(newId)) return@EditFieldComponent
+                                        if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@EditFieldComponent
                                         // ensured that this exists and is possible to swap
                                         backing.remove(id)?.let { backing[newId] = it }
                                         refreshAndDisplayAttributes()
@@ -102,7 +102,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
         }
     }
 
-    private fun createFunctionEntry(function: AttributeFunction, parentId: Identifier, isDefault: Boolean, parent: CollapsibleFoldableContainer, index: Int? = null): CollapsibleContainer {
+    private fun createEntry(function: AttributeFunction, parentId: Identifier, isDefault: Boolean, parent: CollapsibleFoldableContainer, index: Int? = null): CollapsibleContainer {
         // find if it exists already to ignore the default
         val located = parent.childById(CollapsibleContainer::class.java, "${function.id}#child-fn")
         if (located != null) return located
@@ -122,53 +122,53 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                 }
             }
 
-            if (!isDefault) {
-                child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
-                    .apply {
-                        verticalAlignment(VerticalAlignment.BOTTOM)
-                        gap(10)
-                    }
-                    .also { fl ->
+            child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
+                .apply {
+                    verticalAlignment(VerticalAlignment.BOTTOM)
+                    gap(10)
+                }
+                .also { fl ->
+                    if (!isDefault) {
                         fl.child(RemoveButtonComponent { backing[parentId]?.let { backing[parentId] = it.filter { it.id != function.id } }; refreshAndDisplayAttributes() }
                             .renderer(ButtonRenderers.STANDARD))
-
-                        fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
-                            if (fl.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing[parentId]?.find { it.id == predId } != null) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
-                                    {
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        val newFunction = function.copy(id = newId)
-                                        val currentList = backing[parentId]
-                                        if (currentList?.find { it.id == newId } != null) return@EditFieldComponent
-                                        // ensured that this exists and is possible to swap
-                                        val list = currentList?.filter { it.id != function.id }?.toMutableList() ?: return@EditFieldComponent
-                                        list.add(0, newFunction)
-                                        backing[parentId] = list
-                                        refreshAndDisplayAttributes()
-                                    },
-                                    EditFieldComponent::remove
-                                )
-                                child(0, field)
-                            }
-                        }
-                            .renderer(ButtonRenderers.STANDARD)
-                        )
                     }
-                )
-            }
+
+                    fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
+                        if (fl.childById(FlowLayout::class.java, "edit-field") == null) {
+                            val field = EditFieldComponent(
+                                { field, str ->
+                                    val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
+                                    if (backing[parentId]?.find { it.id == predId } != null) {
+                                        field.textBox.setEditableColor(0xe54d48)
+                                    }
+                                    else if (!Registries.ATTRIBUTE.containsId(predId)) {
+                                        field.textBox.setEditableColor(0xf2e1c0)
+                                    }
+                                    else {
+                                        field.textBox.setEditableColor(0x69d699)
+                                    }
+                                    true
+                                },
+                                {
+                                    val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
+                                    val newFunction = function.copy(id = newId)
+                                    val currentList = backing[parentId]
+                                    if (!Registries.ATTRIBUTE.containsId(newId) || currentList?.find { it.id == newId } != null) return@EditFieldComponent
+                                    // ensured that this exists and is possible to swap
+                                    val list = currentList?.filter { it.id != function.id }?.toMutableList() ?: return@EditFieldComponent
+                                    list.add(0, newFunction)
+                                    backing[parentId] = list
+                                    refreshAndDisplayAttributes()
+                                },
+                                EditFieldComponent::remove
+                            )
+                            child(0, field)
+                        }
+                    }
+                        .renderer(ButtonRenderers.STANDARD)
+                    )
+                }
+            )
 
             child(textBoxComponent(
                 Text.translatable("text.config.data_attributes.data_entry.functions.value"),
@@ -177,7 +177,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                 onChange = {
                     it.toDoubleOrNull()?.let { v ->
                         backing[parentId] = (backing.remove(parentId)?.toMutableList() ?: mutableListOf()).apply {
-                            insertFunctionEntry(parentId, function.copy(value = v), this, index)
+                            insertEntry(parentId, function.copy(value = v), this, index)
                         }
                         refreshAndDisplayAttributes()
                     }
@@ -198,7 +198,7 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
                             it.message = Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}")
 
                             backing[parentId] = (backing.remove(parentId)?.toMutableList() ?: mutableListOf()).apply {
-                                insertFunctionEntry(parentId, function.copy(behavior = function.behavior), this, index)
+                                insertEntry(parentId, function.copy(behavior = function.behavior), this, index)
                             }
 
                             refreshAndDisplayAttributes()
@@ -227,21 +227,21 @@ class AttributeFunctionProviderV2(val option: Option<AttributeFunctionConfig>) :
     private fun createFunctionEntries(functions: List<AttributeFunction>, parentId: Identifier, parent: CollapsibleFoldableContainer) {
         functions.forEachIndexed { index, function ->
             val isDefault = backing[parentId]?.find { it.id == function.id } == null
-            createFunctionEntry(function, parentId, isDefault, parent, index)
+            createEntry(function, parentId, isDefault, parent, index)
         }
     }
 
     private fun refreshAndDisplayAttributes() {
         for ((key, map) in trackedEntryComponents) {
             for (container in map.values) {
-                container.id("null")
+                container.id(null)
                 container.remove()
             }
             map.clear()
 
             // ensure cleanup of dead keys
             if (key !in backing) childById(CollapsibleContainer::class.java, key.toString())?.also {
-                it.id("null")
+                it.id(null)
                 it.remove()
             }
         }

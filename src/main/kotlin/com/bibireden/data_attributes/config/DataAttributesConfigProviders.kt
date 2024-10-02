@@ -1,11 +1,9 @@
 package com.bibireden.data_attributes.config
 
-import com.bibireden.data_attributes.config.providers.AttributeEntityTypesProvider
-import com.bibireden.data_attributes.config.providers.AttributeFunctionsProvider
-import com.bibireden.data_attributes.config.providers.AttributeOverrideProvider
 import com.bibireden.data_attributes.ui.colors.ColorCodes
-import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProviderV2
-import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProviderV2
+import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProvider
+import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProvider
+import com.bibireden.data_attributes.ui.config.providers.EntityTypesProvider
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.ui.component.Components
@@ -19,10 +17,11 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 object DataAttributesConfigProviders {
-    fun entityTypeIdentifierToText(id: Identifier): MutableText {
+    // todo: combine functions to accept a registry value like ATTRIBUTE/ENTITY_TYPE
+    fun entityTypeIdentifierToText(id: Identifier, default: Boolean = false): MutableText {
         val type = Registries.ENTITY_TYPE[id]
         return Text.empty().apply {
-            append(Text.translatable(type.translationKey).append(" ").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_YELLOW)))
+            append(Text.translatable(type.translationKey).append(" ").setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B)))
             append(Text.literal("($id)").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_BLACK)))
         }
     }
@@ -40,15 +39,15 @@ object DataAttributesConfigProviders {
     fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeOverrideProviderV2(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeFunctionProviderV2(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeFunctionProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeEntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory EntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null, textBoxID: String? = null): FlowLayout {
