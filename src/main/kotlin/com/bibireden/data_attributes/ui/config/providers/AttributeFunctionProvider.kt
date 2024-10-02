@@ -118,10 +118,6 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
             } else if (isDefault) {
                 titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
-            } else {
-                if (attribute is ClampedEntityAttribute) {
-                    titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.function_child", function.id, attribute.minValue, attribute.maxValue))
-                }
             }
 
             if (!isDefault) {
@@ -183,7 +179,11 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         refreshAndDisplayAttributes()
                     }
                 }
-            ))
+            ).also {
+                if (attribute is ClampedEntityAttribute) {
+                    it.tooltip(Text.translatable("text.config.data_attributes.data_entry.function_child", function.id, attribute.minValue, attribute.maxValue))
+                }
+            })
 
             child(
                 Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).apply {

@@ -180,11 +180,13 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                         if (isDefault) refreshAndDisplayEntries(true)
                     }
                 }
-            ))
+            ).apply {
+                val attribute = Registries.ATTRIBUTE[id] as? ClampedEntityAttribute ?: return@apply
+                tooltip(Text.translatable("text.config.data_attributes.data_entry.entity_type_value", id, attribute.minValue, attribute.maxValue))
+            })
 
-            val attribute = Registries.ATTRIBUTE[id]
-            if (attribute is ClampedEntityAttribute) {
-                ct.titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.entity_type_value", id, attribute.minValue, attribute.maxValue))
+            if (isDefault) {
+                ct.titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
             }
 
             ct.child(SearchAnchorComponent(ct.titleLayout(), Option.Key.ROOT, id::toString, { Text.translatable(id.toTranslationKey()).toString() }))
