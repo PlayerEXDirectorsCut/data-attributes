@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config.models
 
+import blue.endless.jankson.Comment
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
 import io.wispforest.owo.config.Option.SyncMode
@@ -16,5 +17,6 @@ class FunctionsConfigModel {
 
     @JvmField
     @Hook
-    var functions: AttributeFunctionConfig = AttributeFunctionConfig()
+    @Comment("attribute functions are able to compute child attributes based on an increment/decrement, or multiplication of a parent attribute.")
+    var entries: AttributeFunctionConfig = AttributeFunctionConfig()
 }

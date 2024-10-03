@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config.models
 
+import blue.endless.jankson.Comment
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.data.EntityTypeData
 import io.wispforest.owo.config.Option.SyncMode
@@ -17,5 +18,6 @@ class EntityTypesConfigModel {
 
     @JvmField
     @Hook
-    var entity_types: Map<Identifier, EntityTypeData> = mapOf()
+    @Comment("entity types are able to target specific entities in-game to attach certain attributes to them.")
+    var entries: Map<Identifier, EntityTypeData> = mapOf()
 }

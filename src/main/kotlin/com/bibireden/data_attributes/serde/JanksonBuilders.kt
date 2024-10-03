@@ -28,10 +28,10 @@ object JanksonBuilders {
             marshaller.serialize(cfg.data)
         }
         builder.registerDeserializer(JsonObject::class.java, AttributeFunctionConfig::class.java) { obj, marshaller ->
-            AttributeFunctionConfig(marshaller.marshall<Map<String, JsonArray>>(Map::class.java, obj).entries
-                .associate { (id, array) ->
-                    Identifier.tryParse(id)!! to array.map { marshaller.marshall(AttributeFunction::class.java, it) }
-                }
+            AttributeFunctionConfig(marshaller.marshall<Map<String, Map<String, JsonObject>>>(Map::class.java, obj).entries
+                .associate { (a, b) -> Identifier.tryParse(a)!! to b.entries
+                    .associate { (k, v) -> Identifier.tryParse(k)!! to marshaller.marshallCarefully(AttributeFunction::class.java, v) }.toMutableMap()
+                }.toMutableMap()
             )
         }
     }

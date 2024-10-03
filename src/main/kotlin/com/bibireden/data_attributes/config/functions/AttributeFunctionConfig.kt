@@ -9,9 +9,11 @@ import net.minecraft.util.Identifier
 /**
  * Container for data that applies modifiers to specific [EntityAttribute]'s based on a [AttributeFunction].
  */
-data class AttributeFunctionConfig(var data: Map<Identifier, List<AttributeFunction>> = mapOf()) {
+data class AttributeFunctionConfig(
+    val data: MutableMap<Identifier, MutableMap<Identifier, AttributeFunction>> = mutableMapOf()
+) {
     companion object {
         @JvmField
-        val ENDEC = Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf()).xmap(::AttributeFunctionConfig) { it.data }
+        val ENDEC = Endecs.IDENTIFIER.keyOf(Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC)).xmap(::AttributeFunctionConfig) { it.data }
     }
 }

@@ -47,13 +47,13 @@ class EntityAttributeData(val override: AttributeOverride? = null, val functions
         }
     }
     
-    /** Joins a [List] of [AttributeFunction]'s with the data in this class. */
-    fun putFunctions(functions: List<AttributeFunction>) {
-        functions.forEach { (id, behavior, value, enabled) ->
+    /** Joins a [Map] of [AttributeFunction]'s with the data in this class. */
+    fun putFunctions(functions: Map<Identifier, AttributeFunction>) {
+        for ((id, function) in functions) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("The attribute function child [$id] does not seem to be registered. This could allude to a missing mod or registered attribute.")
             }
-            this.functions[id] = AttributeFunction(id, behavior, value, enabled)
+            this.functions[id] = function
         }
     }
 }
