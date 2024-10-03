@@ -36,13 +36,13 @@ import kotlin.math.min
 
 class DataAttributesConfigScreen(val overrides: OverridesConfig, val functions: FunctionsConfig, val entity_types: EntityTypesConfig, parent: Screen?) : ConfigScreen(DEFAULT_MODEL_ID, DataAttributes.CONFIG, parent) {
     override fun build(rootComponent: FlowLayout) {
-        this.extraFactories.put({ it.backingField().field.name.equals("entity_types") },
+        this.extraFactories.put({ it.configName() == "data_attributes/entity_types" && it.backingField().field.name.equals("entries") },
             DataAttributesConfigProviders.ENTITY_TYPES_FACTORY
         )
-        this.extraFactories.put({ it.backingField().field.name.equals("overrides") },
+        this.extraFactories.put({ it.configName() == "data_attributes/overrides" && it.backingField().field.name.equals("entries") },
             DataAttributesConfigProviders.ATTRIBUTE_OVERRIDE_FACTORY
         )
-        this.extraFactories.put({ it.backingField().field.name.equals("functions") },
+        this.extraFactories.put({ it.configName() == "data_attributes/functions" && it.backingField().field.name.equals("entries") },
             DataAttributesConfigProviders.ATTRIBUTE_FUNCTIONS_FACTORY
         )
 
