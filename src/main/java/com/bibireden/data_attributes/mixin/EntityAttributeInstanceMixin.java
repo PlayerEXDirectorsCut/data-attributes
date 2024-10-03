@@ -116,7 +116,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_attributes$container != null) {
 			attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
-				if (function.getBehavior() != StackingBehavior.Add) return;
+				if (!function.getEnabled() || function.getBehavior() != StackingBehavior.Add) return;
 
 				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;
@@ -145,7 +145,7 @@ abstract class EntityAttributeInstanceMixin implements MutableAttributeInstance,
 
 		if (this.data_attributes$container != null) {
             attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
-				if (function.getBehavior() != StackingBehavior.Multiply) return;
+				if (!function.getEnabled() || function.getBehavior() != StackingBehavior.Multiply) return;
 
 				EntityAttributeInstance parentInstance = this.data_attributes$container.getCustomInstance((EntityAttribute) parentAttribute);
 				if (parentInstance == null) return;

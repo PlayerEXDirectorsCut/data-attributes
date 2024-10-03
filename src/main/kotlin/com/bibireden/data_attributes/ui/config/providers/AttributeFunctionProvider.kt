@@ -14,6 +14,7 @@ import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
+import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
 import io.wispforest.owo.ui.component.Components
@@ -119,6 +120,16 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         gap(10)
                     }
                     .also { fl ->
+                        fl.child(ConfigToggleButton().also { button ->
+                            button.enabled(function.enabled)
+                            button.onPress {
+                                val entry = backing[parentId]?.toMutableList() ?: mutableListOf()
+                                entry.removeIf { it.id == function.id }
+                                insertEntry(parentId, function.copy(enabled = !function.enabled), entry)
+                                refreshAndDisplayAttributes()
+                            }
+                            button.renderer(ButtonRenderers.STANDARD)
+                        })
                         fl.child(RemoveButtonComponent { backing[parentId]?.let { backing[parentId] = it.filter { it.id != function.id } }; refreshAndDisplayAttributes() }
                             .renderer(ButtonRenderers.STANDARD))
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
@@ -155,9 +166,9 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 Validators::isNumeric,
                 onChange = {
                     it.toDoubleOrNull()?.let { v ->
-                        backing[parentId] = (backing.remove(parentId)?.toMutableList() ?: mutableListOf()).apply {
-                            insertEntry(parentId, function.copy(value = v), this)
-                        }
+                        val entry = backing[parentId]?.toMutableList() ?: mutableListOf()
+                        entry.removeIf { it.id == function.id }
+                        insertEntry(parentId, function.copy(value = v), entry)
                         refreshAndDisplayAttributes()
                     }
                 }
@@ -170,6 +181,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
             child(
                 Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).apply {
                     verticalAlignment(VerticalAlignment.CENTER)
+
                     child(
                         Components.label(Text.translatable("text.config.data_attributes.data_entry.functions.behavior"))
                             .sizing(Sizing.content(), Sizing.fixed(20))

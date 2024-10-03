@@ -19,10 +19,11 @@ data class AttributeFunction(
     @Serializable(with = IdentifierSerializer::class)
     var id: Identifier,
     var behavior: StackingBehavior,
-    var value: Double
+    var value: Double,
+    var enabled: Boolean
 ) {
     @Suppress("UNUSED")
-    constructor() : this(Identifier("unknown"), StackingBehavior.Add, 0.0)
+    constructor() : this(Identifier("unknown"), StackingBehavior.Add, 0.0, true)
 
     companion object {
         @JvmField
@@ -30,6 +31,7 @@ data class AttributeFunction(
             Endecs.IDENTIFIER.fieldOf("id") { it.id },
             Endec.STRING.xmap(StackingBehavior::of) { x -> x.name.uppercase() }.fieldOf("behavior") { it.behavior },
             Endec.DOUBLE.fieldOf("value") { it.value },
+            Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, true),
             ::AttributeFunction
         )
     }

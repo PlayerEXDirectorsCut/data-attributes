@@ -49,7 +49,7 @@ class OverridesConfigModel {
         companion object {
             @JvmField
             val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
-                Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
+                Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, true),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max", { it.max }, 1_000_000.0),
                 Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.01),
