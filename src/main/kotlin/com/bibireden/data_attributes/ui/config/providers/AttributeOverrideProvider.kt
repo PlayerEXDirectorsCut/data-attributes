@@ -10,7 +10,7 @@ import com.bibireden.data_attributes.config.models.OverridesConfigModel.Attribut
 import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.colors.ColorCodes
-import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
+import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.ConfigToggleButton
@@ -90,11 +90,10 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
 
                         content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (container.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    {
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        val newAttribute = (Registries.ATTRIBUTE[newId] ?: return@EditFieldComponent) as MutableEntityAttribute
-                                        if (backing.containsKey(newId)) return@EditFieldComponent
+                                val field = FieldComponents.identifier(
+                                    { newId, _ ->
+                                        val newAttribute = Registries.ATTRIBUTE[newId] as? MutableEntityAttribute ?: return@identifier
+                                        if (backing.containsKey(newId)) return@identifier
                                         // ensured that this exists and is possible to swap
                                         this.backing.remove(id)
                                         this.backing[newId] = override.copy(
@@ -104,10 +103,8 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                             formula = StackingFormula.Flat,
                                             format = AttributeFormat.Whole
                                         )
-                                        it.remove()
                                         refreshAndDisplayAttributes()
-                                    },
-                                    EditFieldComponent::remove
+                                    }
                                 )
 
                                 field.textBox

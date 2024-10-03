@@ -1,6 +1,7 @@
-package com.bibireden.data_attributes.ui.components.fields
+package com.bibireden.data_attributes.ui.components.boxes
 
 import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.components.fields.ColorPredicate
 import io.wispforest.owo.ui.component.TextBoxComponent
 import io.wispforest.owo.ui.core.Sizing
 import org.jetbrains.annotations.ApiStatus
@@ -9,6 +10,8 @@ import org.jetbrains.annotations.ApiStatus
 class ParsedTextBoxComponent<T>(val parser: (String) -> T?, horizontalSizing: Sizing?) : TextBoxComponent(horizontalSizing) {
     var defaultColor = ColorCodes.TAN
     private val colorConditions: MutableList<Pair<Int, ColorPredicate<T>>> = mutableListOf()
+
+    fun parse(): T? = parser(text)
 
     init {
         textValue.observe { text ->

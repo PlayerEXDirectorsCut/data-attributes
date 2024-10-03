@@ -8,7 +8,7 @@ import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
-import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
+import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.OptionValueProvider
@@ -52,15 +52,13 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
                                 fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                                     if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
-                                        val field = EditFieldComponent(
-                                            {
-                                                val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                                if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@EditFieldComponent
+                                        val field = FieldComponents.identifier(
+                                            { newId, field ->
+                                                if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@identifier
                                                 // ensured that this exists and is possible to swap
                                                 backing.remove(id)?.let { backing[newId] = it }
                                                 refreshAndDisplayEntries(true)
-                                            },
-                                            EditFieldComponent::remove
+                                            }
                                         )
 
                                         field.textBox
@@ -126,17 +124,15 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    {
-                                        val entry = backing[parentId]?.data?.toMutableMap() ?: return@EditFieldComponent
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        if (entry.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@EditFieldComponent
+                                val field = FieldComponents.identifier(
+                                    { newId, _ ->
+                                        val entry = backing[parentId]?.data?.toMutableMap() ?: return@identifier
+                                        if (entry.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@identifier
                                         // ensured that this exists and is possible to swap
-                                        entry[newId] = entry.remove(id) ?: return@EditFieldComponent
+                                        entry[newId] = entry.remove(id) ?: return@identifier
                                         backing[parentId] = EntityTypeData(entry)
                                         refreshAndDisplayEntries(true)
-                                    },
-                                    EditFieldComponent::remove
+                                    }
                                 )
 
                                 field.textBox

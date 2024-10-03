@@ -1,5 +1,9 @@
 package com.bibireden.data_attributes.ui.components.fields
 
-class FieldComponents {
-//    fun edit(): EditFieldComponent {}
+import net.minecraft.util.Identifier
+
+object FieldComponents {
+    fun identifier(onConfirmation: EditFieldDecision<Identifier>, onCancel: EditFieldCancellation<Identifier>? = null): EditFieldComponent<Identifier> {
+        return EditFieldComponent(Identifier::tryParse, onConfirmation, onCancel)
+    }
 }

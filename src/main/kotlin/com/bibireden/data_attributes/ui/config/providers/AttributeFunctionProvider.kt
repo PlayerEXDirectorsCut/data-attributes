@@ -11,6 +11,7 @@ import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
+import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.OptionValueProvider
@@ -59,15 +60,13 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
 
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (cf.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    {
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@EditFieldComponent
+                                val field = FieldComponents.identifier(
+                                    { newId, _ ->
+                                        if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@identifier
                                         // ensured that this exists and is possible to swap
                                         backing.remove(id)?.let { backing[newId] = it }
                                         refreshAndDisplayAttributes()
-                                    },
-                                    EditFieldComponent::remove
+                                    }
                                 )
 
                                 field.textBox
@@ -124,19 +123,17 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                             .renderer(ButtonRenderers.STANDARD))
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (fl.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    {
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
+                                val field = FieldComponents.identifier(
+                                    { newId, _ ->
                                         val newFunction = function.copy(id = newId)
                                         val currentList = backing[parentId]
-                                        if (!Registries.ATTRIBUTE.containsId(newId) || currentList?.find { it.id == newId } != null) return@EditFieldComponent
+                                        if (!Registries.ATTRIBUTE.containsId(newId) || currentList?.find { it.id == newId } != null) return@identifier
                                         // ensured that this exists and is possible to swap
-                                        val list = currentList?.filter { it.id != function.id }?.toMutableList() ?: return@EditFieldComponent
+                                        val list = currentList?.filter { it.id != function.id }?.toMutableList() ?: return@identifier
                                         list.add(0, newFunction)
                                         backing[parentId] = list
                                         refreshAndDisplayAttributes()
-                                    },
-                                    EditFieldComponent::remove
+                                    }
                                 )
 
                                 field.textBox
