@@ -70,6 +70,11 @@
     {"text": "]"}
   ],
 
+  "text.config.data_attributes.data_entry.fallback": [
+    {"text": "⬸ ", "color": "#979797"},
+    {"text": "Fallback", "color": "white"}
+  ],
+
   "text.config.data_attributes.data_entry.overrides.min_fallback": [
     {"text": "⭳ ", "color": "#979797"},
     {"text": "Min Fallback", "color": "white"}

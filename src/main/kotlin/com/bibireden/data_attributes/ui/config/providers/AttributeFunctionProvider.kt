@@ -7,7 +7,6 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBo
 import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
-import com.bibireden.data_attributes.data.EntityTypeData
 import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent

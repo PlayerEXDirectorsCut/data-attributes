@@ -3,7 +3,8 @@ package com.bibireden.data_attributes.config.entry
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeEntry
 import net.minecraft.util.Identifier
 
 object ConfigMerger {
@@ -32,7 +33,7 @@ object ConfigMerger {
         return entries
     }
 
-    fun mergeEntityTypes(values: Map<Identifier, Map<Identifier, Double>>): Map<Identifier, EntityTypeData> {
+    fun mergeEntityTypes(values: Map<Identifier, Map<Identifier, EntityTypeEntry>>): Map<Identifier, EntityTypeData> {
         val entries = values.toMutableMap()
         for ((primaryId, primaryEntry) in DataAttributes.ENTITY_TYPES_CONFIG.entries) {
            val secondaryEntry = entries[primaryId]?.toMutableMap()

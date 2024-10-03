@@ -4,7 +4,9 @@ import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeEntry
+import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
@@ -20,7 +22,10 @@ import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.Component
 import io.wispforest.owo.ui.core.Sizing
 import io.wispforest.owo.ui.core.VerticalAlignment
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.ClampedEntityAttribute
+import net.minecraft.entity.attribute.DefaultAttributeRegistry
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
@@ -31,7 +36,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
     private val headerComponents: MutableMap<Identifier, Component> = mutableMapOf()
     private val entryComponents: MutableMap<Identifier, Component> = mutableMapOf()
 
-    private fun createEntries(id: Identifier, types: Map<Identifier, Double>, isDefault: Boolean = false): CollapsibleFoldableContainer {
+    private fun createEntries(id: Identifier, types: Map<Identifier, EntityTypeEntry>, isDefault: Boolean = false): CollapsibleFoldableContainer {
         val container = childById(CollapsibleFoldableContainer::class.java, id.toString())
             ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ENTITY_TYPE, { it.translationKey }, isDefault), true)
                 .also { ct ->
@@ -74,7 +79,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                             fl.child(
                                 Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
                                     val map = backing[id]?.data?.toMutableMap() ?: mutableMapOf()
-                                    map[Identifier("unknown")] = 0.0
+                                    map[Identifier("unknown")] = EntityTypeEntry()
                                     backing[id] = EntityTypeData(map)
                                     refreshAndDisplayEntries(true)
                                 }
@@ -90,19 +95,25 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                     child(ct)
                 }
 
-        for ((entryId, value) in types) {
-            createEntry(entryId, value, id, container, backing[id]?.data?.get(entryId) == null)
+        for ((entryId, entry) in types) {
+            createEntry(entryId, entry, id, container, backing[id]?.data?.get(entryId) == null)
         }
 
         return container
     }
 
-    private fun createEntry(id: Identifier, value: Double, parentId: Identifier, parent: CollapsibleContainer, isDefault: Boolean) {
+    private fun createEntry(id: Identifier, entityTypeEntry: EntityTypeEntry, parentId: Identifier, parent: CollapsibleContainer, isDefault: Boolean) {
         if (parent.childById(CollapsibleContainer::class.java, id.toString()) != null) return
 
         Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).also { ct ->
             ct.gap(4)
             ct.id(id.toString())
+
+            // find fallback
+            entityTypeEntry.fallback = Registries.ENTITY_TYPE.get(parentId)?.let { entityType ->
+                val defaultContainer = DefaultAttributeRegistry.get(entityType as EntityType<LivingEntity>)
+                Registries.ATTRIBUTE.get(id)?.let(defaultContainer::getBaseValue)
+            }?.round(2)
 
             if (!isDefault) {
                 ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
@@ -147,13 +158,13 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
             ct.child(textBoxComponent(
                 Text.translatable("text.config.data_attributes.data_entry.entity_types.value"),
-                value,
+                entityTypeEntry.value,
                 Validators::isNumeric,
                 onChange = {
                     it.toDoubleOrNull()?.let { value ->
                         val data = this.backing.remove(parentId) ?: EntityTypeData()
                         val mapping = data.data.toMutableMap()
-                        mapping[id] = value
+                        mapping[id] = entityTypeEntry.copy(value = value)
                         this.backing[parentId] = data.copy(data = mapping)
 
                         if (isDefault) refreshAndDisplayEntries(true)
@@ -163,6 +174,15 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                 val attribute = Registries.ATTRIBUTE[id] as? ClampedEntityAttribute ?: return@apply
                 tooltip(Text.translatable("text.config.data_attributes.data_entry.entity_type_value", id, attribute.minValue, attribute.maxValue))
             })
+
+            val fallback = entityTypeEntry.fallback
+            if (fallback != null) {
+                ct.child(textBoxComponent(
+                    Text.translatable("text.config.data_attributes.data_entry.fallback"),
+                    fallback,
+                    Validators::isNumeric,
+                ))
+            }
 
             if (isDefault) {
                 ct.titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))

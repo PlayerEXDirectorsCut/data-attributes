@@ -2,7 +2,7 @@ package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.config.AttributeConfigManager.Companion.ENTITY_TYPE_INSTANCES
 import com.bibireden.data_attributes.config.AttributeConfigManager.Tuple
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
 import com.bibireden.data_attributes.mutable.MutableAttributeContainer
 import com.bibireden.data_attributes.mutable.MutableDefaultAttributeContainer
 import net.minecraft.entity.EntityType

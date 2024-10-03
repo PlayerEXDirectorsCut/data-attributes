@@ -9,7 +9,7 @@ import com.bibireden.data_attributes.config.entry.DefaultAttributesReloadListene
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.data.EntityAttributeData
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.ext.keyOf
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
