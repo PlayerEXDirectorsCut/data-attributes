@@ -84,7 +84,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                     fl.child(
                         Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
                             val entry = backing[id]?.toMutableList() ?: mutableListOf()
-                            entry.add(AttributeFunction())
+                            if (entry.size > 2) entry.add(1, AttributeFunction()) else entry.add(AttributeFunction())
                             backing[id] = entry
                             refreshAndDisplayAttributes(true)
                         }

@@ -1,3 +1,6 @@
+## Overview
+**There are breaking changes in this release. Ensure you back up your config(s) if possible.**
+
 *Welcome to the release of the new Data Attributes. This has taken a considerable amount of time to complete.*
 
 *I am glad to have this opportunity to work on this project and be supported with the first ever public project I will personally release.*
@@ -12,8 +15,12 @@
 - You can now actually use the search bar to look up the specific entries you wish to find.
   - Translations should be compatible in the language you choose as well as the attribute id.
     - e.g., looking up `playerex:luck`, or `Luck` should work.
-
+- You can now enable/disable Attribute Functions.
 ## Changes 🌽
+
+- **[BREAKING]** Changed overall structure of config related class definitions. This will affect your config file considerably.
+- **[BREAKING]** Changed `Map<Identifier, List<AttributeFunction>>` -> `Map<Identifier, Map<Identifier, AttributeFunction>>`
+  - This existed to avoid an odd situation that does not exist anymore.
 - Made some changes to certain logic internally and micro-optimizations.
 - Fixed CTD issues with editing function values.
 - Separated config entries from defaults using color coding & tooltips.
