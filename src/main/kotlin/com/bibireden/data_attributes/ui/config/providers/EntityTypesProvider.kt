@@ -1,11 +1,11 @@
 package com.bibireden.data_attributes.ui.config.providers
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.entityTypeIdentifierToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
 import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
@@ -33,73 +33,67 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
     private val entryComponents: MutableMap<Identifier, Component> = mutableMapOf()
 
     private fun createEntries(id: Identifier, types: Map<Identifier, Double>, isDefault: Boolean = false): CollapsibleFoldableContainer {
-        val container = childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), entityTypeIdentifierToText(id, isDefault), true).also { ct ->
-            ct.gap(4)
-            ct.id(id.toString())
+        val container = childById(CollapsibleFoldableContainer::class.java, id.toString())
+            ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ENTITY_TYPE, { it.translationKey }, isDefault), true)
+                .also { ct ->
+                    ct.gap(4)
+                    ct.id(id.toString())
 
-            if (!isDefault) {
-                ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
-                    .apply {
-                        verticalAlignment(VerticalAlignment.CENTER)
-                        gap(10)
-                        id("dock")
-                    }
-                    .also { fl ->
-                        fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayEntries(true) }
-                            .renderer(ButtonRenderers.STANDARD))
-
-                        fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
-                            if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
-                                val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing.containsKey(predId)) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ENTITY_TYPE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
-                                    {
-                                        val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
-                                        if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@EditFieldComponent
-                                        // ensured that this exists and is possible to swap
-                                        backing.remove(id)?.let { backing[newId] = it }
-                                        refreshAndDisplayEntries(true)
-                                    },
-                                    EditFieldComponent::remove
-                                )
-                                ct.child(0, field)
+                    if (!isDefault) {
+                        ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
+                            .apply {
+                                verticalAlignment(VerticalAlignment.CENTER)
+                                gap(10)
+                                id("dock")
                             }
-                        }
-                            .renderer(ButtonRenderers.STANDARD)
-                        )
+                            .also { fl ->
+                                fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayEntries(true) }
+                                    .renderer(ButtonRenderers.STANDARD))
 
-                        fl.child(
-                            Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                                backing[id]?.let {
-                                    val map = it.data.toMutableMap()
-                                    map[Identifier("unknown")] = 0.0
-                                    backing[id] = EntityTypeData(map)
+                                fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
+                                    if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
+                                        val field = EditFieldComponent(
+                                            {
+                                                val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
+                                                if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@EditFieldComponent
+                                                // ensured that this exists and is possible to swap
+                                                backing.remove(id)?.let { backing[newId] = it }
+                                                refreshAndDisplayEntries(true)
+                                            },
+                                            EditFieldComponent::remove
+                                        )
+
+                                        field.textBox
+                                            .addColorCondition(ColorCodes.RED, backing::containsKey)
+                                            .addColorCondition(ColorCodes.GREEN) { Registries.ENTITY_TYPE.containsId(it) }
+
+                                        ct.child(0, field)
+                                    }
                                 }
-                                refreshAndDisplayEntries(true)
+                                    .renderer(ButtonRenderers.STANDARD)
+                                )
+
+                                fl.child(
+                                    Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
+                                        backing[id]?.let {
+                                            val map = it.data.toMutableMap()
+                                            map[Identifier("unknown")] = 0.0
+                                            backing[id] = EntityTypeData(map)
+                                        }
+                                        refreshAndDisplayEntries(true)
+                                    }
+                                        .renderer(ButtonRenderers.STANDARD)
+                                )
                             }
-                                .renderer(ButtonRenderers.STANDARD)
                         )
                     }
-                )
-            }
 
-            headerComponents[id] = ct
+                    headerComponents[id] = ct
 
-            child(SearchAnchorComponent(ct.titleLayout(), Option.Key.ROOT, id::toString, { Text.translatable(id.toTranslationKey()).toString() }))
+                    child(SearchAnchorComponent(ct.titleLayout(), Option.Key.ROOT, id::toString, { Text.translatable(id.toTranslationKey()).toString() }))
 
-            child(ct)
-        }
+                    child(ct)
+                }
 
         for ((entryId, value) in types) {
             createEntry(entryId, value, id, container, backing[id]?.data?.get(entryId) == null)
@@ -111,7 +105,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
     private fun createEntry(id: Identifier, value: Double, parentId: Identifier, parent: CollapsibleContainer, isDefault: Boolean) {
         if (parent.childById(CollapsibleContainer::class.java, id.toString()) != null) return
 
-        Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(id, isDefault), true).also { ct ->
+        Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).also { ct ->
             ct.gap(4)
             ct.id(id.toString())
 
@@ -133,19 +127,6 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
                                 val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing.containsKey(predId)) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
                                     {
                                         val entry = backing[parentId]?.data?.toMutableMap() ?: return@EditFieldComponent
                                         val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
@@ -157,6 +138,11 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                     },
                                     EditFieldComponent::remove
                                 )
+
+                                field.textBox
+                                    .addColorCondition(ColorCodes.RED) { backing[parentId]?.data?.get(it) != null }
+                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+
                                 ct.child(0, field)
                             }
                         }

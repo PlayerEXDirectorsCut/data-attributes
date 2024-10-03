@@ -2,11 +2,12 @@ package com.bibireden.data_attributes.ui.config.providers
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
+import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
 import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
@@ -41,7 +42,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
     }
 
     private fun getOrCreateEntryContainer(id: Identifier, isDefault: Boolean): CollapsibleFoldableContainer {
-        return childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), attributeIdToText(id, isDefault), true).also { cf ->
+        return childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).also { cf ->
             headerComponents[id] = cf
             cf.id(id.toString())
 
@@ -59,19 +60,6 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (cf.childById(FlowLayout::class.java, "edit-field") == null) {
                                 val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing.containsKey(predId)) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
                                     {
                                         val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
                                         if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@EditFieldComponent
@@ -81,6 +69,11 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                     },
                                     EditFieldComponent::remove
                                 )
+
+                                field.textBox
+                                    .addColorCondition(ColorCodes.RED) { identifier -> backing[id]?.find { it.id == identifier } != null }
+                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+
                                 cf.child(0, field)
                             }
                         }
@@ -109,7 +102,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
         val located = parent.childById(CollapsibleContainer::class.java, "${function.id}#child-fn")
         if (located != null) return located
 
-        val container = Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(function.id, isDefault), true).apply {
+        val container = Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(function.id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).apply {
             gap(4)
             id("${function.id}#child-fn")
 
@@ -132,19 +125,6 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (fl.childById(FlowLayout::class.java, "edit-field") == null) {
                                 val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing[parentId]?.find { it.id == predId } != null) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
                                     {
                                         val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
                                         val newFunction = function.copy(id = newId)
@@ -158,6 +138,11 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                     },
                                     EditFieldComponent::remove
                                 )
+
+                                field.textBox
+                                    .addColorCondition(ColorCodes.RED) { id -> backing[parentId]?.find { it.id == id } != null }
+                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+
                                 child(0, field)
                             }
                         }

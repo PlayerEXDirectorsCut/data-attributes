@@ -10,33 +10,31 @@ import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
+import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 object DataAttributesConfigProviders {
-    // todo: combine functions to accept a registry value like ATTRIBUTE/ENTITY_TYPE
-    fun entityTypeIdentifierToText(id: Identifier, default: Boolean = false): MutableText {
-        val type = Registries.ENTITY_TYPE[id]
-        return Text.empty().apply {
-            append(Text.translatable(type.translationKey).append(" ").setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B)))
-            append(Text.literal("($id)").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_BLACK)))
-        }
-    }
-    fun attributeIdToText(id: Identifier, default: Boolean = false): MutableText {
-        val attribute = Registries.ATTRIBUTE[id]
+    fun <T> registryEntryToText(id: Identifier, registry: Registry<T>, representation: (T) -> String, isDefault: Boolean = false): MutableText {
+        val entry = registry[id]
         val text = Text.empty()
-        if (attribute != null) {
-            text.append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(if (default) 0x84de56 else 0xE7C14B))
+        if (entry != null) {
+            text.append(Text.translatable(representation(entry)).append(" "))
+                .setStyle(Style.EMPTY.withColor(if (isDefault) 0x84de56 else 0xE7C14B))
         }
         text.append(Text.literal("($id)").also { t ->
-            t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
+            t.setStyle(
+                Style.EMPTY.withColor(
+                    if (entry != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE
+                )
+            )
         })
         return text
     }
-    fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }

@@ -3,12 +3,13 @@ package com.bibireden.data_attributes.ui.config.providers
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.AttributeFormat
 import com.bibireden.data_attributes.api.attribute.StackingFormula
-import com.bibireden.data_attributes.config.DataAttributesConfigProviders.attributeIdToText
+import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBoxComponent
 import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
+import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.fields.EditFieldComponent
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -51,7 +52,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
             )
         }
 
-        Containers.collapsible(Sizing.content(), Sizing.content(), attributeIdToText(id, isDefault), true).also { container ->
+        Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).also { container ->
             container.child(SearchAnchorComponent(container.titleLayout(), Option.Key.ROOT, { id.toString() }, { Text.translatable(id.toTranslationKey()).toString() }))
 
             if (!isRegistered) {
@@ -90,19 +91,6 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (container.childById(FlowLayout::class.java, "edit-field") == null) {
                                 val field = EditFieldComponent(
-                                    { field, str ->
-                                        val predId = Identifier.tryParse(str) ?: return@EditFieldComponent true
-                                        if (backing.containsKey(predId)) {
-                                            field.textBox.setEditableColor(0xe54d48)
-                                        }
-                                        else if (!Registries.ATTRIBUTE.containsId(predId)) {
-                                            field.textBox.setEditableColor(0xf2e1c0)
-                                        }
-                                        else {
-                                            field.textBox.setEditableColor(0x69d699)
-                                        }
-                                        true
-                                    },
                                     {
                                         val newId = Identifier.tryParse(it.textBox.text.toString()) ?: return@EditFieldComponent
                                         val newAttribute = (Registries.ATTRIBUTE[newId] ?: return@EditFieldComponent) as MutableEntityAttribute
@@ -121,6 +109,11 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                     },
                                     EditFieldComponent::remove
                                 )
+
+                                field.textBox
+                                    .addColorCondition(ColorCodes.RED, backing::containsKey)
+                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+
                                 container.child(0, field)
                             }
                         }
