@@ -18,7 +18,6 @@ import io.wispforest.owo.ui.container.CollapsibleContainer
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.Component
-import io.wispforest.owo.ui.core.ParentComponent
 import io.wispforest.owo.ui.core.Sizing
 import io.wispforest.owo.ui.core.VerticalAlignment
 import net.minecraft.entity.attribute.ClampedEntityAttribute
@@ -39,14 +38,14 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                     ct.gap(4)
                     ct.id(id.toString())
 
-                    if (!isDefault) {
-                        ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
-                            .apply {
-                                verticalAlignment(VerticalAlignment.CENTER)
-                                gap(10)
-                                id("dock")
-                            }
-                            .also { fl ->
+                    ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
+                        .apply {
+                            verticalAlignment(VerticalAlignment.CENTER)
+                            gap(10)
+                            id("dock")
+                        }
+                        .also { fl ->
+                            if (!isDefault) {
                                 fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayEntries(true) }
                                     .renderer(ButtonRenderers.STANDARD))
 
@@ -70,21 +69,19 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                 }
                                     .renderer(ButtonRenderers.STANDARD)
                                 )
-
-                                fl.child(
-                                    Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                                        backing[id]?.let {
-                                            val map = it.data.toMutableMap()
-                                            map[Identifier("unknown")] = 0.0
-                                            backing[id] = EntityTypeData(map)
-                                        }
-                                        refreshAndDisplayEntries(true)
-                                    }
-                                        .renderer(ButtonRenderers.STANDARD)
-                                )
                             }
-                        )
-                    }
+
+                            fl.child(
+                                Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
+                                    val map = backing[id]?.data?.toMutableMap() ?: mutableMapOf()
+                                    map[Identifier("unknown")] = 0.0
+                                    backing[id] = EntityTypeData(map)
+                                    refreshAndDisplayEntries(true)
+                                }
+                                    .renderer(ButtonRenderers.STANDARD)
+                            )
+                        }
+                    )
 
                     headerComponents[id] = ct
 
