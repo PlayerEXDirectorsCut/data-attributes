@@ -1,5 +1,5 @@
 ## Overview
-**There are breaking changes in this release. Ensure you back up your config(s) if possible.**
+**There are breaking changes in this release. Ensure you back up your config(s) if possible. Mods relying on the beta version will have to be updated.**
 
 *Welcome to the release of the new Data Attributes. This has taken a considerable amount of time to complete.*
 

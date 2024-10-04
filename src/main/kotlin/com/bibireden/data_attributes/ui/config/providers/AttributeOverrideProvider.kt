@@ -224,14 +224,17 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
             })
             container.id(id.toString())
         }
-            .also(::child)
+            .also {
+                if (id.toString() == "minecraft:unknown" && children.size > 1) child(1, it)
+                else child(it)
+            }
             .also { trackedContainers[id] = it }
     }
 
     init {
         child(
             Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                backing[Identifier.of("unresolved", "id")!!] = AttributeOverride()
+                backing[Identifier("unknown")] = AttributeOverride()
                 refreshAndDisplayAttributes()
             }
                 .renderer(ButtonRenderers.STANDARD)

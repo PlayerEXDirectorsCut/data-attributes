@@ -86,7 +86,8 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 }
             )
 
-            child(cf)
+            if (id.toString() == "minecraft:unknown" && children.size > 1) child(1, cf)
+            else child(cf)
         }
     }
 
@@ -196,7 +197,9 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
             child(SearchAnchorComponent(titleLayout(), Option.Key.ROOT, { id.toString() }, { Text.translatable(id.toTranslationKey()).toString() }))
         }
 
-        parent.child(container)
+        if (id.toString() == "minecraft:unknown" && parent.children().size > 1) parent.child(1, container)
+        else parent.child(container)
+
         entryComponents[id] = container
 
         // force a rearrangement to bring the dock up top~

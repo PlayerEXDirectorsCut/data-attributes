@@ -57,7 +57,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                 fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                                     if (ct.childById(FlowLayout::class.java, "edit-field") == null) {
                                         val field = FieldComponents.identifier(
-                                            { newId, field ->
+                                            { newId, _ ->
                                                 if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@identifier
                                                 // ensured that this exists and is possible to swap
                                                 backing.remove(id)?.let { backing[newId] = it }
@@ -92,7 +92,9 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
                     child(SearchAnchorComponent(ct.titleLayout(), Option.Key.ROOT, id::toString, { Text.translatable(id.toTranslationKey()).toString() }))
 
-                    child(ct)
+
+                    if (id.toString() == "minecraft:unknown" && children.size > 1) child(1, ct)
+                    else child(ct)
                 }
 
         for ((entryId, entry) in types) {
@@ -192,7 +194,8 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
             entryComponents[id] = ct
 
-            parent.child(ct)
+            if (id.toString() == "minecraft:unknown" && parent.children().size > 1) parent.child(1, ct)
+            else parent.child(ct)
         }
 
         // force a rearrangement to bring the dock up top~
