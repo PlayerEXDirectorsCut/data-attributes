@@ -9,7 +9,6 @@ import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
-import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -107,9 +106,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                     }
                                 )
 
-                                field.textBox
-                                    .addColorCondition(ColorCodes.RED, backing::containsKey)
-                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+                                field.textBox.predicate = { it !in backing && Registries.ATTRIBUTE.containsId(it) }
 
                                 container.child(0, field)
                             }

@@ -65,9 +65,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                             }
                                         )
 
-                                        field.textBox
-                                            .addColorCondition(ColorCodes.RED, backing::containsKey)
-                                            .addColorCondition(ColorCodes.GREEN) { Registries.ENTITY_TYPE.containsId(it) }
+                                        field.textBox.predicate = { it !in backing && Registries.ENTITY_TYPE.containsId(it) }
 
                                         ct.child(0, field)
                                     }
@@ -145,9 +143,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                     }
                                 )
 
-                                field.textBox
-                                    .addColorCondition(ColorCodes.RED) { backing[parentId]?.data?.get(it) != null }
-                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+                                field.textBox.predicate = { backing[parentId]?.data?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }
 
                                 ct.child(0, field)
                             }

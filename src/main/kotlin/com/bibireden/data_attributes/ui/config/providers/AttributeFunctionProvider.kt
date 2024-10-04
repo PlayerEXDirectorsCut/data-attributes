@@ -63,9 +63,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                     }
                                 )
 
-                                field.textBox
-                                    .addColorCondition(ColorCodes.RED) { backing[id]?.get(it) != null }
-                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+                                field.textBox.predicate = { backing[id]?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }
 
                                 cf.child(0, field)
                             }
@@ -142,9 +140,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                     }
                                 )
 
-                                field.textBox
-                                    .addColorCondition(ColorCodes.RED) { backing[parentId]?.get(it) != null }
-                                    .addColorCondition(ColorCodes.GREEN) { Registries.ATTRIBUTE.containsId(it) }
+                                field.textBox.predicate = { backing[parentId]?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }
 
                                 child(0, field)
                             }

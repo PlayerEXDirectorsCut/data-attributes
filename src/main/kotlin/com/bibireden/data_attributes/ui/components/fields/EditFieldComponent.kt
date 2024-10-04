@@ -10,7 +10,6 @@ import io.wispforest.owo.ui.core.VerticalAlignment
 import net.minecraft.text.Text
 import org.jetbrains.annotations.ApiStatus
 
-typealias ColorPredicate<T> = (T) -> Boolean
 typealias EditFieldDecision<T> = (T, EditFieldComponent<T>) -> Unit
 typealias EditFieldCancellation<T> = (EditFieldComponent<T>) -> Unit
 
@@ -27,7 +26,10 @@ class EditFieldComponent<A>(parser: Parser<String, A>, private val onConfirmatio
             .also(::child)
 
         child(Components.button(Text.translatable("text.config.data_attributes.data_entry.yes")) {
-            textBox.parse()?.let { onConfirmation(it, this); this.remove() }
+            textBox.validate {
+                onConfirmation(it, this)
+                this.remove()
+            }
         }
             .renderer(ButtonRenderers.STANDARD)
         )
