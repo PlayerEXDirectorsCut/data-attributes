@@ -59,7 +59,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                         val field = FieldComponents.identifier(
                                             { newId, _ ->
                                                 if (backing.containsKey(newId) || !Registries.ENTITY_TYPE.containsId(newId)) return@identifier
-                                                // ensured that this exists and is possible to swap
+
                                                 backing.remove(id)?.let { backing[newId] = it }
                                                 refreshAndDisplayEntries(true)
                                             }
@@ -136,9 +136,10 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                     { newId, _ ->
                                         val entry = backing[parentId]?.data?.toMutableMap() ?: return@identifier
                                         if (entry.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@identifier
-                                        // ensured that this exists and is possible to swap
+
                                         entry[newId] = entry.remove(id) ?: return@identifier
                                         backing[parentId] = EntityTypeData(entry)
+
                                         refreshAndDisplayEntries(true)
                                     }
                                 )

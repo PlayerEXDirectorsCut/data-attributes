@@ -93,7 +93,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                     { newId, _ ->
                                         val newAttribute = Registries.ATTRIBUTE[newId] as? MutableEntityAttribute ?: return@identifier
                                         if (backing.containsKey(newId)) return@identifier
-                                        // ensured that this exists and is possible to swap
+
                                         this.backing.remove(id)
                                         this.backing[newId] = override.copy(
                                             min = newAttribute.`data_attributes$min_fallback`(),
@@ -102,6 +102,7 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                             formula = StackingFormula.Flat,
                                             format = AttributeFormat.Whole
                                         )
+
                                         refreshAndDisplayAttributes()
                                     }
                                 )

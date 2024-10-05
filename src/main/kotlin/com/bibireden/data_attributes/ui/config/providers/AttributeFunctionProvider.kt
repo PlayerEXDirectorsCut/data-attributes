@@ -57,8 +57,9 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                 val field = FieldComponents.identifier(
                                     { newId, _ ->
                                         if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@identifier
-                                        // ensured that this exists and is possible to swap
+
                                         backing.remove(id)?.let { backing[newId] = it }
+                                        
                                         refreshAndDisplayEntries()
                                     }
                                 )
@@ -112,14 +113,15 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         gap(10)
                     }
                     .also { fl ->
-                        fl.child(ConfigToggleButton().also { button ->
-                            button.enabled(function.enabled)
-                            button.onPress {
-                                backing[parentId]?.replace(id, function.copy(enabled = !function.enabled))
-                                refreshAndDisplayEntries(isDefault)
-                            }
-                            button.renderer(ButtonRenderers.STANDARD)
-                        })
+                        fl.child(
+                            ConfigToggleButton()
+                                .enabled(function.enabled)
+                                .onPress {
+                                    backing[parentId]?.replace(id, function.copy(enabled = !function.enabled))
+                                    refreshAndDisplayEntries()
+                                }
+                                .renderer(ButtonRenderers.STANDARD)
+                        )
                         fl.child(
                             RemoveButtonComponent {
                                 backing[parentId]?.remove(id)
@@ -133,9 +135,10 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                     { newId, _ ->
                                         val entry = backing[parentId] ?: return@identifier
                                         if (!Registries.ATTRIBUTE.containsId(newId) || entry[newId] != null) return@identifier
-                                        // ensured that this exists and is possible to swap
+
                                         entry[newId] = entry.remove(id) ?: return@identifier
                                         backing[parentId] = entry
+
                                         refreshAndDisplayEntries()
                                     }
                                 )
