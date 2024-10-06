@@ -7,9 +7,8 @@ import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.entities.EntityTypeData
 import com.bibireden.data_attributes.config.entities.EntityTypeEntry
 import com.bibireden.data_attributes.ext.round
-import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
-import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
+import com.bibireden.data_attributes.ui.components.buttons.ButtonComponents
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -51,7 +50,7 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                         }
                         .also { fl ->
                             if (!isDefault) {
-                                fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayEntries(true) }
+                                fl.child(ButtonComponents.remove { backing.remove(id); refreshAndDisplayEntries(true) }
                                     .renderer(ButtonRenderers.STANDARD))
 
                                 fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
@@ -122,8 +121,8 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                         gap(10)
                     }
                     .also { fl ->
-                        fl.child(RemoveButtonComponent {
-                            val entry = backing[parentId]?.data?.toMutableMap() ?: return@RemoveButtonComponent
+                        fl.child(ButtonComponents.remove {
+                            val entry = backing[parentId]?.data?.toMutableMap() ?: return@remove
                             entry.remove(id)
                             backing[parentId] = EntityTypeData(entry)
                             refreshAndDisplayEntries(true)

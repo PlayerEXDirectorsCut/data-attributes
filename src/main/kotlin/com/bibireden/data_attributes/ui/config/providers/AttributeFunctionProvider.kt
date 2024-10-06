@@ -7,9 +7,8 @@ import com.bibireden.data_attributes.config.DataAttributesConfigProviders.textBo
 import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.functions.AttributeFunctionConfig
-import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
-import com.bibireden.data_attributes.ui.components.RemoveButtonComponent
+import com.bibireden.data_attributes.ui.components.buttons.ButtonComponents
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -49,7 +48,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 }
                 .also { fl ->
                     if (!isDefault) {
-                        fl.child(RemoveButtonComponent { backing.remove(id); refreshAndDisplayEntries() }
+                        fl.child(ButtonComponents.remove { backing.remove(id); refreshAndDisplayEntries() }
                             .renderer(ButtonRenderers.STANDARD))
 
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
@@ -123,7 +122,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                 .renderer(ButtonRenderers.STANDARD)
                         )
                         fl.child(
-                            RemoveButtonComponent {
+                            ButtonComponents.remove {
                                 backing[parentId]?.remove(id)
                                 refreshAndDisplayEntries()
                             }
