@@ -3,39 +3,29 @@ package com.bibireden.data_attributes.config.entry
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeEntry
 import net.minecraft.util.Identifier
 
 object ConfigMerger {
     fun mergeOverrides(values: Map<Identifier, AttributeOverride>): Map<Identifier, AttributeOverride> {
         val entries = values.toMutableMap()
-        for ((id, override) in DataAttributes.OVERRIDES_CONFIG.overrides) {
+        for ((id, override) in DataAttributes.OVERRIDES_CONFIG.entries) {
             entries[id] = override
         }
         return entries
     }
 
-    fun mergeFunctions(values: Map<Identifier, List<AttributeFunction>>): Map<Identifier, List<AttributeFunction>> {
+    fun mergeFunctions(values: Map<Identifier, Map<Identifier, AttributeFunction>>): Map<Identifier, Map<Identifier, AttributeFunction>> {
         val entries = values.toMutableMap()
-        for ((primaryId, primaryFunctions) in DataAttributes.FUNCTIONS_CONFIG.functions.data) {
-            val entriesMap = entries[primaryId]
-            if (entriesMap == null) {
-                entries[primaryId] = primaryFunctions
+        for ((primaryId, primaryEntry) in DataAttributes.FUNCTIONS_CONFIG.entries.data) {
+            val secondaryEntry = entries[primaryId]?.toMutableMap()
+            if (secondaryEntry == null) {
+                entries[primaryId] = primaryEntry
             }
             else {
-                val secondaryEntry = entriesMap.toMutableList()
-                primaryFunctions.forEach { primaryFunction ->
-                    var replaced = false
-                    entriesMap.forEachIndexed { index, entry ->
-                        if (entry.id == primaryFunction.id) {
-                            secondaryEntry.removeAt(index)
-                            secondaryEntry.add(index, primaryFunction)
-                            replaced = true
-                        }
-                    }
-                    if (!replaced) {
-                        secondaryEntry.add(primaryFunction)
-                    }
+                for ((id, value) in primaryEntry) {
+                    secondaryEntry[id] = value
                 }
                 entries[primaryId] = secondaryEntry
             }
@@ -43,9 +33,9 @@ object ConfigMerger {
         return entries
     }
 
-    fun mergeEntityTypes(values: Map<Identifier, Map<Identifier, Double>>): Map<Identifier, EntityTypeData> {
+    fun mergeEntityTypes(values: Map<Identifier, Map<Identifier, EntityTypeEntry>>): Map<Identifier, EntityTypeData> {
         val entries = values.toMutableMap()
-        for ((primaryId, primaryEntry) in DataAttributes.ENTITY_TYPES_CONFIG.entity_types) {
+        for ((primaryId, primaryEntry) in DataAttributes.ENTITY_TYPES_CONFIG.entries) {
            val secondaryEntry = entries[primaryId]?.toMutableMap()
            if (secondaryEntry == null) {
                entries[primaryId] = primaryEntry.data

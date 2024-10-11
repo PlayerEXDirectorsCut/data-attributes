@@ -48,6 +48,33 @@
     {"text": "Reset", "color": "white"}
   ],
 
+  "text.config.data_attributes.data_entry.edit": [
+    {"text": "✎ ", "color": "#efb13f"},
+    {"text": "Edit", "color": "white"}
+  ],
+
+  "text.config.data_attributes.data_entry.remove": [
+    {"text": "\uD83D\uDDD1 ", "color": "#EB1D36"},
+    {"text": "Remove", "color": "white"}
+  ],
+
+  "text.config.data_attributes.data_entry.yes": [
+    {"text": "[", "color": "white"},
+    {"text": "✔", "color": "#84de56"},
+    {"text": "]"}
+  ],
+
+  "text.config.data_attributes.data_entry.no": [
+    {"text": "[", "color": "white"},
+    {"text": "X", "color": "#EB1D36"},
+    {"text": "]"}
+  ],
+
+  "text.config.data_attributes.data_entry.fallback": [
+    {"text": "⬸ ", "color": "#979797"},
+    {"text": "Fallback", "color": "white"}
+  ],
+
   "text.config.data_attributes.data_entry.overrides.min_fallback": [
     {"text": "⭳ ", "color": "#979797"},
     {"text": "Min Fallback", "color": "white"}
@@ -115,6 +142,19 @@
     {"text": "It will be ignored as a result of this.\n\nPlease use a valid identifier and press ", "color": "gray", "italic": true},
     {"text":  "Reload ", "italic": true, "color": "green"},
     {"text":  "when ready.", "italic": true, "color": "gray"}
+  ],
+
+  "text.config.data_attributes_data_entry.default": [
+    {"text": "✱ ", "color": "#84de56"},
+    {"text": "Default Entry\n\n", "color": "white"},
+    {"text": "This entry is from another mod or datapack, and can be overrided by editing it.", "color": "white"}
+  ],
+
+  "text.config.data_attributes.buttons.add": [
+    {"text": "(", "color": "white"},
+    {"text": "+", "color": "#84de56"},
+    {"text": ")"},
+    {"text": " Add"}
   ],
 
   "ui.data_attributes.cfc.collapse_all": "Collapse",

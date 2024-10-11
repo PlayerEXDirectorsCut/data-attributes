@@ -9,7 +9,7 @@ import com.bibireden.data_attributes.config.entry.DefaultAttributesReloadListene
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.data.EntityAttributeData
-import com.bibireden.data_attributes.data.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeData
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.ext.keyOf
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
@@ -30,7 +30,7 @@ import net.minecraft.util.Identifier
 /**
  * Used to manage config data, and contains an [AttributeContainerHandler] to build related [EntityTypeData].
  */
-class AttributeConfigManager(var data: Data = Data(), val handler: AttributeContainerHandler = AttributeContainerHandler()) {
+class AttributeConfigManager(var data: Data = Data(), private val handler: AttributeContainerHandler = AttributeContainerHandler()) {
     var updateFlag: Int = 0
 
     var defaults: DefaultAttributesReloadListener.Cache = DefaultAttributesReloadListener.Cache()
@@ -55,14 +55,14 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
      */
     data class Data(
         var overrides: Map<Identifier, AttributeOverride> = mapOf(),
-        var functions: Map<Identifier, List<AttributeFunction>> = mapOf(),
+        var functions: Map<Identifier, Map<Identifier, AttributeFunction>> = mapOf(),
         var entity_types: Map<Identifier, EntityTypeData> = mapOf()
     )
     {
         companion object {
             val ENDEC = StructEndecBuilder.of(
                 Endecs.IDENTIFIER.keyOf(AttributeOverride.ENDEC).fieldOf("overrides") { it.overrides },
-                Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC.listOf()).fieldOf("functions") { it.functions },
+                Endecs.IDENTIFIER.keyOf(Endecs.IDENTIFIER.keyOf(AttributeFunction.ENDEC)).fieldOf("functions") { it.functions },
                 Endecs.IDENTIFIER.keyOf(EntityTypeData.ENDEC).fieldOf("entity_types") { it.entity_types },
                 ::Data
             )
@@ -93,7 +93,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         get() = this.data.overrides
 
     /** Currently applied [AttributeFunction]'s tied to the parent [EntityAttribute]'s [Identifier]. */
-    val functions: Map<Identifier, List<AttributeFunction>>
+    val functions: Map<Identifier, Map<Identifier, AttributeFunction>>
         get() = this.data.functions
 
     /** Currently applied [EntityTypeData] tied to an [EntityType]'s [Identifier]. */
@@ -179,7 +179,7 @@ class AttributeConfigManager(var data: Data = Data(), val handler: AttributeCont
         }
     }
 
-    private fun insertFunctions(store: Map<Identifier, List<AttributeFunction>>, data: MutableMap<Identifier, EntityAttributeData>) {
+    private fun insertFunctions(store: Map<Identifier, Map<Identifier, AttributeFunction>>, data: MutableMap<Identifier, EntityAttributeData>) {
         for ((id, functions) in store) {
             if (!Registries.ATTRIBUTE.containsId(id)) {
                 DataAttributes.LOGGER.warn("Function parent [$id] that was defined in config is not registered. This has been skipped.")

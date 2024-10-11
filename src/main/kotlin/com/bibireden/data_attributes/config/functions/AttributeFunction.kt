@@ -16,18 +16,17 @@ import net.minecraft.util.Identifier
  * */
 @Serializable
 data class AttributeFunction(
-    @Serializable(with = IdentifierSerializer::class)
-    var id: Identifier,
+    var enabled: Boolean,
     var behavior: StackingBehavior,
     var value: Double
 ) {
     @Suppress("UNUSED")
-    constructor() : this(Identifier("unknown"), StackingBehavior.Add, 0.0)
+    constructor() : this(true, StackingBehavior.Add, 0.0)
 
     companion object {
         @JvmField
         val ENDEC = StructEndecBuilder.of(
-            Endecs.IDENTIFIER.fieldOf("id") { it.id },
+            Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, true),
             Endec.STRING.xmap(StackingBehavior::of) { x -> x.name.uppercase() }.fieldOf("behavior") { it.behavior },
             Endec.DOUBLE.fieldOf("value") { it.value },
             ::AttributeFunction

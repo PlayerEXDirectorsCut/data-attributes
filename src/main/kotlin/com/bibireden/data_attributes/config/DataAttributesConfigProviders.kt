@@ -1,52 +1,51 @@
 package com.bibireden.data_attributes.config
 
-import com.bibireden.data_attributes.config.providers.AttributeEntityTypesProvider
-import com.bibireden.data_attributes.config.providers.AttributeFunctionsProvider
-import com.bibireden.data_attributes.config.providers.AttributeOverrideProvider
 import com.bibireden.data_attributes.ui.colors.ColorCodes
+import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProvider
+import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProvider
+import com.bibireden.data_attributes.ui.config.providers.EntityTypesProvider
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
+import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 object DataAttributesConfigProviders {
-    fun entityTypeIdentifierToText(id: Identifier): MutableText {
-        val type = Registries.ENTITY_TYPE[id]
-        return Text.empty().apply {
-            append(Text.translatable(type.translationKey).append(" ").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_YELLOW)))
-            append(Text.literal("($id)").setStyle(Style.EMPTY.withColor(ColorCodes.BEE_BLACK)))
+    fun <T> registryEntryToText(id: Identifier, registry: Registry<T>, representation: (T) -> String, isDefault: Boolean = false): MutableText {
+        val entry = registry[id]
+        val text = Text.empty()
+        if (entry != null) {
+            text.append(Text.translatable(representation(entry)).append(" "))
+                .setStyle(Style.EMPTY.withColor(if (isDefault) 0x84de56 else 0xE7C14B))
         }
+        text.append(Text.literal("($id)").also { t ->
+            t.setStyle(
+                Style.EMPTY.withColor(
+                    if (entry != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE
+                )
+            )
+        })
+        return text
     }
-    fun attributeIdentifierToText(id: Identifier): MutableText {
-        val attribute = Registries.ATTRIBUTE[id]
-        return Text.empty().apply {
-            if (attribute != null) {
-                append(Text.translatable(attribute.translationKey).append(" ")).setStyle(Style.EMPTY.withColor(0xE7C14B))
-            }
-            append(Text.literal("($id)").also { t ->
-                t.setStyle(Style.EMPTY.withColor(if (attribute != null) ColorCodes.BEE_BLACK else ColorCodes.UNEDITABLE))
-            })
-        }
-    }
-    fun isAttributeUnregistered(id: Identifier) = !Registries.ATTRIBUTE.containsId(id)
 
     val ATTRIBUTE_OVERRIDE_FACTORY = OptionComponentFactory { _, option ->
         return@OptionComponentFactory AttributeOverrideProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeFunctionsProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeFunctionProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeEntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory EntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     fun textBoxComponent(txt: Text, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null, textBoxID: String? = null): FlowLayout {
@@ -75,6 +74,7 @@ object DataAttributesConfigProviders {
                         tb.setTextPredicate { predicate == null || predicate.apply(it) }
                         tb.onChanged().subscribe(onChange::invoke)
                     }
+                    tb.id("text")
                 }.positioning(Positioning.relative(100, 50)).id(textBoxID)
             )
         }

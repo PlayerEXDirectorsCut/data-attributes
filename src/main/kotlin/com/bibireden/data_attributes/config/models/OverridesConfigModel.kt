@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.config.models
 
+import blue.endless.jankson.Comment
 import com.bibireden.data_attributes.DataAttributes
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.api.attribute.AttributeFormat
@@ -20,7 +21,8 @@ class OverridesConfigModel {
 
     @JvmField
     @Hook
-    var overrides: Map<Identifier, AttributeOverride> = mapOf()
+    @Comment("attribute overrides can change the range of the attribute, and can apply different formulas to modify its behavior when computed.")
+    var entries: Map<Identifier, AttributeOverride> = mapOf()
 
     @Serializable
     data class AttributeOverride(
@@ -31,7 +33,7 @@ class OverridesConfigModel {
         @JvmField
         var max: Double = Double.NaN,
         @JvmField
-        var smoothness: Double = 0.01,
+        var smoothness: Double = 1.0,
         @JvmField
         var min_fallback: Double = 0.0,
         @JvmField
@@ -49,7 +51,7 @@ class OverridesConfigModel {
         companion object {
             @JvmField
             val ENDEC: Endec<AttributeOverride> = StructEndecBuilder.of(
-                Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, false),
+                Endec.BOOLEAN.optionalFieldOf("enabled", { it.enabled }, true),
                 Endec.DOUBLE.optionalFieldOf("min", { it.min }, 0.0),
                 Endec.DOUBLE.optionalFieldOf("max", { it.max }, 1_000_000.0),
                 Endec.DOUBLE.optionalFieldOf("smoothness", { it.smoothness }, 0.01),

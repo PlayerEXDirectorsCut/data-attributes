@@ -1,6 +1,5 @@
 package com.bibireden.data_attributes
 
-import com.bibireden.data_attributes.api.DataAttributesAPI.serverManager
 import com.bibireden.data_attributes.config.AttributeConfigManager
 import com.bibireden.data_attributes.config.entry.DefaultAttributesReloadListener
 import com.bibireden.data_attributes.config.models.DataAttributesConfig
@@ -72,12 +71,10 @@ class DataAttributes : ModInitializer {
         fun reload(server: MinecraftServer) {
             reloadConfigs()
 
-            val manager = serverManager
+            MANAGER.update()
+            MANAGER.nextUpdateFlag()
 
-            manager.update()
-            manager.nextUpdateFlag()
-
-            val buf = AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, manager.toPacket())
+            val buf = AttributeConfigManager.Packet.ENDEC.encodeFully({ ByteBufSerializer.of(PacketByteBufs.create()) }, MANAGER.toPacket())
             PlayerLookup.all(server).forEach { player -> ServerPlayNetworking.send(player, NetworkingChannels.RELOAD, buf) }
         }
 

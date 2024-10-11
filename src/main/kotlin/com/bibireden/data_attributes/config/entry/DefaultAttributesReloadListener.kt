@@ -6,6 +6,7 @@ import com.bibireden.data_attributes.serde.IdentifierSerializer
 import kotlinx.serialization.UseSerializers
 
 import com.bibireden.data_attributes.DataAttributes
+import com.bibireden.data_attributes.config.entities.EntityTypeEntry
 import com.bibireden.data_attributes.config.functions.AttributeFunction
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -31,9 +32,9 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
     @Serializable
     data class Overrides(var entries: LinkedHashMap<Identifier, AttributeOverride> = LinkedHashMap())
     @Serializable
-    data class Functions(var entries: LinkedHashMap<Identifier, List<AttributeFunction>> = LinkedHashMap())
+    data class Functions(var entries: LinkedHashMap<Identifier, LinkedHashMap<Identifier, AttributeFunction>> = LinkedHashMap())
     @Serializable
-    data class EntityTypes(var entries: LinkedHashMap<Identifier, LinkedHashMap<Identifier, Double>> = LinkedHashMap())
+    data class EntityTypes(var entries: LinkedHashMap<Identifier, LinkedHashMap<Identifier, EntityTypeEntry>> = LinkedHashMap())
 
     @Serializable
     data class Cache(val overrides: Overrides = Overrides(), val functions: Functions = Functions(), val types: EntityTypes = EntityTypes())
@@ -61,7 +62,7 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
                     cache.functions.entries.remove(id)
                     return@forEach
                 }
-                cache.functions.entries[id] = functions.filter { f -> Registries.ATTRIBUTE.containsId(f.id) }
+                cache.functions.entries[id] = LinkedHashMap(functions.filter { (id2) -> Registries.ATTRIBUTE.containsId(id2) })
             }
             cache.types.entries.forEach { (id, data) ->
                 if (!Registries.ENTITY_TYPE.containsId(id)) {
@@ -105,12 +106,10 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
                         cache.functions.entries[id] = entry
                     }
                     else {
-                        val mutablePresentEntry = presentEntry.toMutableList()
-                        for (func in entry) {
-                            if (presentEntry.find { it.id == func.id } != null) continue
-                            mutablePresentEntry.add(func)
+                        for ((secondaryId, secondaryValue) in entry) {
+                            presentEntry.computeIfAbsent(secondaryId) { secondaryValue }
                         }
-                        cache.functions.entries[id] = mutablePresentEntry
+                        cache.functions.entries[id] = presentEntry
                     }
                 }
             }
