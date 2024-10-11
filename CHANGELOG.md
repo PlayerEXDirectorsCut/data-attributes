@@ -35,4 +35,6 @@
 - Made some changes to certain logic internally and micro-optimizations.
 - Fixed CTD issues with editing function values.
 - Separated config entries from defaults using color coding & tooltips.
-- Integrated diminishing returns as intended.
+- **[BREAKING]** Integrated diminishing returns as intended.
+  - You must keep and/or target attribute min/max ranges between -1 & 1.
+  - It is how it usually worked in the original DataAttributes, as unfortunately, a solution to implement diminishing returns on all attributes was not possible (at this time).
