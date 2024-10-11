@@ -60,7 +60,8 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                         backing.remove(id)?.let { backing[newId] = it }
                                         
                                         refreshAndDisplayEntries()
-                                    }
+                                    },
+                                    autocomplete = Registries.ATTRIBUTE.ids
                                 )
 
                                 field.textBox.predicate = { backing[id]?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }
@@ -139,7 +140,8 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                         backing[parentId] = entry
 
                                         refreshAndDisplayEntries()
-                                    }
+                                    },
+                                    autocomplete = Registries.ATTRIBUTE.ids
                                 )
 
                                 field.textBox.predicate = { backing[parentId]?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }

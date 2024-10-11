@@ -6,12 +6,17 @@
 *I am glad to have this opportunity to work on this project and be supported with the first ever public project I will personally release.*
 
 ## Additions 🍎
+- No more needing to leave the UI to your config json~ you can do everything you need to do in the UI!
 - Allowed easier control of the config menu, and added some new features.
   - A `Reset` option to reset your targeted attribute, refreshing all its entries to start anew.
   - A `Remove` option to remove the targeted entry of your choice.
   - A `Edit` option to edit the identifier to target a different entry.
   - A `Add` option to include new entries.
-- Attributes in configuration now will re-render in certain scenarios, allowing for a better experience with working with multiple attributes.
+  - You can also add into default entries.
+- Added autocomplete that will appear while editing fields. This will show you currently registered entities and attributes when editing the respective id you want.
+  - Press [ENTER] to quickly grab the first entry on the autocomplete.
+- Attribute components in configuration now will re-render in certain scenarios, allowing for a better experience with working with multiple attributes.
+- Improved logic with entering fields, commit changes by pressing [Done], and [Reload] to refresh to the latest config.
 - You can now actually use the search bar to look up the specific entries you wish to find.
   - Translations should be compatible in the language you choose as well as the attribute id.
     - e.g., looking up `playerex:luck`, or `Luck` should work.
@@ -30,4 +35,4 @@
 - Made some changes to certain logic internally and micro-optimizations.
 - Fixed CTD issues with editing function values.
 - Separated config entries from defaults using color coding & tooltips.
-- Resolved issue with diminishing returns. Hopefully, this should work.
+- Integrated diminishing returns as intended.

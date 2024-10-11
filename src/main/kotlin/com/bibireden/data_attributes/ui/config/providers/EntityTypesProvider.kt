@@ -61,7 +61,8 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
 
                                                 backing.remove(id)?.let { backing[newId] = it }
                                                 refreshAndDisplayEntries(true)
-                                            }
+                                            },
+                                            autocomplete = Registries.ENTITY_TYPE.ids
                                         )
 
                                         field.textBox.predicate = { it !in backing && Registries.ENTITY_TYPE.containsId(it) }
@@ -140,7 +141,8 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
                                         backing[parentId] = EntityTypeData(entry)
 
                                         refreshAndDisplayEntries(true)
-                                    }
+                                    },
+                                    autocomplete = Registries.ATTRIBUTE.ids
                                 )
 
                                 field.textBox.predicate = { backing[parentId]?.data?.get(it) == null && Registries.ATTRIBUTE.containsId(it) }

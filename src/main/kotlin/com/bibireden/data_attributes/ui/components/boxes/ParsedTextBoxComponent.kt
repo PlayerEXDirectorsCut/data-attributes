@@ -18,6 +18,7 @@ class ParsedTextBoxComponent<T>(val parser: Parser<String, T>, horizontalSizing:
         .also { if (it && onSuccess != null) onSuccess(z)  } }
 
     init {
+        setMaxLength(500)
         textValue.observe {
             parsed = parser(it)
             if (!validate { setEditableColor(ColorCodes.GREEN) }) {

@@ -104,7 +104,8 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                                         )
 
                                         refreshAndDisplayAttributes()
-                                    }
+                                    },
+                                    autocomplete = Registries.ATTRIBUTE.ids
                                 )
 
                                 field.textBox.predicate = { it !in backing && Registries.ATTRIBUTE.containsId(it) }
