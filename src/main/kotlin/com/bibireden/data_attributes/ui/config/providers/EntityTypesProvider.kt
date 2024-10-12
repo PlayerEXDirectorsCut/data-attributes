@@ -110,10 +110,15 @@ class EntityTypesProvider(val option: Option<Map<Identifier, EntityTypeData>>) :
             ct.id(id.toString())
 
             // find fallback
-            entityTypeEntry.fallback = Registries.ENTITY_TYPE.get(parentId)?.let { entityType ->
-                val defaultContainer = DefaultAttributeRegistry.get(entityType as EntityType<LivingEntity>)
-                Registries.ATTRIBUTE.get(id)?.let(defaultContainer::getBaseValue)
-            }?.round(2)
+            try {
+                entityTypeEntry.fallback = Registries.ENTITY_TYPE.get(parentId)?.let { entityType ->
+                    val defaultContainer = DefaultAttributeRegistry.get(entityType as EntityType<LivingEntity>)
+                    Registries.ATTRIBUTE.get(id)?.let(defaultContainer::getBaseValue)
+                }?.round(2)
+            }
+            catch (_: IllegalArgumentException) {
+                entityTypeEntry.fallback = 0.0
+            }
 
             if (!isDefault) {
                 ct.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))

@@ -13,7 +13,7 @@ data class EntityTypeEntry(var value: Double = 0.0, var fallback: Double? = null
     companion object {
         val ENDEC: Endec<EntityTypeEntry> = StructEndecBuilder.of(
             Endec.DOUBLE.fieldOf("value") { it.value },
-            Endec.DOUBLE.nullableOf().fieldOf("fallback", { it.fallback }),
+            Endec.DOUBLE.nullableOf().fieldOf("fallback") { it.fallback },
             ::EntityTypeEntry
         )
     }
