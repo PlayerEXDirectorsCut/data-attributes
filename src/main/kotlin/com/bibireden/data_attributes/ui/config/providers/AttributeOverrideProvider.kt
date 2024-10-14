@@ -9,6 +9,7 @@ import com.bibireden.data_attributes.config.Validators
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
+import com.bibireden.data_attributes.ui.components.config.AttributeConfigComponents
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
@@ -16,6 +17,7 @@ import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
 import io.wispforest.owo.ui.component.Components
+import io.wispforest.owo.ui.component.SliderComponent
 import io.wispforest.owo.ui.container.CollapsibleContainer
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
@@ -177,10 +179,8 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                         .sizing(Sizing.content(), Sizing.fixed(20))
                 )
                 hf.child(
-                    Components.discreteSlider(Sizing.fill(30), 0.01, 100.0).value(override.smoothness).also { slider ->
-                        slider.onChanged().subscribe {
-                            replaceEntry(id, override.copy(smoothness = max(slider.value().round(2), 0.01)))
-                        }
+                    AttributeConfigComponents.smoothnessSlider(override) {
+                        replaceEntry(id, override.copy(smoothness = max(it.value(), 0.001)))
                     }
                         .positioning(Positioning.relative(100, 0))
                 )

@@ -106,28 +106,29 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
             }
 
-            if (!isDefault) {
-                child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
-                    .apply {
-                        verticalAlignment(VerticalAlignment.BOTTOM)
-                        gap(10)
-                    }
-                    .also { fl ->
-                        fl.child(
-                            ConfigToggleButton()
-                                .enabled(function.enabled)
-                                .onPress {
-                                    backing[parentId]?.replace(id, function.copy(enabled = !function.enabled))
-                                    refreshAndDisplayEntries()
-                                }
-                                .renderer(ButtonRenderers.STANDARD)
-                        )
+            child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
+                .apply {
+                    verticalAlignment(VerticalAlignment.BOTTOM)
+                    gap(10)
+                }
+                .also { fl ->
+                    fl.child(
+                        ConfigToggleButton()
+                            .enabled(function.enabled)
+                            .onPress {
+                                backing[parentId]?.set(id, function.copy(enabled = !function.enabled))
+                                refreshAndDisplayEntries()
+                            }
+                            .renderer(ButtonRenderers.STANDARD)
+                    )
+
+                    if (!isDefault) {
                         fl.child(
                             ButtonComponents.remove {
                                 backing[parentId]?.remove(id)
                                 refreshAndDisplayEntries()
                             }
-                            .renderer(ButtonRenderers.STANDARD)
+                                .renderer(ButtonRenderers.STANDARD)
                         )
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
                             if (fl.childById(FlowLayout::class.java, "edit-field") == null) {
@@ -152,16 +153,15 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                             .renderer(ButtonRenderers.STANDARD)
                         )
                     }
-                )
-            }
-
+                }
+            )
             child(textBoxComponent(
                 Text.translatable("text.config.data_attributes.data_entry.functions.value"),
                 function.value,
                 Validators::isNumeric,
                 onChange = {
                     it.toDoubleOrNull()?.let { v ->
-                        backing[parentId]?.replace(id, function.copy(value = v))
+                        backing[parentId]?.set(id, function.copy(value = v))
                         refreshAndDisplayEntries(isDefault)
                     }
                 }
@@ -185,7 +185,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
 
                             it.message = Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}")
 
-                            backing[parentId]?.replace(id, function.copy(behavior = function.behavior))
+                            backing[parentId]?.set(id, function.copy(behavior = function.behavior))
                             refreshAndDisplayEntries(isDefault)
                         }
                             .renderer(ButtonRenderers.STANDARD)

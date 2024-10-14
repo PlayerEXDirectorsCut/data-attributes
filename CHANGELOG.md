@@ -2,4 +2,4 @@
 - Resolved an exception that happened with the `DefaultAttributeRegistry`.
 
 ## Fixes 🍋
-- Resolved percentage formatting, should be more accurate now
+- Fixed attribute functions not being able to be edited (and that were default).
