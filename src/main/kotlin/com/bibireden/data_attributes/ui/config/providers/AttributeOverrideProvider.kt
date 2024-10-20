@@ -28,7 +28,7 @@ import net.minecraft.util.Identifier
 import kotlin.math.max
 
 class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverride>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-    private val backing = option.value().toMutableMap()
+    private val backing = option.value().toSortedMap(compareBy { it.namespace.first() }).toMutableMap()
 
     private val trackedContainers: MutableMap<Identifier, CollapsibleContainer> = mutableMapOf()
 
