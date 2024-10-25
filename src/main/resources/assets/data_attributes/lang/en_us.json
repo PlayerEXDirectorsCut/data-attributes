@@ -139,9 +139,9 @@
     {"text": "⚑ ", "color": "#DB9A2F"},
     {"text": "Warning\n\n", "color": "white"},
     {"text": "This value does not exist in the registry it is meant to belong to.\n", "color": "gray"},
-    {"text": "It will be ignored as a result of this.\n\nPlease use a valid identifier and press ", "color": "gray", "italic": true},
-    {"text":  "Reload ", "italic": true, "color": "green"},
-    {"text":  "when ready.", "italic": true, "color": "gray"}
+    {"text": "It will be ignored as a result of this.\n\nPlease ", "color": "gray", "italic": true},
+    {"text":  "Edit ", "italic": true, "color": "yellow"},
+    {"text":  "this field when ready, or replace the config entry in the file.", "italic": true, "color": "gray"}
   ],
 
   "text.config.data_attributes_data_entry.default": [

@@ -8,7 +8,9 @@ import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.Internal
 class ParsedTextBoxComponent<T>(val parser: Parser<String, T>, horizontalSizing: Sizing?) : TextBoxComponent(horizontalSizing) {
-    private var defaultColor = ColorCodes.TAN
+    var validColor = ColorCodes.GREEN
+    var invalidColor = ColorCodes.TAN
+
     private var parsed: T? = null
 
     var predicate: ((T) -> Boolean)? = null
@@ -21,8 +23,8 @@ class ParsedTextBoxComponent<T>(val parser: Parser<String, T>, horizontalSizing:
         setMaxLength(500)
         textValue.observe {
             parsed = parser(it)
-            if (!validate { setEditableColor(ColorCodes.GREEN) }) {
-                setEditableColor(defaultColor)
+            if (!validate { setEditableColor(validColor) }) {
+                setEditableColor(invalidColor)
             }
         }
     }

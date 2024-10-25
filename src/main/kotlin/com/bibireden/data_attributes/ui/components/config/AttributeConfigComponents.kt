@@ -9,8 +9,12 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.Internal
 object AttributeConfigComponents {
     fun smoothnessSlider(override: OverridesConfigModel.AttributeOverride, onChanged: (SliderComponent) -> Unit): SliderComponent {
-        return Components.discreteSlider(Sizing.fill(30), 0.001, 100.0).value(override.smoothness).also { slider ->
-            slider.onChanged().subscribe { onChanged(slider) }
-        }
+        return Components.discreteSlider(Sizing.fill(30), 0.001, 100.0)
+            .apply {
+                value(override.smoothness)
+                onChanged().subscribe {
+                    onChanged(this)
+                }
+            }
     }
 }

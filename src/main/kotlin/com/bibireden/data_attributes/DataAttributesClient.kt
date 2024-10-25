@@ -1,6 +1,7 @@
 package com.bibireden.data_attributes
 
 import com.bibireden.data_attributes.config.AttributeConfigManager
+import com.bibireden.data_attributes.config.ConfigUIState
 import com.bibireden.data_attributes.networking.NetworkingChannels
 import com.bibireden.data_attributes.ui.DataAttributesConfigScreen
 import io.wispforest.endec.format.bytebuf.ByteBufDeserializer
@@ -17,6 +18,9 @@ class DataAttributesClient : ClientModInitializer {
     companion object {
         @JvmField
         val MANAGER = AttributeConfigManager()
+
+        @JvmField
+        val UI_STATE = ConfigUIState()
 
         /** Whenever the client receives a sync packet from the server to update the world-state via. configuration. */
         fun onPacketReceived(client: MinecraftClient, buf: PacketByteBuf) {

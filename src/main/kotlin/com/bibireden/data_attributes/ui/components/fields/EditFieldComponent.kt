@@ -29,7 +29,6 @@ class EditFieldComponent<A>(parser: Parser<String, A>, private val onConfirmatio
 
         child(Containers.horizontalFlow(Sizing.fill(100), Sizing.content(2)).also { hf ->
             hf.verticalAlignment(VerticalAlignment.CENTER)
-            hf.id("edit-field")
 
             this.textBox = ParsedTextBoxComponent(parser, Sizing.fill(60))
                 .apply { verticalSizing(Sizing.fixed(12)) }
