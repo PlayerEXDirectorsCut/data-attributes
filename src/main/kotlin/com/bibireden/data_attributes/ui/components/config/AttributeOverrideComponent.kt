@@ -1,10 +1,12 @@
 package com.bibireden.data_attributes.ui.components.config
 
 import com.bibireden.data_attributes.DataAttributesClient
+import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.AttributeFormat
 import com.bibireden.data_attributes.api.attribute.StackingFormula
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
+import com.bibireden.data_attributes.ext.round
 import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.components.entries.DataEntryComponent
 import com.bibireden.data_attributes.ui.components.entries.EntryComponents
@@ -73,11 +75,24 @@ class AttributeOverrideComponent(
 
         this.titleLayout().children().filterIsInstance<LabelComponent>().first().text(registryEntryToText(identifier, Registries.ATTRIBUTE, { it.translationKey }, isDefault()))
 
+        titleLayout().tooltip(null)
+
         if (!isRegistered()) {
             titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
         }
         else if (isDefault()) {
             titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
+        }
+    }
+
+    private fun changeAttributeOverride(changed: AttributeOverride) {
+        val wasDefault = isDefault()
+        replaceEntry(identifier, changed)
+        if (wasDefault) {
+            val index = provider.children().indexOf(this)
+            this.provider.child(index, AttributeOverrideComponent(identifier, changed, backing, provider))
+            this.remove()
+            update()
         }
     }
 
@@ -92,26 +107,20 @@ class AttributeOverrideComponent(
 
             content.child(ConfigToggleButton().also { button ->
                 button.enabled(override.enabled)
-                button.onPress { replaceEntry(identifier, override.copy(enabled = !override.enabled)) }
+                button.onPress { changeAttributeOverride(override.copy(enabled = !override.enabled)) }
                 button.renderer(ButtonRenderers.STANDARD)
             })
 
             if (!isDefault()) {
                 content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.reset"))
                 {
-                    override = override.copy(
-                        min = attribute?.`data_attributes$min_fallback`() ?: override.min_fallback,
-                        max = attribute?.`data_attributes$max_fallback`() ?: override.max_fallback,
-                        smoothness = 1.0,
-                        formula = StackingFormula.Flat,
-                        format = AttributeFormat.Whole
-                    )
-                    this.backing[identifier] = override
-                    update()
-
-                    val index = provider.children().indexOf(this)
-                    remove()
-                    provider.child(index, AttributeOverrideComponent(identifier, override, backing, provider, horizontalSizing, verticalSizing))
+                   changeAttributeOverride(override.copy(
+                       min = attribute?.`data_attributes$min_fallback`() ?: override.min_fallback,
+                       max = attribute?.`data_attributes$max_fallback`() ?: override.max_fallback,
+                       smoothness = 1.0,
+                       formula = StackingFormula.Flat,
+                       format = AttributeFormat.Whole
+                   ))
                 }
                     .renderer(ButtonRenderers.STANDARD)
                 )
@@ -139,16 +148,22 @@ class AttributeOverrideComponent(
 
                 content.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.remove")) {
                     this.backing.remove(identifier)
-                    remove()
+
+                    val default = DataAttributesAPI.serverManager.defaults.overrides.entries[identifier]
+                    if (default != null) {
+                        val index = provider.children().indexOf(this)
+                        this.provider.child(index, AttributeOverrideComponent(identifier, default, backing, provider))
+                        remove()
+                    }
                 }
                     .renderer(ButtonRenderers.STANDARD)
                 )
             }
         })
 
-        dataEntryMin = EntryComponents.double(Text.translatable("$stub.min"), DataEntryComponent.Properties({ replaceEntry(identifier, override.copy(min = it)) }), override.min.toString())
+        dataEntryMin = EntryComponents.double(Text.translatable("$stub.min"), DataEntryComponent.Properties({ changeAttributeOverride(override.copy(min = it)) }), override.min.toString())
             .also(::child)
-        dataEntryMax = EntryComponents.double(Text.translatable("$stub.max"), DataEntryComponent.Properties({ replaceEntry(identifier, override.copy(max = it)) }), override.max.toString())
+        dataEntryMax = EntryComponents.double(Text.translatable("$stub.max"), DataEntryComponent.Properties({ changeAttributeOverride(override.copy(max = it)) }), override.max.toString())
             .also(::child)
 
         dataEntryMinFallback = EntryComponents.double(Text.translatable("$stub.min_fallback"), suggestion = override.min_fallback.toString()).also(::child)
@@ -160,7 +175,7 @@ class AttributeOverrideComponent(
             child(Components.label(Text.translatable("text.config.data_attributes.data_entry.overrides.smoothness"))
                 .sizing(Sizing.content(), Sizing.fixed(20))
             )
-            child(AttributeConfigComponents.smoothnessSlider(override) { replaceEntry(identifier, override.copy(smoothness = max(it.value(), 0.001))) }
+            child(AttributeConfigComponents.smoothnessSlider(override) { changeAttributeOverride(override.copy(smoothness = max(it.value().round(2), 0.001))) }
                 .positioning(Positioning.relative(100, 0))
             )
         }.id("smoothness"))
@@ -176,7 +191,7 @@ class AttributeOverrideComponent(
                 Components.button(Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")) {
                     override.formula = StackingFormula.entries[override.formula.ordinal xor 1]
                     it.message = Text.translatable("text.config.data_attributes.enum.stackingFormula.${override.formula.name.lowercase()}")
-                    replaceEntry(identifier, override.copy(formula = override.formula))
+                    changeAttributeOverride(override.copy(formula = override.formula))
                 }
                     .renderer(ButtonRenderers.STANDARD)
                     .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
@@ -194,7 +209,7 @@ class AttributeOverrideComponent(
                 Components.button(Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")) {
                     override.format = AttributeFormat.entries[override.format.ordinal xor 1]
                     it.message = Text.translatable("text.config.data_attributes.enum.format.${override.format.name.lowercase()}")
-                    replaceEntry(identifier, override.copy(formula = override.formula))
+                    changeAttributeOverride(override.copy(formula = override.formula))
                 }
                     .renderer(ButtonRenderers.STANDARD)
                     .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))

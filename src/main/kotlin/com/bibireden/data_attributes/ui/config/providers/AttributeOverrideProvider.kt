@@ -2,21 +2,18 @@ package com.bibireden.data_attributes.ui.config.providers
 
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.config.models.OverridesConfigModel.AttributeOverride
-import com.bibireden.data_attributes.mutable.MutableEntityAttribute
 import com.bibireden.data_attributes.ui.components.config.AttributeOverrideComponent
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.container.CollapsibleContainer
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
-import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOverride>>) : FlowLayout(Sizing.fill(100), Sizing.content(), Algorithm.VERTICAL), OptionValueProvider {
-    private val backing = option.value().toSortedMap(compareBy { it.namespace.first() }).toMutableMap()
+    private val backing: MutableMap<Identifier, AttributeOverride> = option.value().toMutableMap()
 
     /** Construct single override entry that discerns defaults from config-based ones. */
     private fun createOverrideEntry(id: Identifier, override: AttributeOverride) {
@@ -36,12 +33,6 @@ class AttributeOverrideProvider(val option: Option<Map<Identifier, AttributeOver
                 .verticalSizing(Sizing.fixed(20))
         )
 
-        reloadAttributes()
-    }
-
-    /** Initiates a deletion of all config components and replaces them with fresh ones provided from the map. */
-    private fun reloadAttributes() {
-        // config first
         backing.forEach(::createOverrideEntry)
         DataAttributesAPI.serverManager.defaults.overrides.entries.forEach { (id, override) ->
             if (id !in backing) createOverrideEntry(id, override)

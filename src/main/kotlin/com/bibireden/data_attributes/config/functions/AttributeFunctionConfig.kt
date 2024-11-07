@@ -2,7 +2,6 @@ package com.bibireden.data_attributes.config.functions
 
 import com.bibireden.data_attributes.endec.Endecs
 import com.bibireden.data_attributes.ext.keyOf
-import io.wispforest.endec.Endec
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Identifier
 
