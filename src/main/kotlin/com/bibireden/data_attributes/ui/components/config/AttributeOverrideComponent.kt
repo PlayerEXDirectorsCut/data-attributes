@@ -33,10 +33,8 @@ class AttributeOverrideComponent(
     var identifier: Identifier,
     private var override: AttributeOverride,
     private val backing: MutableMap<Identifier, AttributeOverride>,
-    private val provider: AttributeOverrideProvider,
-    horizontalSizing: Sizing = Sizing.content(),
-    verticalSizing: Sizing = Sizing.content()
-) : CollapsibleContainer(horizontalSizing, verticalSizing, Text.of("<n/a>"), DataAttributesClient.UI_STATE.collapsible.overrides[identifier.toString()] ?: true) {
+    private val provider: AttributeOverrideProvider
+) : CollapsibleContainer(Sizing.content(), Sizing.content(), Text.of("<n/a>"), DataAttributesClient.UI_STATE.collapsible.overrides[identifier.toString()] ?: true) {
     private val attribute: MutableEntityAttribute?
         get() = Registries.ATTRIBUTE[identifier]
 
@@ -153,8 +151,9 @@ class AttributeOverrideComponent(
                     if (default != null) {
                         val index = provider.children().indexOf(this)
                         this.provider.child(index, AttributeOverrideComponent(identifier, default, backing, provider))
-                        remove()
                     }
+
+                    remove()
                 }
                     .renderer(ButtonRenderers.STANDARD)
                 )

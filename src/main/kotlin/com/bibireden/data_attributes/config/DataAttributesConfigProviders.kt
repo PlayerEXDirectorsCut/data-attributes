@@ -2,6 +2,7 @@ package com.bibireden.data_attributes.config
 
 import com.bibireden.data_attributes.ui.colors.ColorCodes
 import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProvider
+import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProviderV2
 import com.bibireden.data_attributes.ui.config.providers.AttributeOverrideProvider
 import com.bibireden.data_attributes.ui.config.providers.EntityTypesProvider
 import com.google.common.base.Predicate
@@ -10,8 +11,6 @@ import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
@@ -41,7 +40,7 @@ object DataAttributesConfigProviders {
     }
 
     val ATTRIBUTE_FUNCTIONS_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory AttributeFunctionProvider(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory AttributeFunctionProviderV2(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->

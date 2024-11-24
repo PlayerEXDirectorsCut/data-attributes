@@ -1,5 +1,6 @@
 package com.bibireden.data_attributes.ui.config.providers
 
+import com.bibireden.data_attributes.DataAttributesClient
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.api.attribute.StackingBehavior
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
@@ -16,6 +17,7 @@ import io.wispforest.owo.config.ui.component.ConfigToggleButton
 import io.wispforest.owo.config.ui.component.OptionValueProvider
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
 import io.wispforest.owo.ui.component.Components
+import io.wispforest.owo.ui.component.LabelComponent
 import io.wispforest.owo.ui.container.CollapsibleContainer
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
@@ -35,10 +37,23 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
     private val headerComponents: MutableMap<Identifier, Component> = mutableMapOf()
     private val entryComponents: MutableMap<Identifier, Component> = mutableMapOf()
 
+    private fun isFunctionHeaderDefault(id: Identifier) = !backing.containsKey(id)
+
+    private fun isFunctionChildDefault(parentId: Identifier, childId: Identifier) = backing[parentId]?.containsKey(childId) != true
+
+    private fun updateHeader(id: Identifier, component: CollapsibleContainer, isDefault: Boolean) {
+        component.titleLayout().children().filterIsInstance<LabelComponent>().first().text(registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault))
+    }
+
+    private fun updateChild(id: Identifier, parentId: Identifier, incomingFunction: AttributeFunction, component: CollapsibleContainer) {
+        backing[parentId]?.set(id, incomingFunction)
+    }
+
     private fun getOrCreateEntryContainer(id: Identifier, isDefault: Boolean): CollapsibleFoldableContainer {
-        return childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).also { cf ->
+        return childById(CollapsibleFoldableContainer::class.java, id.toString()) ?: CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), DataAttributesClient.UI_STATE.collapsible.functionParents[id.toString()] ?: true).also { cf ->
             headerComponents[id] = cf
             cf.id(id.toString())
+            cf.onToggled().subscribe { DataAttributesClient.UI_STATE.collapsible.functionParents[id.toString()] = it }
 
             cf.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(15))
                 .apply {
@@ -48,7 +63,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 }
                 .also { fl ->
                     if (!isDefault) {
-                        fl.child(ButtonComponents.remove { backing.remove(id); refreshAndDisplayEntries() }
+                        fl.child(ButtonComponents.remove { backing.remove(id); cf.remove() }
                             .renderer(ButtonRenderers.STANDARD))
 
                         fl.child(Components.button(Text.translatable("text.config.data_attributes.data_entry.edit")) {
@@ -58,8 +73,8 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                         if (backing.containsKey(newId) || !Registries.ATTRIBUTE.containsId(newId)) return@identifier
 
                                         backing.remove(id)?.let { backing[newId] = it }
-                                        
-                                        refreshAndDisplayEntries()
+
+                                        updateHeader(newId, cf, isFunctionHeaderDefault(newId))
                                     },
                                     autocomplete = Registries.ATTRIBUTE.ids
                                 )
@@ -76,9 +91,11 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                     fl.child(
                         Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
                             val map = backing[id] ?: mutableMapOf()
-                            map[Identifier("unknown")] = AttributeFunction()
-                            backing[id] = map
-                            refreshAndDisplayEntries(true)
+                            val createdId = Identifier("unknown")
+                            val function = AttributeFunction()
+                            map[createdId] = function
+                            backing[createdId] = map
+                            createEntry(createdId, function, createdId, false, cf)
                         }
                             .renderer(ButtonRenderers.STANDARD)
                     )
@@ -90,14 +107,16 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
         }
     }
 
-    private fun createEntry(id: Identifier, function: AttributeFunction, parentId: Identifier, isDefault: Boolean, parent: CollapsibleFoldableContainer): CollapsibleContainer {
+    private fun createEntry(incomingIdentifier: Identifier, function: AttributeFunction, parentId: Identifier, isDefault: Boolean, parent: CollapsibleFoldableContainer): CollapsibleContainer {
+        var id = incomingIdentifier
         // find if it exists already to ignore the default
         val located = parent.childById(CollapsibleContainer::class.java, "${id}#child-fn")
         if (located != null) return located
 
-        val container = Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), true).apply {
+        val container = Containers.collapsible(Sizing.content(), Sizing.content(), registryEntryToText(id, Registries.ATTRIBUTE, { it.translationKey }, isDefault), DataAttributesClient.UI_STATE.collapsible.functionChildren[parentId.toString()]?.get(id.toString()) == true).apply {
             gap(4)
             id("${id}#child-fn")
+            onToggled().subscribe { DataAttributesClient.UI_STATE.collapsible.functionChildren.computeIfAbsent(parentId.toString()) { mutableMapOf() }[id.toString()] = true }
 
             val attribute = Registries.ATTRIBUTE[id]
             if (attribute !is EntityAttribute) {
@@ -115,10 +134,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                     fl.child(
                         ConfigToggleButton()
                             .enabled(function.enabled)
-                            .onPress {
-                                backing[parentId]?.set(id, function.copy(enabled = !function.enabled))
-                                refreshAndDisplayEntries()
-                            }
+                            .onPress { updateChild(id, parentId, function.copy(enabled = !function.enabled), this) }
                             .renderer(ButtonRenderers.STANDARD)
                     )
 
@@ -126,7 +142,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                         fl.child(
                             ButtonComponents.remove {
                                 backing[parentId]?.remove(id)
-                                refreshAndDisplayEntries()
+                                remove()
                             }
                                 .renderer(ButtonRenderers.STANDARD)
                         )
@@ -140,7 +156,9 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                                         entry[newId] = entry.remove(id) ?: return@identifier
                                         backing[parentId] = entry
 
-                                        refreshAndDisplayEntries()
+                                        id = newId
+
+                                        updateHeader(id, this, isFunctionChildDefault(parentId, newId))
                                     },
                                     autocomplete = Registries.ATTRIBUTE.ids
                                 )
@@ -160,10 +178,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 function.value,
                 Validators::isNumeric,
                 onChange = {
-                    it.toDoubleOrNull()?.let { v ->
-                        backing[parentId]?.set(id, function.copy(value = v))
-                        refreshAndDisplayEntries(isDefault)
-                    }
+                    it.toDoubleOrNull()?.let { z -> updateChild(id, parentId, function.copy(value = z), this) }
                 }
             ).also {
                 if (attribute is ClampedEntityAttribute) {
@@ -175,10 +190,7 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                 Containers.horizontalFlow(Sizing.fill(100), Sizing.fixed(20)).apply {
                     verticalAlignment(VerticalAlignment.CENTER)
 
-                    child(
-                        Components.label(Text.translatable("text.config.data_attributes.data_entry.functions.behavior"))
-                            .sizing(Sizing.content(), Sizing.fixed(20))
-                    )
+                    child(Components.label(Text.translatable("text.config.data_attributes.data_entry.functions.behavior")).sizing(Sizing.content(), Sizing.fixed(20)))
                     child(
                         Components.button(Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}")) {
                             function.behavior = StackingBehavior.entries[function.behavior.ordinal xor 1]
@@ -186,7 +198,6 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
                             it.message = Text.translatable("text.config.data_attributes.enum.functionBehavior.${function.behavior.name.lowercase()}")
 
                             backing[parentId]?.set(id, function.copy(behavior = function.behavior))
-                            refreshAndDisplayEntries(isDefault)
                         }
                             .renderer(ButtonRenderers.STANDARD)
                             .positioning(Positioning.relative(100, 0)).horizontalSizing(Sizing.fixed(65))
@@ -218,19 +229,18 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
         }
     }
 
-    private fun refreshAndDisplayEntries(clearHeaders: Boolean = true) {
-        if (clearHeaders) {
-            headerComponents.values.forEach { component ->
-                component.id(null)
+    init {
+        child(
+            Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
+                backing[Identifier("unknown")] = mutableMapOf()
+                val component = getOrCreateEntryContainer(Identifier("unknown"), false)
                 component.remove()
+                child(1, component)
             }
-            headerComponents.clear()
-        }
-        entryComponents.values.forEach { component ->
-            component.id(null)
-            component.remove()
-        }
-        entryComponents.clear()
+                .renderer(ButtonRenderers.STANDARD)
+                .horizontalSizing(Sizing.content())
+                .verticalSizing(Sizing.fixed(20))
+        )
 
         for ((id, functions) in backing) {
             createFunctionEntries(functions, id, getOrCreateEntryContainer(id, !backing.containsKey(id)))
@@ -239,20 +249,6 @@ class AttributeFunctionProvider(val option: Option<AttributeFunctionConfig>) : F
         for ((id, functions) in DataAttributesAPI.serverManager.defaults.functions.entries) {
             createFunctionEntries(functions, id, getOrCreateEntryContainer(id, !backing.containsKey(id)))
         }
-    }
-
-    init {
-        child(
-            Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                backing[Identifier("unknown")] = mutableMapOf()
-                refreshAndDisplayEntries()
-            }
-                .renderer(ButtonRenderers.STANDARD)
-                .horizontalSizing(Sizing.content())
-                .verticalSizing(Sizing.fixed(20))
-        )
-
-        refreshAndDisplayEntries()
     }
 
     override fun isValid() = !this.option.detached()

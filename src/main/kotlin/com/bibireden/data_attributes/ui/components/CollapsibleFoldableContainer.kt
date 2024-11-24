@@ -8,7 +8,7 @@ import io.wispforest.owo.ui.core.Sizing
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
-class CollapsibleFoldableContainer(horizontalSizing: Sizing, verticalSizing: Sizing, title: Text, expanded: Boolean) : CollapsibleContainer(horizontalSizing, verticalSizing, title, expanded) {
+open class CollapsibleFoldableContainer(horizontalSizing: Sizing, verticalSizing: Sizing, title: Text, expanded: Boolean) : CollapsibleContainer(horizontalSizing, verticalSizing, title, expanded) {
     var isFoldered = !expanded()
 
     fun getFoldableText(): MutableText {
