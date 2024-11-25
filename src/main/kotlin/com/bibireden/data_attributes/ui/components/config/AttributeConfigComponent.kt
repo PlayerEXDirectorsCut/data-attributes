@@ -15,4 +15,6 @@ interface AttributeConfigComponent<T> {
     /** If the given entry is currently registered. */
     val isRegistered: Boolean
         get() = registryEntry != null
+
+    fun update()
 }

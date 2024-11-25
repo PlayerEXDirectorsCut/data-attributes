@@ -75,11 +75,13 @@ class AttributeOverrideComponent(
 
         titleLayout().tooltip(null)
 
-        if (!isRegistered()) {
-            titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
-        }
-        else if (isDefault()) {
-            titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
+        when {
+            !isRegistered() -> {
+                titleLayout().tooltip(Text.translatable("text.config.data_attributes.data_entry.invalid"))
+            }
+            isDefault() -> {
+                titleLayout().tooltip(Text.translatable("text.config.data_attributes_data_entry.default"))
+            }
         }
     }
 

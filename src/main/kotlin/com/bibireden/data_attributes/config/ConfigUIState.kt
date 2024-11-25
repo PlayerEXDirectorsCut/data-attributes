@@ -5,6 +5,7 @@ data class ConfigUIState(val collapsible: Collapsible = Collapsible()) {
         val overrides: MutableMap<String, Boolean> = mutableMapOf(),
         val functionParents: MutableMap<String, Boolean> = mutableMapOf(),
         val functionChildren: MutableMap<String, MutableMap<String, Boolean>> = mutableMapOf(),
-        val entityTypes: MutableMap<String, Boolean> = mutableMapOf()
+        val entityTypeHeaders: MutableMap<String, Boolean> = mutableMapOf(),
+        val entityTypeEntries: MutableMap<String, MutableMap<String, Boolean>> = mutableMapOf()
     )
 }

@@ -1,15 +1,17 @@
-package com.bibireden.data_attributes.ui.components.config.function
+package com.bibireden.data_attributes.ui.components.config.entities
 
 import com.bibireden.data_attributes.DataAttributesClient
 import com.bibireden.data_attributes.api.DataAttributesAPI
 import com.bibireden.data_attributes.config.DataAttributesConfigProviders.registryEntryToText
-import com.bibireden.data_attributes.config.functions.AttributeFunction
+import com.bibireden.data_attributes.config.entities.EntityTypeData
+import com.bibireden.data_attributes.config.entities.EntityTypeEntry
 import com.bibireden.data_attributes.ui.components.CollapsibleFoldableContainer
 import com.bibireden.data_attributes.ui.components.buttons.ButtonComponents
 import com.bibireden.data_attributes.ui.components.config.AttributeConfigComponent
 import com.bibireden.data_attributes.ui.components.config.ConfigDockComponent
+import com.bibireden.data_attributes.ui.components.config.function.AttributeFunctionComponent
 import com.bibireden.data_attributes.ui.components.fields.FieldComponents
-import com.bibireden.data_attributes.ui.config.providers.AttributeFunctionProvider
+import com.bibireden.data_attributes.ui.config.providers.EntityTypesProviderV2
 import com.bibireden.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
@@ -19,20 +21,20 @@ import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.Sizing
 import io.wispforest.owo.ui.core.VerticalAlignment
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class AttributeFunctionHeaderComponent(override var identifier: Identifier, private val functions: MutableMap<Identifier, AttributeFunction>, private val provider: AttributeFunctionProvider) : CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), Text.of("<n/a>"), DataAttributesClient.UI_STATE.collapsible.functionParents[identifier.toString()] ?: true), AttributeConfigComponent<EntityAttribute> {
-    override val registry: Registry<EntityAttribute>
-        get() = Registries.ATTRIBUTE
+class EntityTypesHeaderComponent(override var identifier: Identifier, private val entityTypes: MutableMap<Identifier, EntityTypeEntry>, private val provider: EntityTypesProviderV2)
+    : CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), Text.of("<n/a>"), DataAttributesClient.UI_STATE.collapsible.entityTypeHeaders[identifier.toString()] ?: true), AttributeConfigComponent<EntityType<*>> {
+
+    override val registry: Registry<EntityType<*>> = Registries.ENTITY_TYPE
 
     override val isDefault: Boolean
         get() = !provider.backing.containsKey(identifier)
-
-    private fun createEntry(childId: Identifier, function: AttributeFunction): AttributeFunctionComponent = childById(AttributeFunctionComponent::class.java, "child#$childId") ?: AttributeFunctionComponent(childId, function, identifier, provider).also { it.id("child#$childId") }.also(::child)
 
     private fun updateSearchAnchor() {
         childById(SearchAnchorComponent::class.java, "search-anchor")?.remove()
@@ -40,8 +42,10 @@ class AttributeFunctionHeaderComponent(override var identifier: Identifier, priv
     }
 
     private fun updateTextLabel() {
-        titleLayout().children().filterIsInstance<LabelComponent>().first().text(registryEntryToText(identifier, Registries.ATTRIBUTE, { it.translationKey }, isDefault))
+        titleLayout().children().filterIsInstance<LabelComponent>().first().text(registryEntryToText(identifier, registry, { it.translationKey }, isDefault))
     }
+
+    private fun createEntry(entryId: Identifier, entry: EntityTypeEntry): EntityTypesComponent = childById(EntityTypesComponent::class.java, "entry#$entryId") ?: EntityTypesComponent(entryId, identifier, entry, provider).also { it.id("entry#$entryId")}.also(::child)
 
     override fun update() {
         titleLayout().tooltip(null)
@@ -57,25 +61,21 @@ class AttributeFunctionHeaderComponent(override var identifier: Identifier, priv
         updateSearchAnchor()
     }
 
-    fun addFunctions(functions: MutableMap<Identifier, AttributeFunction>) {
-        for ((id, function) in functions) createEntry(id, function)
+    fun addEntityTypes(entityTypes: MutableMap<Identifier, EntityTypeEntry>) {
+        for ((id, types) in entityTypes) createEntry(id, types)
     }
 
     init {
-        onToggled().subscribe { DataAttributesClient.UI_STATE.collapsible.functionParents[identifier.toString()] = it }
-
-        update()
+        onToggled().subscribe { DataAttributesClient.UI_STATE.collapsible.entityTypeHeaders[identifier.toString()] = it }
 
         child(
             ConfigDockComponent(ConfigDockComponent.ConfigDefaultProperties({ _, _ ->
                 provider.backing.remove(identifier)
 
-                val entries = DataAttributesAPI.serverManager.defaults.functions.entries[identifier]
+                val entries = DataAttributesAPI.serverManager.defaults.types.entries[identifier]
 
                 if (entries != null) {
-                    forEachDescendant {
-                        if (it is AttributeFunctionComponent) { if (entries.containsKey(it.identifier)) it.update() else it.remove() }
-                    }
+                    forEachDescendant { if (it is EntityTypesComponent) { if (entries.containsKey(it.identifier)) it.update() else it.remove() } }
                     update()
                 }
                 else remove()
@@ -90,29 +90,26 @@ class AttributeFunctionHeaderComponent(override var identifier: Identifier, priv
 
                             identifier = newId
 
-                            for (afc in children().filterIsInstance<AttributeFunctionComponent>()) { afc.updateParent(identifier) }
+                            children().filterIsInstance<EntityTypesComponent>().forEach { it.updateParent(identifier) }
 
                             update()
                         },
                         autocomplete = registry.ids
                     )
 
-                    field.textBox.predicate = { provider.backing[identifier]?.get(it) == null && registry.containsId(it) }
+                    field.textBox.predicate = { provider.backing[identifier]?.data?.get(it) == null && registry.containsId(it) }
 
                     child(0, field)
                 }
             }).child(
                 Components.button(Text.translatable("text.config.data_attributes.buttons.add")) {
-                    val entries = provider.backing.computeIfAbsent(identifier) { mutableMapOf() }
-
+                    val map = provider.backing[identifier]?.data?.toMutableMap() ?: mutableMapOf()
                     val childId = Identifier("unknown")
-                    val function = AttributeFunction()
+                    val entry = EntityTypeEntry()
+                    map[childId] = entry
+                    provider.backing[identifier] = EntityTypeData(map)
 
-                    entries[childId] = function
-
-                    provider.backing[identifier] = entries
-
-                    child(2, AttributeFunctionComponent(childId, function, identifier, provider))
+                    child(1, EntityTypesComponent(childId, identifier, entry, provider))
 
                     update()
                 }
@@ -122,6 +119,8 @@ class AttributeFunctionHeaderComponent(override var identifier: Identifier, priv
             )
         )
 
-        addFunctions(this.functions)
+        addEntityTypes(this.entityTypes)
+
+        update()
     }
 }
