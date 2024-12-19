@@ -1,5 +1,2 @@
-## Additions 🍎
-- Added saved state for collapsed entries (session based, saved until game relaunch)
-## Changes 🍐
-- Applied a different method to updating UI components.
-- Most entries sync, but there is still some work to do, so it will stay as beta until the rest of the issues are figured out.
+## Fixes 🍋
+- Remove null text in UI in favor of empty string to fix compatibility with other mods

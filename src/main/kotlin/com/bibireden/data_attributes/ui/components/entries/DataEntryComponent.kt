@@ -43,7 +43,7 @@ class DataEntryComponent<V>(label: Text, val parser: Parser<String, V>, properti
             textbox.tooltip(Text.translatable("text.config.data_attributes.data_entry.unchangeable"))
             textbox.cursorStyle(CursorStyle.POINTER)
             textbox.tooltip(null)
-            textbox.text = null
+            textbox.text = ""
         }
     }
 
