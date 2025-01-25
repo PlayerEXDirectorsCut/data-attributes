@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "id": "data_attributes",
+  "version": "${version}",
+  "name": "Data Attributes: Directors Cut",
+  "description": "This mod serves to overhaul the Entity Attribute system to be a lot more dynamic.",
+  "authors": [
+    {
+      "name": "bibireden",
+      "contact": {
+        "homepage": "https://github.com/bibi-reden"
+      }
+    },
+    {
+      "name": "OverlordsIII",
+      "contact": {
+        "homepage": "https://github.com/OverlordsIII"
+      }
+    },
+    {
+      "name": "DataEncoded",
+      "contact": {
+        "homepage": "https://github.com/DataEncoded"
+      }
+    }
+  ],
+  "contributors": [
+    {
+      "name": "pokesmells",
+      "contact": {
+        "homepage": "https://github.com/pokesmells"
+      }
+    },
+    {
+      "name": "Blodhgarm",
+      "contact": {
+        "homepage": "https://github.com/Dragon-Seeker"
+      }
+    },
+    {
+      "name": "chyzman",
+      "contact": {
+        "homepage": "https://github.com/chyzman"
+      }
+    },
+    {
+      "name": "CleverNucleus [former author]",
+      "contact": {
+        "homepage": "https://github.com/CleverNucleus"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://github.com/BareMinimumStudios/data-attributes",
+    "sources": "https://github.com/BareMinimumStudios/data-attributes"
+  },
+  "license": "MIT",
+  "icon": "assets/data_attributes/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.bms.data_attributes.fabric.DataAttributesInitializerFabric"
+    ],
+    "client": [
+      "com.bms.data_attributes.fabric.DataAttributesInitializerClientFabric"
+    ]
+  },
+  "mixins": [
+    "data_attributes.mixins.json",
+    "data_attributes-common.mixins.json"
+  ],
+  "depends": {
+    "minecraft": "~1.21",
+    "fabric": "*",
+    "java": ">=21",
+    "fabric-api": "*",
+    "fabric-language-kotlin": ">=1.11.0+kotlin.2.0.0",
+    "owo-lib": ">=0.12.11+1.21"
+  }
+}

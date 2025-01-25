@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.bms.data_attributes.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [],
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

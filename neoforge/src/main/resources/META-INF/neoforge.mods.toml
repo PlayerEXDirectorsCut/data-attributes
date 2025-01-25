@@ -1,0 +1,33 @@
+modLoader = "kotlinforforge"
+loaderVersion = "[4,)"
+issueTrackerURL = "https://github.com/BareMinimumStudios/data-attributes/issues"
+license = "MIT"
+
+[[mods]]
+modId = "data_attributes"
+version = "${version}"
+displayName = "Data Attributes: Directors Cut"
+authors = "bibireden, Bare Minimum Studios"
+description = '''This mod serves to overhaul the Entity Attribute system to be a lot more dynamic.'''
+logoFile = "../icon.png"
+displayURL = "https://github.com/BareMinimumStudios/data-attributes"
+
+[[dependencies.data_attributes]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[21.0.0-beta,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.data_attributes]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config="data_attributes.mixins.json"
+
+[[mixins]]
+config="data_attributes-common.mixins.json"

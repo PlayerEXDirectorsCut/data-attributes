@@ -1,0 +1,10 @@
+{
+    "accessWidener": "data_attributes.accesswidener",
+    "injected_interfaces": {
+        "net/minecraft/class_1320": ["com/bms/data_attributes/api/attribute/IAttribute", "com/bms/data_attributes/mutable/MutableAttribute"],
+        "net/minecraft/class_1324": ["com/bms/data_attributes/api/attribute/IAttributeInstance", "com/bms/data_attributes/mutable/MutableAttributeInstance"],
+        "net/minecraft/class_5131": ["com/bms/data_attributes/mutable/MutableAttributeMap"],
+        "net/minecraft/class_5132": ["com/bms/data_attributes/mutable/MutableAttributeSupplier"],
+        "net/minecraft/class_1322": ["com/bms/data_attributes/mutable/MutableAttributeModifier"]
+    }
+}

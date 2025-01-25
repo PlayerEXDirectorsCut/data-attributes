@@ -1,100 +1,76 @@
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
+
 plugins {
-    id("fabric-loom")
-    kotlin("jvm") version "2.0.0"
+    id("architectury-plugin") version "3.4-SNAPSHOT"
+    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
     java
-    `maven-publish`
+    kotlin("jvm") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
+    idea
     id("com.google.devtools.ksp") version "2.0.0-1.0.21"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_21
-java.targetCompatibility = JavaVersion.VERSION_21
+val minecraftVersion = project.properties["minecraft_version"] as String
 
-group = "${properties["maven_group"]}"
-version = "${properties["mod_version"]}-${properties["loader"]}"
+architectury.minecraft = minecraftVersion
 
-loom {
-    runConfigs.configureEach {
-        ideConfigGenerated(true)
+subprojects {
+    apply(plugin = "dev.architectury.loom")
+
+    val loom = project.extensions.getByName<LoomGradleExtensionAPI>("loom")
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven("https://maven.parchmentmc.org")
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.neoforged.net/releases/")
+        maven("https://thedarkcolour.github.io/KotlinForForge/")
+	    maven("https://maven.quiltmc.org/repository/release/")
+        maven("https://maven.kosmx.dev/")
+        maven("https://maven.wispforest.io/releases")
+        maven("https://maven.terraformersmc.com")
+        maven("https://api.modrinth.com/maven")
+        maven("https://maven.su5ed.dev/releases")
+    }
+
+    @Suppress("UnstableApiUsage")
+    dependencies {
+        "minecraft"("com.mojang:minecraft:$minecraftVersion")
+        loom.silentMojangMappingsLicense()
+        "mappings"(loom.layered {
+            mappings("org.quiltmc:quilt-mappings:${project.properties["quilt_mappings_minecraft_version"]}+build.${project.properties["quilt_mappings_version"]}:intermediary-v2")
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-$minecraftVersion:${project.properties["parchment"]}@zip")
+        })
+
+        implementation("com.google.devtools.ksp:symbol-processing-api:${properties["ksp_version"]}")
+        implementation("com.squareup:kotlinpoet-ksp:${properties["kotlinpoet_version"]}")
+
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+        compileOnly("org.jetbrains:annotations:24.1.0")
     }
 }
 
-repositories {
-    maven("https://maven.wispforest.io/releases")
-    maven("https://maven.terraformersmc.com")
-    maven("https://api.modrinth.com/maven")
-    maven("https://maven.kosmx.dev/")
-    maven("https://maven.parchmentmc.org")
-    maven("https://maven.quiltmc.org/repository/release/")
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "architectury-plugin")
+    apply(plugin = "maven-publish")
+    apply(plugin = "idea")
+    apply(plugin = "com.google.devtools.ksp")
+
+    version = project.properties["mod_version"] as String
+    group = project.properties["maven_group"] as String
+    base.archivesName.set(project.properties["archives_base_name"] as String)
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release.set(21)
+    }
+
+    java.withSourcesJar()
 }
 
-dependencies {
-    minecraft("com.mojang:minecraft:${properties["minecraft_version"]}")
-
-    mappings("net.fabricmc:yarn:${properties["yarn_mappings"]}:v2")
-
-//    "mappings"(loom.layered {
-//        mappings("org.quiltmc:quilt-mappings:${properties["minecraft_version"]}+build.${project.properties["quilt_mappings_version"]}:intermediary-v2")
-//        officialMojangMappings()
-//        parchment("org.parchmentmc.data:parchment-${properties["minecraft_version"]}:${project.properties["parchment"]}@zip")
-//    })
-
-    modImplementation("net.fabricmc:fabric-loader:${properties["loader_version"]}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${properties["fabric_kotlin_version"]}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_api_version"]}")
-
-    include("io.wispforest:owo-sentinel:${properties["owo_version"]}")
-
-    modImplementation("com.terraformersmc:modmenu:${properties["modmenu_version"]}") {
-        exclude("net.fabricmc.fabric-api")
-    }
-
-    annotationProcessor("io.github.llamalad7:mixinextras-fabric:${properties["mixinextras_version"]}")?.let {
-        implementation(it)
-        include(it)
-    }
-
-    modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")
-
-    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:gson:${properties["endec_gson_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:jankson:${properties["endec_jankson_version"]}")!!.let(::include)
-
-    implementation("com.google.devtools.ksp:symbol-processing-api:${properties["ksp_version"]}")
-    implementation("com.squareup:kotlinpoet-ksp:${properties["kotlinpoet_version"]}")
-
-    ksp("dev.kosmx.kowoconfig:ksp-owo-config:${properties["ksp_owo_config_version"]}")
-}
-
-tasks {
-    processResources {
-        inputs.property("version", project.version)
-        filesMatching("fabric.mod.json") {
-            expand("version" to project.version)
-        }
-    }
-
-
-    jar {
-        from("LICENSE")
-    }
-
-    java {
-        withSourcesJar()
-    }
-
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                artifact(remapJar) {
-                    builtBy(remapJar)
-                }
-                artifact(kotlinSourcesJar) {
-                    builtBy(remapSourcesJar)
-                }
-            }
-        }
-
-        repositories {}
-    }
-}

@@ -1,21 +1,19 @@
-rootProject.name = "data-attributes"
-
-pluginManagement {
-    repositories {
-        maven("https://maven.fabricmc.net/") {
-            name = "Fabric"
-        }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-
-    val loom_version: String by settings
-    val fabric_kotlin_version: String by settings
-    plugins {
-        id("fabric-loom") version loom_version
-        id("org.jetbrains.kotlin.jvm") version
-                fabric_kotlin_version
-                    .split("+kotlin.")[1] // Grabs the sentence after `+kotlin.`
-                    .split("+")[0] // Ensures sentences like `+build.1` are ignored
-    }
+pluginManagement.repositories {
+    maven("https://maven.fabricmc.net/")
+    maven("https://maven.architectury.dev/")
+    maven("https://maven.neoforged.net/")
+    gradlePluginPortal()
 }
+
+plugins {
+    id("com.gradle.develocity") version "3.17.4"
+}
+
+develocity.buildScan {
+    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    termsOfUseAgree = "yes"
+}
+
+include("common", "fabric", "neoforge")
+
+rootProject.name = "Data Attributes"

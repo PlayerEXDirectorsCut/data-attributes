@@ -1,0 +1,28 @@
+{
+    "required": true,
+    "package": "com.bms.data_attributes.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "minVersion": "0.8",
+    "client": [],
+    "mixins": [
+        "AttributeInstanceMixin",
+        "AttributeMapMixin",
+        "AttributeMixin",
+        "AttributeModifierMixin",
+        "AttributeSupplierMixin",
+        "LivingEntityMixin",
+        "MobEntityMixin",
+        "PlayerMixin",
+        "RangedAttributeMixin",
+        "ReloadCommandMixin",
+        "ServerEntityMixin",
+        "item.ArmorItemMixin",
+        "item.DiggerItemMixin",
+        "item.ItemMixin",
+        "item.ItemStackMixin",
+        "item.SwordItemMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
