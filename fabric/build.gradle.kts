@@ -21,12 +21,25 @@ loom {
     accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 }
 
+val fabricApiModules = setOf(
+    "fabric-api-base",
+    "fabric-command-api-v1",
+    "fabric-lifecycle-events-v1",
+    "fabric-networking-api-v1",
+    "fabric-resource-loader-v0",
+    "fabric-entity-events-v1"
+)
+
 // Fabric Datagen Gradle config.  Remove if not using Fabric datagen
 //fabricApi.configureDataGeneration()
 
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.properties["fabric_loader_version"]}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_api_version"]}+$minecraftVersion")
+
+    fabricApiModules.forEach {
+        modImplementation(fabricApi.module(it, "${project.properties["fabric_api_version"]}+$minecraftVersion"))
+    }
+
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.properties["fabric_language_kotlin_version"]}")
 
     modImplementation("io.wispforest:owo-lib:${properties["owo_version"]}")

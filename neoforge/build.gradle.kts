@@ -27,14 +27,15 @@ dependencies {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
 
-    implementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:${properties["fabric_api_version"]}+${properties["ffapi_version"]}+${minecraftVersion}") {
-        exclude(group = "net.neoforged.fancymodloader", module = "loader")
-    }
+    implementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:${properties["fabric_api_version"]}+${properties["ffapi_version"]}+${minecraftVersion}")
 
     modImplementation("maven.modrinth:owo-lib:${properties["owo_neo_version"]}") {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
 //    include("io.wispforest:owo-sentinel:${properties["owo_neo_version"]}")
+
+    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
+    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
 
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionNeoForge")) { isTransitive = false }

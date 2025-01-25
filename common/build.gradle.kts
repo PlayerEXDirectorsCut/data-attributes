@@ -1,9 +1,20 @@
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 architectury {
     common("fabric", "neoforge")
     platformSetupLoomIde()
 }
 
 val minecraftVersion = project.properties["minecraft_version"] as String
+
+val fabricApiModules = setOf(
+    "fabric-api-base",
+    "fabric-command-api-v1",
+    "fabric-lifecycle-events-v1",
+    "fabric-networking-api-v1",
+    "fabric-resource-loader-v0",
+    "fabric-entity-events-v1"
+)
 
 loom.accessWidenerPath.set(file("src/main/resources/data_attributes.accesswidener"))
 
@@ -16,7 +27,10 @@ dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
     modImplementation("net.fabricmc:fabric-loader:${properties["fabric_loader_version"]}")
-    modApi("net.fabricmc.fabric-api:fabric-api:${project.properties["fabric_api_version"]}+$minecraftVersion")
+
+    fabricApiModules.forEach {
+        modApi(fabricApi.module(it, "${project.properties["fabric_api_version"]}+$minecraftVersion"))
+    }
 
     modApi("io.wispforest:owo-lib:${properties["owo_version"]}")
 
