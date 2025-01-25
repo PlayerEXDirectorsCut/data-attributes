@@ -41,7 +41,7 @@ dependencies {
 }
 
 tasks {
-    base.archivesName.set(base.archivesName.get() + "-NeoForge")
+    base.archivesName.set(base.archivesName.get() + "-neoforge")
     processResources {
         inputs.property("version", project.version)
 
@@ -79,7 +79,7 @@ components {
 
 publishing {
     publications.create<MavenPublication>("mavenNeoForge") {
-        artifactId = "${project.properties["archives_base_name"]}" + "-NeoForge"
+        artifactId = "${project.properties["archives_base_name"]}" + "-neoforge"
         from(components["java"])
     }
 

@@ -75,6 +75,26 @@
     "java": ">=21",
     "fabric-api": "*",
     "fabric-language-kotlin": ">=1.11.0+kotlin.2.0.0",
-    "owo-lib": ">=0.12.11+1.21"
+    "owo-lib": ">=0.12.15+1.21"
+  },
+  "custom": {
+    "mc-publish": {
+      "modrinth": "KCGxOJsE",
+      "curseforge": 955929,
+      "loaders": ["fabric", "quilt"],
+      "dependencies": [
+        "fabric-api@>=0.107.0+1.21.1(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)",
+        "fabric-language-kotlin@>=1.12.3+kotlin.2.0.21(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)",
+        "owo-lib@0.12.15(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)"
+      ]
+    },
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/pcRw79hwey",
+        "modmenu.wiki": "https://bareminimumstudios.github.io/Bare-Minimum-Docs/",
+        "modmenu.kofi": "https://ko-fi.com/bibiredens",
+        "modmenu.modrinth": "https://modrinth.com/mod/data-attributes-directors-cut"
+      }
+    }
   }
 }

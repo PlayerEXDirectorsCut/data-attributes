@@ -8,24 +8,18 @@ import com.bms.data_attributes.config.Validators
 import com.bms.data_attributes.config.entities.EntityTypeData
 import com.bms.data_attributes.config.entities.EntityTypeEntry
 import com.bms.data_attributes.ext.round
-import com.bms.data_attributes.ui.components.buttons.ButtonComponents
 import com.bms.data_attributes.ui.components.config.AttributeConfigComponent
 import com.bms.data_attributes.ui.components.config.ConfigDockComponent
 import com.bms.data_attributes.ui.components.entries.DataEntryComponent
 import com.bms.data_attributes.ui.components.entries.EntryComponents
 import com.bms.data_attributes.ui.components.fields.FieldComponents
-import com.bms.data_attributes.ui.config.providers.EntityTypesProviderV2
-import com.bms.data_attributes.ui.renderers.ButtonRenderers
+import com.bms.data_attributes.ui.config.providers.EntityTypesProvider
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
-import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.component.LabelComponent
-import io.wispforest.owo.ui.component.TextBoxComponent
 import io.wispforest.owo.ui.container.CollapsibleContainer
-import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.Sizing
-import io.wispforest.owo.ui.core.VerticalAlignment
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes
@@ -36,7 +30,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.ai.attributes.RangedAttribute
 
-class EntityTypesComponent(override var identifier: ResourceLocation, private var parentId: ResourceLocation, private var entry: EntityTypeEntry, private val provider: EntityTypesProviderV2)
+class EntityTypesComponent(override var identifier: ResourceLocation, private var parentId: ResourceLocation, private var entry: EntityTypeEntry, private val provider: EntityTypesProvider)
     : CollapsibleContainer(Sizing.content(), Sizing.content(), Component.literal("<n/a>"), DataAttributesClient.UI_STATE.collapsible.entityTypeEntries[parentId.toString()]?.get(identifier.toString()) ?: true), AttributeConfigComponent<Attribute> {
 
     override val registry: Registry<Attribute> = BuiltInRegistries.ATTRIBUTE

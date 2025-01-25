@@ -1,12 +1,6 @@
 name: Deployment (J21)
 on:
-  push:
-    branches-ignore:
-      - master
-      - "**/dev**"
-      - "**-dev"
-      - "**-dev**"
-      - dev
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -78,9 +72,6 @@ jobs:
             fabric/build/libs/!(*-@(dev|sources|javadoc|shadow)).jar
             fabric/build/libs/*-@(dev|sources|javadoc|shadow).jar
 
-          modrinth-id: oLPaySSb
-          curseforge-id: 1019391
-
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
@@ -90,14 +81,6 @@ jobs:
 
           version: ${{ steps.mod_version.outputs.mod_version }}-fabric
           changelog-file: CHANGELOG.md
-
-          loaders: |
-            fabric
-            quilt
-
-          dependencies: |
-            fabric-api@0.100.8+1.21(required){modrinth:P7dR8mSH}{curseforge:306612}#(ignore:github)
-            fabric-language-kotlin@1.9.5+kotlin.1.8.22(required){modrinth:Ha28R6CL}{curseforge:308769}#(ignore:github)
 
           game-versions: "${{ steps.minecraft_version.outputs.minecraft_version }}"
           java: "${{ matrix.java }}"
@@ -115,8 +98,8 @@ jobs:
             neoforge/build/libs/!(*-@(dev|sources|javadoc|shadow)).jar
             neoforge/build/libs/*-@(dev|sources|javadoc|shadow).jar
 
-          modrinth-id: oLPaySSb
-          curseforge-id: 1019391
+          modrinth-id: KCGxOJsE
+          curseforge-id: 955929
 
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
@@ -133,6 +116,8 @@ jobs:
 
           dependencies: |
             kotlinforforge@4.10.0(required){modrinth:ordsPcFz}{curseforge:351264}#(ignore:github)
+            forgified-fabric-api@0.107.0+2.0.22+1.21.1(required){modrinth:Aqlf1Shp}{curseforge:889079}#(ignore:github)
+            owo-lib@0.12.15-beta.12+1.21(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)
 
           game-versions: "${{ steps.minecraft_version.outputs.minecraft_version }}"
           java: "${{ matrix.java }}"

@@ -41,7 +41,7 @@ dependencies {
 }
 
 tasks {
-    base.archivesName.set(base.archivesName.get() + "-Fabric")
+    base.archivesName.set(base.archivesName.get() + "-fabric")
     processResources {
         inputs.property("version", project.version)
 
@@ -79,7 +79,7 @@ components {
 
 publishing {
     publications.create<MavenPublication>("mavenFabric") {
-        artifactId = "${project.properties["archives_base_name"]}" + "-Fabric"
+        artifactId = "${project.properties["archives_base_name"]}" + "-fabric"
         from(components["java"])
     }
 

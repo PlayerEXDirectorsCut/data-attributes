@@ -3,7 +3,7 @@ package com.bms.data_attributes.config
 import com.bms.data_attributes.ui.colors.ColorCodes
 import com.bms.data_attributes.ui.config.providers.AttributeFunctionProvider
 import com.bms.data_attributes.ui.config.providers.AttributeOverrideProvider
-import com.bms.data_attributes.ui.config.providers.EntityTypesProviderV2
+import com.bms.data_attributes.ui.config.providers.EntityTypesProvider
 import com.google.common.base.Predicate
 import io.wispforest.owo.config.ui.OptionComponentFactory
 import io.wispforest.owo.ui.component.Components
@@ -43,7 +43,7 @@ object DataAttributesConfigProviders {
     }
 
     val ENTITY_TYPES_FACTORY = OptionComponentFactory { _, option ->
-        return@OptionComponentFactory EntityTypesProviderV2(option).let { OptionComponentFactory.Result(it, it) }
+        return@OptionComponentFactory EntityTypesProvider(option).let { OptionComponentFactory.Result(it, it) }
     }
 
     fun textBoxComponent(txt: Component, obj: Any, predicate: Predicate<String>? = null, onChange: ((String) -> Unit)? = null, textBoxID: String? = null): FlowLayout {

@@ -6,29 +6,24 @@ import com.bms.data_attributes.config.DataAttributesConfigProviders.registryEntr
 import com.bms.data_attributes.config.entities.EntityTypeData
 import com.bms.data_attributes.config.entities.EntityTypeEntry
 import com.bms.data_attributes.ui.components.CollapsibleFoldableContainer
-import com.bms.data_attributes.ui.components.buttons.ButtonComponents
 import com.bms.data_attributes.ui.components.config.AttributeConfigComponent
 import com.bms.data_attributes.ui.components.config.ConfigDockComponent
-import com.bms.data_attributes.ui.components.config.function.AttributeFunctionComponent
 import com.bms.data_attributes.ui.components.fields.FieldComponents
-import com.bms.data_attributes.ui.config.providers.EntityTypesProviderV2
+import com.bms.data_attributes.ui.config.providers.EntityTypesProvider
 import com.bms.data_attributes.ui.renderers.ButtonRenderers
 import io.wispforest.owo.config.Option
 import io.wispforest.owo.config.ui.component.SearchAnchorComponent
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.component.LabelComponent
-import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.Sizing
-import io.wispforest.owo.ui.core.VerticalAlignment
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.Registry
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 
-class EntityTypesHeaderComponent(override var identifier: ResourceLocation, private val entityTypes: MutableMap<ResourceLocation, EntityTypeEntry>, private val provider: EntityTypesProviderV2)
+class EntityTypesHeaderComponent(override var identifier: ResourceLocation, private val entityTypes: MutableMap<ResourceLocation, EntityTypeEntry>, private val provider: EntityTypesProvider)
     : CollapsibleFoldableContainer(Sizing.content(), Sizing.content(), Component.literal("<n/a>"), DataAttributesClient.UI_STATE.collapsible.entityTypeHeaders[identifier.toString()] ?: true), AttributeConfigComponent<EntityType<*>> {
 
     override val registry: Registry<EntityType<*>> = BuiltInRegistries.ENTITY_TYPE
