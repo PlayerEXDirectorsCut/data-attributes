@@ -1,7 +1,6 @@
 package com.bms.data_attributes
 
-import com.bms.data_attributes.config.AttributeConfigManager
-import com.bms.data_attributes.config.entry.DefaultAttributesReloadListener
+import com.bms.data_attributes.config.impl.AttributeConfigManager
 import com.bms.data_attributes.config.models.DataAttributesConfig
 import com.bms.data_attributes.config.models.EntityTypesConfig
 import com.bms.data_attributes.config.models.FunctionsConfig
