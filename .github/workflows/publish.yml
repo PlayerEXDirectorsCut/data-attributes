@@ -1,5 +1,5 @@
-name: Deployment (J21)
-on: [workflow_dispatch]
+name: Publish
+on: workflow_dispatch
 
 jobs:
   build-and-deploy:
