@@ -116,7 +116,6 @@ jobs:
 
           dependencies: |
             kotlinforforge@4.10.0(required){modrinth:ordsPcFz}{curseforge:351264}#(ignore:github)
-            forgified-fabric-api@0.107.0+2.0.22+1.21.1(required){modrinth:Aqlf1Shp}{curseforge:889079}#(ignore:github)
             owo-lib@0.12.15-beta.12+1.21(required){modrinth:ccKDOlHs}{curseforge:532610}#(ignore:github)
 
           game-versions: "${{ steps.minecraft_version.outputs.minecraft_version }}"
