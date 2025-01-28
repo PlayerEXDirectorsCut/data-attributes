@@ -23,19 +23,21 @@ loom {
 
 dependencies {
     neoForge("net.neoforged:neoforge:${project.properties["neoforge_version"]}")
+
     implementation("thedarkcolour:kotlinforforge-neoforge:${project.properties["kotlin_forge_version"]}") {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
 
-    implementation("org.sinytra.forgified-fabric-api:forgified-fabric-api:${properties["fabric_api_version"]}+${properties["ffapi_version"]}+${minecraftVersion}")
-
     modImplementation("maven.modrinth:owo-lib:${properties["owo_neo_version"]}") {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
-//    include("io.wispforest:owo-sentinel:${properties["owo_neo_version"]}")
 
-    modImplementation("io.wispforest:endec:${properties["endec_version"]}")!!.let(::include)
-    modImplementation("io.wispforest.endec:netty:${properties["endec_netty_version"]}")!!.let(::include)
+    // needed because architectury crashes out otherwise (strips jij)
+    forgeRuntimeLibrary("io.wispforest:endec:0.1.8")
+    forgeRuntimeLibrary("io.wispforest.endec:netty:0.1.4")
+    forgeRuntimeLibrary("io.wispforest.endec:gson:0.1.5")
+    forgeRuntimeLibrary("io.wispforest.endec:jankson:0.1.5")
+    forgeRuntimeLibrary("blue.endless:jankson:1.2.2")
 
     "common"(project(":common", "namedElements")) { isTransitive = false }
     "shadowCommon"(project(":common", "transformProductionNeoForge")) { isTransitive = false }
