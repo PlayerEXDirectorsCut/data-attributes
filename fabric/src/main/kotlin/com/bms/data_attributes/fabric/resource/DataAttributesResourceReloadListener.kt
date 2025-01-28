@@ -1,16 +1,8 @@
-@file:UseSerializers(ResourceLocationSerializer::class)
-
-package com.bms.data_attributes.config.entry
-
-import com.bms.data_attributes.serde.ResourceLocationSerializer
-import kotlinx.serialization.UseSerializers
+package com.bms.data_attributes.fabric.resource
 
 import com.bms.data_attributes.DataAttributes
-import com.bms.data_attributes.config.entities.EntityTypeEntry
-import com.bms.data_attributes.config.functions.AttributeFunction
-import com.bms.data_attributes.config.models.OverridesConfigModel.AttributeOverride
+import com.bms.data_attributes.config.Cache
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener
@@ -26,18 +18,8 @@ import java.util.concurrent.Executor
  * and then be applied to the manager.
  */
 @OptIn(ExperimentalSerializationApi::class)
-class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttributesReloadListener.Cache> {
+class DataAttributesResourceReloadListener : SimpleResourceReloadListener<Cache> {
     var data: Cache = Cache()
-
-    @Serializable
-    data class Overrides(var entries: LinkedHashMap<ResourceLocation, AttributeOverride> = LinkedHashMap())
-    @Serializable
-    data class Functions(var entries: LinkedHashMap<ResourceLocation, LinkedHashMap<ResourceLocation, AttributeFunction>> = LinkedHashMap())
-    @Serializable
-    data class EntityTypes(var entries: LinkedHashMap<ResourceLocation, LinkedHashMap<ResourceLocation, EntityTypeEntry>> = LinkedHashMap())
-
-    @Serializable
-    data class Cache(val overrides: Overrides = Overrides(), val functions: Functions = Functions(), val types: EntityTypes = EntityTypes())
 
     companion object {
         const val DIRECTORY = DataAttributes.MOD_ID
@@ -85,7 +67,7 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
 
         manager.listResources(path, ::isPathJson).forEach { (id, res) ->
             try {
-                Json.decodeFromStream<Overrides>(res.open()).entries.forEach { (id, entry) ->
+                Json.decodeFromStream<Cache.Overrides>(res.open()).entries.forEach { (id, entry) ->
                     cache.overrides.entries.computeIfAbsent(id) { entry }
                 }
             }
@@ -100,7 +82,7 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
 
         manager.listResources(path, ::isPathJson).forEach { (id, res) ->
             try {
-                Json.decodeFromStream<Functions>(res.open()).entries.forEach { (id, entry) ->
+                Json.decodeFromStream<Cache.Functions>(res.open()).entries.forEach { (id, entry) ->
                     val presentEntry = cache.functions.entries[id]
                     if (presentEntry == null) {
                         cache.functions.entries[id] = entry
@@ -124,7 +106,7 @@ class DefaultAttributesReloadListener : SimpleResourceReloadListener<DefaultAttr
 
         manager.listResources(path, ::isPathJson).forEach { (id, res) ->
             try {
-                Json.decodeFromStream<EntityTypes>(res.open()).entries.forEach { (id, entry) ->
+                Json.decodeFromStream<Cache.EntityTypes>(res.open()).entries.forEach { (id, entry) ->
                     val presentEntry = cache.types.entries[id]
                     if (presentEntry == null) {
                         cache.types.entries[id] = entry

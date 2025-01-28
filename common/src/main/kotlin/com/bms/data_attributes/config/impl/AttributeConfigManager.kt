@@ -1,11 +1,11 @@
-package com.bms.data_attributes.config
+package com.bms.data_attributes.config.impl
 
 import com.bms.data_attributes.DataAttributes
 import com.bms.data_attributes.api.EntityInstances
 import com.bms.data_attributes.api.attribute.IAttribute
 import com.bms.data_attributes.api.event.AttributesReloadedEvent
+import com.bms.data_attributes.config.Cache
 import com.bms.data_attributes.config.entry.ConfigMerger
-import com.bms.data_attributes.config.entry.DefaultAttributesReloadListener
 import com.bms.data_attributes.config.functions.AttributeFunction
 import com.bms.data_attributes.config.models.OverridesConfigModel.AttributeOverride
 import com.bms.data_attributes.data.AttributeData
@@ -15,6 +15,7 @@ import com.bms.data_attributes.ext.keyOf
 import com.bms.data_attributes.mutable.MutableAttribute
 import com.bms.data_attributes.networking.NetworkingChannels
 import io.wispforest.endec.Endec
+import io.wispforest.endec.StructEndec
 import io.wispforest.endec.impl.StructEndecBuilder
 import io.wispforest.owo.serialization.CodecUtils
 import net.minecraft.core.registries.BuiltInRegistries
@@ -33,12 +34,12 @@ import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.entity.monster.Monster
 
 /**
- * Used to manage config data, and contains an [AttributeContainerHandler] to build related [EntityTypeData].
+ * Used to manage config data, and contains an [AttributeMapHandler] to build related [EntityTypeData].
  */
 class AttributeConfigManager(var data: Data = Data(), private val handler: AttributeMapHandler = AttributeMapHandler()) {
     var updateFlag: Int = 0
 
-    var defaults: DefaultAttributesReloadListener.Cache = DefaultAttributesReloadListener.Cache()
+    var defaults: Cache = Cache()
 
     @JvmRecord
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
@@ -47,10 +48,10 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
     data class Packet(val data: Data, val updateFlag: Int) : CustomPacketPayload {
         companion object {
             @JvmField
-            val ENDEC = StructEndecBuilder.of(
+            val ENDEC: StructEndec<Packet> = StructEndecBuilder.of(
                 Data.ENDEC.fieldOf("data") { it.data },
                 Endec.INT.fieldOf("updateFlag") { it.updateFlag },
-                ::Packet
+                AttributeConfigManager::Packet
             )
 
             val PACKET_ID = CustomPacketPayload.Type<Packet>(NetworkingChannels.RELOAD)
@@ -70,11 +71,11 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
     )
     {
         companion object {
-            val ENDEC = StructEndecBuilder.of(
+            val ENDEC: StructEndec<Data> = StructEndecBuilder.of(
                 Endecs.RESOURCE.keyOf(AttributeOverride.ENDEC).fieldOf("overrides") { it.overrides },
                 Endecs.RESOURCE.keyOf(Endecs.RESOURCE.keyOf(AttributeFunction.ENDEC)).fieldOf("functions") { it.functions },
                 Endecs.RESOURCE.keyOf(EntityTypeData.ENDEC).fieldOf("entity_types") { it.entityTypes },
-                ::Data
+                AttributeConfigManager::Data
             )
         }
     }
@@ -141,7 +142,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
     }
 
     /**
-     * Gets an [AttributeContainer] based on the given [EntityType] and the provided [LivingEntity].
+     * Gets an [AttributeMap] based on the given [EntityType] and the provided [LivingEntity].
      * Useful for constructing a container based on the handler's state.
      */
     fun getContainer(type: EntityType<out LivingEntity>, entity: LivingEntity): AttributeMap = this.handler.getContainer(type, entity)
@@ -172,7 +173,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
         DataAttributes.LOGGER.info("Updated manager with {} entries & {} entity-types. :: update flag [#{}]", attributeData.size, this.entityTypes.size, updateFlag)
     }
 
-    private fun insertOverrides(overrides: Map<ResourceLocation, AttributeOverride>, AttributeData: MutableMap<ResourceLocation, AttributeData>) {
+    private fun insertOverrides(overrides: Map<ResourceLocation, AttributeOverride>, attributeData: MutableMap<ResourceLocation, AttributeData>) {
         for ((id, override) in overrides) {
             if (!BuiltInRegistries.ATTRIBUTE.containsKey(id)) {
                 DataAttributes.LOGGER.warn("Attribute [$id] that was targeted for override is not registered. This has been skipped.")
@@ -185,7 +186,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
             if (override.min.isNaN()) {
                 override.min = attribute.`data_attributes$min_fallback`()
             }
-            AttributeData[id] = AttributeData(override)
+            attributeData[id] = AttributeData(override)
         }
     }
 
