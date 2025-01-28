@@ -1,8 +1,17 @@
 name: Publish
-on: workflow_dispatch
-
+on:
+  push:
+    branches-ignore:
+      - master
+      - "**/dev**"
+      - "**-dev"
+      - "**-dev**"
+      - dev
+    paths-ignore:
+      - ".gitignore"
+      - ".github/ISSUE_TEMPLATE"
 jobs:
-  build-and-deploy:
+  publish:
     env:
       BRANCH_PREFIX: $(cat gradle.properties | grep mod_version | cut -d'+' -f2)
     strategy:
