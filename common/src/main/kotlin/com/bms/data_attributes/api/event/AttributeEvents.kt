@@ -1,13 +1,14 @@
 package com.bms.data_attributes.api.event
 
-import com.bms.data_attributes.api.event.AttributesReloadedEvent.Reloaded
-import net.fabricmc.fabric.api.event.Event
-import net.fabricmc.fabric.api.event.EventFactory
+import com.bms.data_attributes.api.event.AttributeEvents.Reloaded
+import io.wispforest.owo.util.EventSource
+import io.wispforest.owo.util.EventStream
 
 /**
  * Event that allows for logic reliant on config to be ordered after they are **loaded** on both the server and client.
  */
-object AttributesReloadedEvent {
+@Suppress("unused")
+object AttributeEvents {
     /**
      * Triggered on the **server** upon these conditions:
      * - World Startup (if the config is enabled for it)
@@ -17,12 +18,17 @@ object AttributesReloadedEvent {
      * - On sync with the server, primarily upon any join connection or reload.
      */
     @JvmField
-    val EVENT: Event<Reloaded> = EventFactory.createArrayBacked(Reloaded::class.java) {
-        Reloaded { it.forEach(Reloaded::onReloadCompleted) }
-    }
+    val RELOADED: EventSource<Reloaded> = Reloaded.stream.source()
 
     fun interface Reloaded {
         /** When the config data has fully been applied.  */
         fun onReloadCompleted()
+
+        companion object {
+            @JvmField
+            val stream: EventStream<Reloaded> = EventStream { subscribers ->
+                Reloaded { subscribers.forEach { it.onReloadCompleted() } }
+            }
+        }
     }
 }

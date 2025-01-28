@@ -61,7 +61,7 @@ abstract class AttributeMixin implements MutableAttribute {
     @Unique
     protected double data_attributes$clamped(double valueIn) {
         // todo: unify with bus & modified event
-        double value = AttributeModifiedEvents.CLAMPED.invoker().onClamped((Attribute) (Object) this, valueIn);
+        double value = AttributeModifiedEvents.Clamped.stream.sink().onClamped((Attribute) (Object) this, valueIn);
         return Mth.clamp(value, this.data_attributes$min(), this.data_attributes$max());
     }
 

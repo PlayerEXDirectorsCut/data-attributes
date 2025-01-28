@@ -1,7 +1,7 @@
 package com.bms.data_attributes.mixin;
 
 import com.bms.data_attributes.api.DataAttributesAPI;
-import com.bms.data_attributes.config.AttributeConfigManager;
+import com.bms.data_attributes.config.impl.AttributeConfigManager;
 import com.bms.data_attributes.ext.LivingEntityKt;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

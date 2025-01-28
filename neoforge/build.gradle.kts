@@ -32,6 +32,11 @@ dependencies {
         exclude(group = "net.neoforged.fancymodloader", module = "loader")
     }
 
+    forgeRuntimeLibrary("org.sinytra:forgified-fabric-loader:2.5.29+0.16.0+1.21:full")
+    forgeRuntimeLibrary("org.sinytra.forgified-fabric-api:fabric-api-base:0.4.42+d1308dedd1") { exclude(group = "fabric-api")  }
+    forgeRuntimeLibrary("org.sinytra.forgified-fabric-api:fabric-networking-api-v1:4.2.2+a92978fd19") { exclude(group = "fabric-api") }
+    forgeRuntimeLibrary("org.sinytra.forgified-fabric-api:fabric-screen-api-v1:2.0.24+79a4c2b0d1") { exclude(group = "fabric-api") }
+
     // needed because architectury crashes out otherwise (strips jij)
     forgeRuntimeLibrary("io.wispforest:endec:0.1.8")
     forgeRuntimeLibrary("io.wispforest.endec:netty:0.1.4")

@@ -4,7 +4,7 @@ import com.bms.data_attributes.DataAttributes
 import com.bms.data_attributes.DataAttributesClient
 import com.bms.data_attributes.api.attribute.AttributeSupplier
 import com.bms.data_attributes.api.attribute.IAttribute
-import com.bms.data_attributes.config.AttributeConfigManager
+import com.bms.data_attributes.config.impl.AttributeConfigManager
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attribute

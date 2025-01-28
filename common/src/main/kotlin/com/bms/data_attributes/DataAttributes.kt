@@ -6,6 +6,7 @@ import com.bms.data_attributes.config.models.EntityTypesConfig
 import com.bms.data_attributes.config.models.FunctionsConfig
 import com.bms.data_attributes.config.models.OverridesConfig
 import com.bms.data_attributes.networking.ConfigPacketBufs
+import com.bms.data_attributes.networking.NetworkingChannels
 import com.bms.data_attributes.serde.JanksonBuilders
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
@@ -56,11 +57,13 @@ class DataAttributes {
          * Changes are then networked to the client.
          * */
         @JvmStatic
-        fun reload() {
+        fun reload(server: MinecraftServer) {
             reloadConfigs()
 
             MANAGER.update()
             MANAGER.nextUpdateFlag()
+
+            NetworkingChannels.RELOAD.serverHandle(server).send(MANAGER.toPacket())
         }
 
         init {

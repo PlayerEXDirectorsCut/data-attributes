@@ -3,7 +3,7 @@ package com.bms.data_attributes.config.impl
 import com.bms.data_attributes.DataAttributes
 import com.bms.data_attributes.api.EntityInstances
 import com.bms.data_attributes.api.attribute.IAttribute
-import com.bms.data_attributes.api.event.AttributesReloadedEvent
+import com.bms.data_attributes.api.event.AttributeEvents
 import com.bms.data_attributes.config.Cache
 import com.bms.data_attributes.config.entry.ConfigMerger
 import com.bms.data_attributes.config.functions.AttributeFunction
@@ -45,7 +45,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
     data class Tuple<T>(val livingEntity: Class<out LivingEntity>, val value: T)
 
     @JvmRecord
-    data class Packet(val data: Data, val updateFlag: Int) : CustomPacketPayload {
+    data class Packet(val data: Data, val updateFlag: Int) {
         companion object {
             @JvmField
             val ENDEC: StructEndec<Packet> = StructEndecBuilder.of(
@@ -53,12 +53,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
                 Endec.INT.fieldOf("updateFlag") { it.updateFlag },
                 AttributeConfigManager::Packet
             )
-
-            val PACKET_ID = CustomPacketPayload.Type<Packet>(NetworkingChannels.RELOAD)
-            val PACKET_CODEC: StreamCodec<FriendlyByteBuf, Packet> = CodecUtils.toPacketCodec(ENDEC)
         }
-
-        override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> = PACKET_ID
     }
 
     /**
@@ -168,7 +163,7 @@ class AttributeConfigManager(var data: Data = Data(), private val handler: Attri
 
         this.handler.buildContainers(this.entityTypes)
 
-        AttributesReloadedEvent.EVENT.invoker().onReloadCompleted()
+        AttributeEvents.Reloaded.stream.sink().onReloadCompleted()
 
         DataAttributes.LOGGER.info("Updated manager with {} entries & {} entity-types. :: update flag [#{}]", attributeData.size, this.entityTypes.size, updateFlag)
     }

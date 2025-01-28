@@ -1,7 +1,7 @@
 package com.bms.data_attributes.config.impl
 
-import com.bms.data_attributes.config.AttributeConfigManager.Companion.ENTITY_TYPE_INSTANCES
-import com.bms.data_attributes.config.AttributeConfigManager.Tuple
+import com.bms.data_attributes.config.impl.AttributeConfigManager.Companion.ENTITY_TYPE_INSTANCES
+import com.bms.data_attributes.config.impl.AttributeConfigManager.Tuple
 import com.bms.data_attributes.config.entities.EntityTypeData
 import com.bms.data_attributes.mutable.MutableAttributeMap
 import com.bms.data_attributes.mutable.MutableAttributeSupplier

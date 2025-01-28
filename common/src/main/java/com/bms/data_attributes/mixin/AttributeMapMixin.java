@@ -49,7 +49,7 @@ abstract class AttributeMapMixin implements MutableAttributeMap {
 
 	@Inject(method = "onAttributeModified", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$onAttributeModified(AttributeInstance instance, CallbackInfo ci) {
-		ResourceLocation identifier = ((MutableAttributeInstance) instance).data_attributes$get_id();
+		ResourceLocation identifier = instance.data_attributes$get_id();
 		if (identifier != null) {
 			this.data_attributes$tracked.put(identifier, instance);
 		}
@@ -70,7 +70,7 @@ abstract class AttributeMapMixin implements MutableAttributeMap {
 		ResourceLocation identifier = BuiltInRegistries.ATTRIBUTE.getKey(holder.value());
 		if (identifier == null) return original;
 
-		MutableAttributeInstance instance = (MutableAttributeInstance) this.data_attributes$custom.computeIfAbsent(identifier, id -> this.supplier.createInstance(this::onAttributeModified, holder));
+		AttributeInstance instance = this.data_attributes$custom.computeIfAbsent(identifier, id -> this.supplier.createInstance(this::onAttributeModified, holder));
 		if (instance != null) {
 			instance.data_attributes$setContainerCallback((AttributeMap) (Object) this);
 			if (instance.data_attributes$get_id() == null) {
@@ -78,7 +78,7 @@ abstract class AttributeMapMixin implements MutableAttributeMap {
 			}
 		}
 
-		return (AttributeInstance) instance;
+		return instance;
 	}
 
 	@ModifyReturnValue(method = "hasAttribute", at = @At("RETURN"))
@@ -130,14 +130,13 @@ abstract class AttributeMapMixin implements MutableAttributeMap {
 
 	@Inject(method = "assignAllValues", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$setFrom(AttributeMap other, CallbackInfo ci) {
-		MutableAttributeMap mutableMap = (MutableAttributeMap) other;
-		mutableMap.data_attributes$custom().values().forEach(attributeInstance -> {
+		other.data_attributes$custom().values().forEach(attributeInstance -> {
 			Holder<Attribute> holder = attributeInstance.getAttribute();
 			AttributeInstance AttributeInstance = this.getInstance(holder);
 
 			if (AttributeInstance != null) {
 				AttributeInstance.replaceFrom(attributeInstance);
-				AttributeModifiedEvents.MODIFIED.invoker().onModified(
+				AttributeModifiedEvents.Modified.stream.sink().onModified(
 					holder.value(),
 					this.data_attributes$livingEntity,
 					null,
@@ -172,7 +171,7 @@ abstract class AttributeMapMixin implements MutableAttributeMap {
 
 	@Override
 	public void data_attributes$refresh() {
-		this.data_attributes$custom.values().forEach((instance) -> ((MutableAttributeInstance) instance).data_attributes$refresh());
+		this.data_attributes$custom.values().forEach(AttributeInstance::data_attributes$refresh);
 	}
 
 	@Override

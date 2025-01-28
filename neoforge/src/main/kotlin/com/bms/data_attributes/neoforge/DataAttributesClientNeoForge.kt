@@ -6,7 +6,7 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.common.Mod
 
 @Mod(DataAttributes.MOD_ID, dist = [Dist.CLIENT])
-class DataAttributesInitializerClientNeoForge {
+class DataAttributesClientNeoForge {
     init {
         DataAttributesClient.init()
     }

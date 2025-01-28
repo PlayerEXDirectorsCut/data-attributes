@@ -59,10 +59,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.bms.data_attributes.fabric.DataAttributesInitializerFabric"
+      "com.bms.data_attributes.fabric.DataAttributesFabric"
     ],
     "client": [
-      "com.bms.data_attributes.fabric.DataAttributesInitializerClientFabric"
+        "com.bms.data_attributes.fabric.DataAttributesClientFabric"
     ]
   },
   "mixins": [

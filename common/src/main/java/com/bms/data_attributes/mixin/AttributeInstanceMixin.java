@@ -73,7 +73,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 	@Shadow @Final private Map<ResourceLocation, AttributeModifier> permanentModifiers;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void data_attributes$init(Holder<Attribute> attribute, Consumer onDirty, CallbackInfo ci) {
+	private void data_attributes$init(Holder<Attribute> attribute, Consumer<AttributeInstance> onDirty, CallbackInfo ci) {
 		this.data_attributes$id = BuiltInRegistries.ATTRIBUTE.getKey(this.attribute.value());
 	}
 
@@ -86,7 +86,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 	@SuppressWarnings("UnreachableCode")
 	@Inject(method = "calculateValue", at = @At("HEAD"), cancellable = true)
 	private void data_attributes$calculateValue(CallbackInfoReturnable<Double> cir) {
-		MutableAttribute attribute = (MutableAttribute) this.getAttribute().value();
+		Attribute attribute = this.getAttribute().value();
 		StackingFormula formula = attribute.data_attributes$formula();
 
 		// If the formula is set to Flat and there is no associated container, drop out early.
@@ -122,7 +122,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 			attribute.data_attributes$parentsMutable().forEach((parentAttribute, function) -> {
 				if (!function.getEnabled() || function.getBehavior() != StackingBehavior.Add) return;
 
-				AttributeInstance parentInstance = this.data_attributes$container.getInstance((Holder<Attribute>) parentAttribute);
+				AttributeInstance parentInstance = this.data_attributes$container.getInstance(BuiltInRegistries.ATTRIBUTE.wrapAsHolder((Attribute) parentAttribute));
 				if (parentInstance == null) return;
 
 				double multiplier = function.getValue();
@@ -158,7 +158,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 			});
 		}
 
-		cir.setReturnValue(((Attribute) attribute).sanitizeValue(e.get()));
+		cir.setReturnValue(attribute.sanitizeValue(e.get()));
 	}
 
 	@Inject(method = "addModifier", at = @At("HEAD"), cancellable = true)
@@ -224,7 +224,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 	public void data_attributes$actionModifier(final VoidConsumer consumerIn, final AttributeInstance instanceIn, final AttributeModifier modifierIn, final boolean isWasAdded) {
 		if (this.data_attributes$container == null) return;
 
-		MutableAttribute parent = this.getAttribute().value();
+		Attribute parent = this.getAttribute().value();
 
 		for (IAttribute child : parent.data_attributes$childrenMutable().keySet()) {
 			AttributeInstance instance = this.data_attributes$container.getInstance(BuiltInRegistries.ATTRIBUTE.wrapAsHolder((Attribute) child));
@@ -237,14 +237,14 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 
 		this.setDirty();
 
-		LivingEntity livingEntity = ((MutableAttributeMap) this.data_attributes$container).data_attributes$getLivingEntity();
+		LivingEntity livingEntity = (this.data_attributes$container).data_attributes$getLivingEntity();
 
-		AttributeModifiedEvents.MODIFIED.invoker().onModified((Attribute) parent, livingEntity, modifierIn, value, isWasAdded);
+		AttributeModifiedEvents.Modified.stream.sink().onModified(parent, livingEntity, modifierIn, value, isWasAdded);
 
 		for (IAttribute child : parent.data_attributes$childrenMutable().keySet()) {
-			MutableAttributeInstance instance = (MutableAttributeInstance) this.data_attributes$container.getInstance(BuiltInRegistries.ATTRIBUTE.wrapAsHolder((Attribute) child));
+			AttributeInstance instance = this.data_attributes$container.getInstance(BuiltInRegistries.ATTRIBUTE.wrapAsHolder((Attribute) child));
 			if (instance != null) {
-				instance.data_attributes$actionModifier(() -> {}, (AttributeInstance) instance, modifierIn, isWasAdded);
+				instance.data_attributes$actionModifier(() -> {}, instance, modifierIn, isWasAdded);
 			}
 		}
 	}
@@ -264,7 +264,7 @@ abstract class AttributeInstanceMixin implements MutableAttributeInstance, IAttr
 		AttributeModifier modifier = this.getModifier(id);
 		if (modifier == null) return;
 
-		this.data_attributes$actionModifier(() -> ((MutableAttributeModifier) (Object) modifier).data_attributes$updateValue(value), (AttributeInstance) (Object) this, modifier, false);
+		this.data_attributes$actionModifier(() -> modifier.data_attributes$updateValue(value), (AttributeInstance) (Object) this, modifier, false);
 	}
 
 	@Override
