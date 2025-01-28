@@ -1,5 +1,5 @@
 ## Additions 🍎
-- PlayerEX is now on 1.21.1 for fabric & neoforge!
+- DataAttributes is now on 1.21.1 for fabric & neoforge!
 - Add button for Entity Types (will downstream this to 1.20.1 momentarily).
 - I cannot guarantee its stability (specifically in the areas of attribute modification). If there are no issues, I'll stabilize it later.
 ## Changes 🌽
