@@ -10,6 +10,7 @@ on:
     paths-ignore:
       - ".gitignore"
       - ".github/ISSUE_TEMPLATE"
+
 jobs:
   publish:
     env:
